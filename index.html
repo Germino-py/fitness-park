@@ -749,7 +749,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#2bffa0,#3fd8ff);box-shadow:0 0 12px rgba(43,255,160,.6);transition:width 1s cubic-bezier(.2,.8,.2,1)}
 #demo{color:var(--gold);font-size:11px}
 #legal{position:absolute;z-index:999;left:50%;transform:translateX(-50%);bottom:calc(4px + env(safe-area-inset-bottom,0px));font-size:10.5px;color:var(--dim);white-space:nowrap}
-#legal a,#legal button{color:var(--dim);background:none;border:0;padding:0;font:inherit;text-decoration:underline;cursor:pointer}
+#legal a,#legal button{color:var(--muted);background:none;border:0;padding:2px 4px;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;display:inline}
 
 /* ---------- carte : étiquettes */
 .lbl{background:none;border:0;box-shadow:none;padding:0;pointer-events:none;white-space:nowrap;text-align:center;transform:translate(-50%,-50%)}
@@ -895,7 +895,8 @@ textarea{resize:none;min-height:62px;width:100%}
   #map.far .pin i{inset:5.5px}
   #map.far .pin.done i{inset:4px}
   #adminBar{top:calc(122px + env(safe-area-inset-top,0px))}
-  #legal{font-size:9.5px;bottom:2px}
+  #legal{font-size:10px;bottom:1px}
+  #legal .wide{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -964,7 +965,7 @@ textarea{resize:none;min-height:62px;width:100%}
 </div>
 
 <aside id="sheet" class="sheet glass" hidden aria-live="polite"></aside>
-<div id="legal">Site indépendant, non affilié à Fitness Park · données relevées sur fitnesspark.fr le 15/11/2026 · <button id="bAdmin">Admin</button></div>
+<div id="legal">Site indépendant, non affilié à Fitness Park<span class="wide"> · données relevées sur fitnesspark.fr le 15/11/2026</span> · <button id="bAdmin">Admin</button></div>
 
 <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1458,14 +1459,14 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
   order.forEach((x,i)=>drawMarker(x.c,200+Math.round(i*1100/order.length)));
   updateHeader();
   setTimeout(()=>$("intro").classList.add("out"),650);
-  const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900);
+  const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900); else if(h==="admin"&&!isAdmin()) setTimeout(loginModal,900);
   const n=await geocodeMissing();
   if(n&&isAdmin()&&LIVE){ // l'admin enregistre les positions exactes pour tous les visiteurs
     const rows=CLUBS.filter(c=>geoCache[c.id]&&geoCache[c.id].lat&&!db.geo[c.id]).map(c=>({club_id:c.id,lat:geoCache[c.id].lat,lon:geoCache[c.id].lon}));
     if(rows.length) api("/rest/v1/club_geo",{method:"POST",body:rows,prefer:"resolution=merge-duplicates,return=minimal"}).then(()=>rows.forEach(r=>db.geo[r.club_id]=r)).catch(()=>{});
   }
 })();
-addEventListener("hashchange",()=>{ const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) openClub(h,true); });
+addEventListener("hashchange",()=>{ const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) openClub(h,true); else if(h==="admin"&&!isAdmin()&&!document.querySelector(".modal")) loginModal(); });
 </script>
 </body>
 </html>
