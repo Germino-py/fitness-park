@@ -751,6 +751,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#2bffa0,#3fd8ff);box-shadow:0 0 12px rgba(43,255,160,.6);transition:width 1s cubic-bezier(.2,.8,.2,1)}
 #demo{color:var(--gold);font-size:11px}
 #legal{position:absolute;z-index:999;left:50%;transform:translateX(-50%);bottom:calc(4px + env(safe-area-inset-bottom,0px));font-size:10.5px;color:var(--dim);white-space:nowrap}
+#legal .osm{display:none}#legal.osm-on .osm{display:inline}
 #legal a,#legal button{color:var(--muted);background:none;border:0;padding:2px 4px;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;display:inline}
 
 /* ---------- carte : étiquettes */
@@ -761,7 +762,9 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .lbl.city.t1{font:600 13.5px var(--f-d);letter-spacing:.04em;color:#fff}
 .lbl.city.t2{font-weight:600;font-size:12.5px}
 .lbl.city::before{content:"";display:block;width:4px;height:4px;border-radius:50%;background:rgba(238,243,255,.7);margin:0 auto 3px}
-.leaflet-tile-pane{filter:saturate(.6) brightness(.9)}
+/* plan des rues : tuiles OpenStreetMap (sans clé) passées en sombre pour rester dans le thème */
+.leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.55)}
+.leaflet-container .leaflet-tile{background:#e8e8e8}
 /* marqueurs des salles */
 .pin{width:18px;height:18px;border-radius:50%;position:relative;cursor:pointer;transition:transform .2s}
 .pin i{position:absolute;inset:4px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 14px var(--c),0 0 4px var(--c)}
@@ -909,6 +912,7 @@ textarea{resize:none;min-height:62px;width:100%}
   #toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
   #legal{font-size:10px;bottom:1px}
   #legal .wide{display:none}
+  #legal.osm-on .ind{display:none}
 }
 @media (max-width:760px){
   /* panneau ouvert : on masque ce qui dépasserait dessous */
@@ -987,7 +991,7 @@ textarea{resize:none;min-height:62px;width:100%}
 </div>
 
 <aside id="sheet" class="sheet glass" hidden aria-live="polite"></aside>
-<div id="legal">Site indépendant, non affilié à Fitness Park<span class="wide"> · données relevées sur fitnesspark.fr le 15/11/2026</span> · <button id="bAdmin">Admin</button></div>
+<div id="legal"><span class="ind">Site indépendant, non affilié à Fitness Park<span class="wide"> · données relevées sur fitnesspark.fr le 15/11/2026</span> · </span><span class="osm">Plan © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · </span><button id="bAdmin">Admin</button></div>
 
 <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1105,8 +1109,7 @@ async function geocodeMissing(){
 
 /* ================= CARTE ================ */
 const FR_BOUNDS=[[41.3,-5.2],[51.15,9.6]];
-const map = L.map("map",{zoomControl:false,minZoom:5,maxZoom:18,maxBounds:[[38.5,-11],[54,15]],maxBoundsViscosity:.8,zoomSnap:.25,zoomDelta:.75,wheelPxPerZoomLevel:90,attributionControl:true,preferCanvas:false});
-map.attributionControl.setPrefix(false);
+const map = L.map("map",{zoomControl:false,minZoom:5,maxZoom:18,maxBounds:[[38.5,-11],[54,15]],maxBoundsViscosity:.8,zoomSnap:.25,zoomDelta:.75,wheelPxPerZoomLevel:90,attributionControl:false,preferCanvas:false});
 const isMobile = () => innerWidth<=760;
 function fitFrance(anim){ map.fitBounds(FR_BOUNDS,{paddingTopLeft:[10,isMobile()?130:90],paddingBottomRight:[isMobile()?60:20,isMobile()?150:20],animate:!!anim}); }
 fitFrance(false); $("map").classList.toggle("far",map.getZoom()<7.5);
@@ -1116,7 +1119,8 @@ const nbLayer=L.polygon(OUTLINE.nb,{pane:"land",stroke:true,color:"rgba(147,160,
 const frGlow=L.polygon(OUTLINE.fr,{pane:"land",color:"#3fd8ff",weight:7,opacity:.10,fill:false,interactive:false}).addTo(map);
 const frLayer=L.polygon(OUTLINE.fr,{pane:"land",color:"#3fd8ff",weight:1.4,opacity:.75,fillColor:"#0d1626",fillOpacity:.92,interactive:false}).addTo(map);
 const depLayer=L.layerGroup(DEPS.map(d=>L.polygon(d.r,{pane:"deps",color:"#3fd8ff",weight:.8,opacity:.22,fill:false,interactive:false}))).addTo(map);
-const tiles=L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'});
+const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; contributeurs <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'});
+let tileErr=0; tiles.on("tileerror",()=>{ if(++tileErr===6&&tilesOn){ setTiles(false); toast("Le plan des rues est indisponible pour le moment.",1); } }); tiles.on("tileload",()=>{tileErr=0});
 let tilesOn=false;
 const lblLayer=L.layerGroup().addTo(map);
 const lblCache=new Map();
@@ -1140,7 +1144,7 @@ function updateLabels(){
 map.on("zoomend moveend",updateLabels);
 map.on("zoomend",()=>$("map").classList.toggle("far",map.getZoom()<7.5));
 function setTiles(on){ tilesOn=on; if(on){ tiles.addTo(map); frLayer.setStyle({fillOpacity:0}); nbLayer.setStyle({fillOpacity:0}); } else { map.removeLayer(tiles); frLayer.setStyle({fillOpacity:.92}); nbLayer.setStyle({fillOpacity:.9}); }
-  $("bTiles").classList.toggle("on",on); $("bTiles").setAttribute("aria-pressed",on); updateLabels(); }
+  $("bTiles").classList.toggle("on",on); $("legal").classList.toggle("osm-on",on); $("bTiles").setAttribute("aria-pressed",on); updateLabels(); }
 
 /* marqueurs */
 const clubLayer=L.layerGroup().addTo(map);
