@@ -8,6 +8,12 @@
 <meta name="theme-color" content="#05070d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="canonical" href="https://hmgfitness.fr/">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hmgfitness.fr/">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="HMG Fitness">
 <meta property="og:title" content="HMG Fitness · Tous les Fitness Park de France">
 <meta property="og:description" content="Carte interactive, notes sur 10, avis et photos de chaque salle.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -831,6 +837,15 @@ textarea{resize:none;min-height:62px;width:100%}
 .rev .d{font-size:11px;color:var(--dim)}
 .rev .adm{grid-row:1/3;grid-column:3;display:flex;gap:4px}
 .rev.hid{opacity:.45}
+.rev .vt{grid-column:2;display:flex;gap:7px;margin-top:5px}
+.vote{padding:5px 11px;min-height:32px;border-radius:999px;gap:6px;font:600 12.5px var(--f-b);font-variant-numeric:tabular-nums;color:var(--muted)}
+.vote svg.i{width:15px;height:15px}
+.vote.up:hover,.vote.up.on{color:var(--done);border-color:rgba(43,255,160,.45)}
+.vote.down:hover,.vote.down.on{color:var(--danger);border-color:rgba(255,93,115,.45)}
+.vote.up.on{background:rgba(43,255,160,.1);box-shadow:0 0 14px rgba(43,255,160,.22)}
+.vote.down.on{background:rgba(255,93,115,.1);box-shadow:0 0 14px rgba(255,93,115,.22)}
+.vote.on svg.i{fill:currentColor;fill-opacity:.25;animation:vpop .32s ease-out}
+@keyframes vpop{0%{transform:scale(1)}45%{transform:scale(1.35) rotate(-8deg)}100%{transform:scale(1)}}
 .mini{padding:5px 8px;font-size:11.5px;border-radius:9px}
 .empty{color:var(--muted);font-size:13px;padding:18px 4px;text-align:center}
 .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -942,6 +957,8 @@ textarea{resize:none;min-height:62px;width:100%}
   <symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
   <symbol id="i-cam" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
   <symbol id="i-loc" viewBox="0 0 24 24"><path d="M12 22s-8-6.5-8-12a8 8 0 0 1 16 0c0 5.5-8 12-8 12z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
 </defs></svg>
 
@@ -1037,6 +1054,11 @@ let session = store.get("hmg-session", null);
 const isAdmin = () => !!(session && session.admin);
 const db = { reviews:[], photos:[], visits:{}, geo:{}, settings:{show_progress:false} };
 const myRated = store.get("hmg-rated", {});
+/* pouces sur les commentaires : un vote par appareil, identifiant anonyme aléatoire */
+const myVotes = store.get("hmg-votes", {});
+let voterId = store.get("hmg-voter", null);
+if(!/^[0-9a-f]{32}$/.test(voterId||"")){ voterId = uuid().replace(/-/g,"").toLowerCase(); store.set("hmg-voter", voterId); }
+let VOTES = true;
 async function api(path, opt={}){
   const h = { apikey: CONFIG.key }; if(session && session.access_token) h.Authorization = "Bearer " + session.access_token; else if(CONFIG.key.startsWith("eyJ")) h.Authorization = "Bearer " + CONFIG.key;
   let body = opt.body;
@@ -1064,7 +1086,9 @@ async function loadAll(){
   }
   const adm = isAdmin();
   const [rv,ph,st,vi,ge] = await Promise.all([
-    api("/rest/v1/reviews?select=id,club_id,rating,comment,created_at,hidden&order=created_at.desc&limit=10000"),
+    api("/rest/v1/reviews?select=id,club_id,rating,comment,created_at,hidden,up,down&order=created_at.desc&limit=10000")
+      .then(x=>{ VOTES=true; return x; })
+      .catch(()=>{ VOTES=false; return api("/rest/v1/reviews?select=id,club_id,rating,comment,created_at,hidden&order=created_at.desc&limit=10000"); }),
     api("/rest/v1/photos?select=id,club_id,path,approved,by_admin,created_at&order=created_at.desc&limit=5000"),
     api("/rest/v1/settings?select=key,value"),
     api("/rest/v1/visits?select="+(adm?"club_id,visited_on,note":"club_id,visited_on")).catch(()=>[]),
@@ -1249,9 +1273,28 @@ function reviewsHtml(c,st){
       <div class="n" style="color:${r.rating>=8?"var(--done)":r.rating>=5?"var(--cyan)":"var(--todo)"}">${r.rating}</div>
       <div class="t">${r.comment?esc(r.comment):"<i>Note sans commentaire</i>"}</div>
       <div class="d">Anonyme · ${adm?frDateTime(r.created_at):frDate(r.created_at)}${r.hidden?" · en attente":""}</div>
+      ${voteHtml(r)}
       ${adm?`<div class="adm"><button class="mini" data-hide="${r.id}">${r.hidden?"Publier":"Masquer"}</button><button class="mini danger" data-delrev="${r.id}">Suppr.</button></div>`:""}
     </div>`).join("") : `<div class="empty">Aucun avis pour l'instant. Sois le premier à noter cette salle !</div>`;
   return form+items;
+}
+function voteHtml(r){
+  if(!VOTES || !r.comment || r.hidden) return "";
+  const v=myVotes[r.id]||0, u=r.up||0, d=r.down||0;
+  return `<div class="vt"><button type="button" class="vote up${v===1?" on":""}" data-vote="${r.id}" data-v="1" aria-pressed="${v===1}" title="D'accord" aria-label="D'accord, ${u}">${ic("up")}<span>${u}</span></button><button type="button" class="vote down${v===-1?" on":""}" data-vote="${r.id}" data-v="-1" aria-pressed="${v===-1}" title="Pas d'accord" aria-label="Pas d'accord, ${d}">${ic("down")}<span>${d}</span></button></div>`;
+}
+function refreshVotes(r){ const seen=new Set(); document.querySelectorAll('[data-vote="'+r.id+'"]').forEach(b=>{ const box=b.closest(".vt"); if(box&&!seen.has(box)){ seen.add(box); box.outerHTML=voteHtml(r); } }); }
+const voteBusy = {};
+async function vote(id,v){
+  const r=db.reviews.find(x=>x.id===id); if(!r||voteBusy[id]) return;
+  const old=myVotes[id]||0, nv=old===v?0:v;
+  const apply=(o,n)=>{ r.up=Math.max(0,(r.up||0)-(o===1?1:0)+(n===1?1:0)); r.down=Math.max(0,(r.down||0)-(o===-1?1:0)+(n===-1?1:0)); if(n) myVotes[id]=n; else delete myVotes[id]; store.set("hmg-votes",myVotes); };
+  apply(old,nv); refreshVotes(r); voteBusy[id]=1;
+  try{
+    if(LIVE){ const res=await api("/rest/v1/rpc/vote_review",{method:"POST",body:{p_review:id,p_voter:voterId,p_value:nv}}); if(res&&typeof res.up==="number"){ r.up=res.up; r.down=res.down; } }
+    else demo.set("reviews",db.reviews);
+  }catch(e){ apply(nv,old); toast("Vote impossible : "+e.message,1); }
+  delete voteBusy[id]; refreshVotes(r);
 }
 function photosHtml(c,photos){
   const adm=isAdmin();
@@ -1399,7 +1442,7 @@ $("aShowProg").addEventListener("change",async e=>{
 function renderMod(){
   sheetMode="mod"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const pend=db.photos.filter(p=>!p.approved), pendR=db.reviews.filter(r=>r.hidden), last=db.reviews.filter(r=>!r.hidden).slice(0,150);
-  const revRow=r=>`<div class="rev${r.hidden?" hid":""}" style="opacity:1"><div class="n">${r.rating}</div><div class="t"><b data-open="${r.club_id}" style="cursor:pointer">${esc(byId[r.club_id]?.n||r.club_id)}</b> · ${r.comment?esc(r.comment):"<i>sans commentaire</i>"}</div><div class="d">${frDateTime(r.created_at)}</div><div class="adm"><button class="mini${r.hidden?" cy":""}" data-hide="${r.id}">${r.hidden?"Publier":"Masquer"}</button><button class="mini danger" data-delrev="${r.id}">Suppr.</button></div></div>`;
+  const revRow=r=>`<div class="rev${r.hidden?" hid":""}" style="opacity:1"><div class="n">${r.rating}</div><div class="t"><b data-open="${r.club_id}" style="cursor:pointer">${esc(byId[r.club_id]?.n||r.club_id)}</b> · ${r.comment?esc(r.comment):"<i>sans commentaire</i>"}</div><div class="d">${frDateTime(r.created_at)}${VOTES&&r.comment&&!r.hidden?` · <span style="color:var(--done)">${r.up||0} d'accord</span> · <span style="color:var(--danger)">${r.down||0} pas d'accord</span>`:""}</div><div class="adm"><button class="mini${r.hidden?" cy":""}" data-hide="${r.id}">${r.hidden?"Publier":"Masquer"}</button><button class="mini danger" data-delrev="${r.id}">Suppr.</button></div></div>`;
   sh.innerHTML=`<div class="sh-head"><h2>Modération</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
    <div class="grp">Photos à valider (${pend.length})</div>
    ${pend.length?`<div class="gal">${pend.map(p=>`<figure data-img="${p.id}"><img src="${esc(photoUrl(p))}" alt="" loading="lazy"><span class="tag p">${esc(byId[p.club_id]?.n||p.club_id)}</span><div class="adm"><button class="mini" data-approve="${p.id}">Valider</button><button class="mini danger" data-delph="${p.id}">Suppr.</button></div></figure>`).join("")}</div>`:`<div class="empty">Rien à valider.</div>`}
@@ -1454,6 +1497,7 @@ document.addEventListener("click",async e=>{
   const op=t.closest("[data-open]"); if(op&&!t.closest("button:not([data-open])")){ $("sugg").hidden=true; openClub(op.dataset.open,true); return; }
   const tb=t.closest("[data-tab]"); if(tb){ clubTab=tb.dataset.tab; renderClub(); return; }
   const rt=t.closest("[data-rate]"); if(rt){ draftRating=+rt.dataset.rate; document.querySelectorAll("[data-rate]").forEach(b=>{const n=+b.dataset.rate; b.className=n===draftRating?"sel":n<draftRating?"lit":""; b.setAttribute("aria-checked",n===draftRating);}); $("rSend").disabled=false; return; }
+  const vb=t.closest("[data-vote]"); if(vb){ vote(vb.dataset.vote,+vb.dataset.v); return; }
   if(t.closest("#rSend")){ sendReview(); return; }
   const hd=t.closest("[data-hide]"); if(hd){ const r=db.reviews.find(x=>x.id===hd.dataset.hide); if(!r) return; try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"PATCH",body:{hidden:!r.hidden},prefer:"return=minimal"}); r.hidden=!r.hidden; if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
   const dr=t.closest("[data-delrev]"); if(dr){ if(dr.dataset.sure!=="1"){ dr.dataset.sure="1"; dr.textContent="Sûr ?"; return; } const r=db.reviews.find(x=>x.id===dr.dataset.delrev); try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"DELETE"}); db.reviews=db.reviews.filter(x=>x!==r); if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
