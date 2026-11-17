@@ -837,6 +837,15 @@ textarea{resize:none;min-height:62px;width:100%}
 .rev .d{font-size:11px;color:var(--dim)}
 .rev .adm{grid-row:1/3;grid-column:3;display:flex;gap:4px}
 .rev.hid{opacity:.45}
+.mine-row{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;margin:-4px 0 16px}
+.mine-row span{font-size:11.5px;color:var(--dim)}
+.mine-btn.on{color:var(--gold);border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.1);box-shadow:0 0 16px rgba(255,209,102,.2)}
+.mine-btn.on svg.i{animation:vpop .32s ease-out}
+.pin.mine i{inset:2px;box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 18px var(--c)}
+.pin.mine i::after{content:"";position:absolute;left:50%;top:44%;width:3px;height:6px;border:solid #05070d;border-width:0 2px 2px 0;transform:translate(-50%,-50%) rotate(45deg)}
+.dot.mine{background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.bar.mine i{background:linear-gradient(90deg,#ffd166,#ff7a3d);box-shadow:0 0 12px rgba(255,209,102,.55)}
+.chip.mine{color:var(--gold);border-color:rgba(255,209,102,.35)}
 .rev .vt{grid-column:2;display:flex;gap:7px;margin-top:5px}
 .vote{padding:5px 11px;min-height:32px;border-radius:999px;gap:6px;font:600 12.5px var(--f-b);font-variant-numeric:tabular-nums;color:var(--muted)}
 .vote svg.i{width:15px;height:15px}
@@ -959,6 +968,7 @@ textarea{resize:none;min-height:62px;width:100%}
   <symbol id="i-loc" viewBox="0 0 24 24"><path d="M12 22s-8-6.5-8-12a8 8 0 0 1 16 0c0 5.5-8 12-8 12z"/><circle cx="12" cy="10" r="3"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
 </defs></svg>
 
@@ -981,6 +991,7 @@ textarea{resize:none;min-height:62px;width:100%}
   <button id="aMod" class="mini">Modération <span class="badge" id="aPend" hidden>0</span></button>
   <button id="aVisits" class="mini">Mes visites</button>
   <label class="toggle mini" style="padding:0 6px"><input type="checkbox" id="aShowProg"> Progression publique</label>
+  <label class="toggle mini" style="padding:0 6px" title="Les visiteurs peuvent marquer les salles où ils sont allés (visible seulement par eux)"><input type="checkbox" id="aVisitorVis"> Salles des visiteurs</label>
   <button id="aRoute" class="mini">Tournée</button>
   <button id="aOut" class="mini ghost">Quitter</button>
 </div>
@@ -990,7 +1001,9 @@ textarea{resize:none;min-height:62px;width:100%}
   <div class="lg"><span class="dot todo"></span><span id="lgTodo">Salle ouverte</span></div>
   <div class="lg" id="lgDone" hidden><span class="dot done"></span>Visitée par Mino</div>
   <div class="lg"><span class="dot soon"></span>Ouverture prochaine</div>
+  <div class="lg" id="lgMine" hidden><span class="dot mine"></span>Mes salles</div>
   <div id="progBox" hidden><div class="lg" style="color:var(--ink)"><b id="progTxt"></b></div><div class="bar"><i id="progBar" style="width:0"></i></div></div>
+  <div id="mineBox" hidden><div class="lg" style="color:var(--ink)"><b id="mineTxt"></b></div><div class="bar mine"><i id="mineBar" style="width:0"></i></div></div>
   <div id="demo" hidden>Mode démo : avis et photos restent sur cet appareil</div>
 </div>
 
@@ -1103,6 +1116,10 @@ function migrateOldVisits(){ const old=store.get("fp-visited-v1",{}); const o={}
 const photoUrl = p => p.dataUrl || (CONFIG.url + "/storage/v1/object/public/photos/" + p.path);
 const showProgress = () => isAdmin() || db.settings.show_progress===true;
 const visited = id => showProgress() && !!db.visits[id];
+/* salles visitées par un visiteur : gardées seulement sur son appareil, jamais envoyées */
+const myVisits = store.get("hmg-my-visits", {});
+const mineOn = () => !isAdmin() && db.settings.visitor_visits !== false;
+const mine = id => mineOn() && !!myVisits[id];
 
 function stats(id){
   const rs = db.reviews.filter(r=>r.club_id===id && !r.hidden);
@@ -1175,10 +1192,10 @@ const clubLayer=L.layerGroup().addTo(map);
 const markers={};
 let selected=null, startMarker=null, routeLine=null;
 function pinIcon(c,anim){
-  const v=visited(c.id), a=avgOf(c.id), col=v?"var(--done)":c.s?"var(--soon)":"var(--todo)";
+  const v=visited(c.id), m=mine(c.id), a=avgOf(c.id), col=m?"var(--gold)":v?"var(--done)":c.s?"var(--soon)":"var(--todo)";
   const zoomTag = a!=null && map.getZoom()>=9 ? `<b>${fmt1(a)}</b>` : "";
   return L.divIcon({className:"",iconSize:[18,18],iconAnchor:[9,9],
-    html:`<div class="pin${v?" done":""}${c.s&&!v?" soon":""}${selected===c.id?" sel":""}${anim?" pop-in":""}" style="--c:${col};${anim?"animation-delay:"+anim+"ms":""}"><i></i>${zoomTag}</div>`});
+    html:`<div class="pin${v?" done":""}${m?" mine":""}${c.s&&!v&&!m?" soon":""}${selected===c.id?" sel":""}${anim?" pop-in":""}" style="--c:${col};${anim?"animation-delay:"+anim+"ms":""}"><i></i>${zoomTag}</div>`});
 }
 function drawMarker(c,anim){
   const p=pos(c); if(!p||isDom(c)) return;
@@ -1207,6 +1224,9 @@ function updateHeader(){
   $("lgDone").hidden=!sp; $("progBox").hidden=!sp;
   $("lgTodo").textContent=sp?"À visiter":"Salle ouverte";
   if(sp){ $("progTxt").textContent=`${CONFIG.owner} : ${nVis} / ${CLUBS.length} salles visitées`; requestAnimationFrame(()=>$("progBar").style.width=(100*nVis/CLUBS.length)+"%"); }
+  const nMine=Object.keys(myVisits).filter(id=>byId[id]).length, mo=mineOn()&&nMine>0;
+  $("lgMine").hidden=!mo; $("mineBox").hidden=!mo;
+  if(mo){ $("mineTxt").textContent=`Mes salles : ${nMine} / ${CLUBS.length}`; requestAnimationFrame(()=>$("mineBar").style.width=(100*nMine/CLUBS.length)+"%"); }
   $("demo").hidden=LIVE;
   const pend=db.photos.filter(p=>!p.approved).length+db.reviews.filter(r=>r.hidden).length; $("aPend").hidden=!pend; $("aPend").textContent=pend;
 }
@@ -1249,6 +1269,7 @@ function renderClub(){
       <a class="btn pri" href="${gmaps}" target="_blank" rel="noopener">${ic("nav")} Itinéraire</a>
       <a class="btn" href="${esc(c.u)}" target="_blank" rel="noopener">${ic("ext")} Site officiel</a>
     </div>
+    ${mineOn()?mineHtml(c):""}
     <div class="tabs" role="tablist">
       <button role="tab" data-tab="avis" aria-selected="${clubTab==="avis"}">Avis (${st.n})</button>
       <button role="tab" data-tab="photos" aria-selected="${clubTab==="photos"}">Photos (${photos.filter(x=>x.approved).length})</button>
@@ -1257,6 +1278,20 @@ function renderClub(){
     ${adm?adminClubHtml(c):""}
   </div>`;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ const fg=sh.querySelector(".fg"); if(fg) fg.style.strokeDashoffset=fg.dataset.off; }));
+}
+function mineHtml(c){
+  const d=myVisits[c.id];
+  return `<div class="mine-row"><button type="button" class="mine-btn${d?" on":""}" data-mine="${c.id}" aria-pressed="${!!d}">${ic("check")} ${d?"J'y suis allé · "+frDate(d):"J'y suis déjà allé"}</button><span>${d?"Recliquer pour retirer. ":""}Visible seulement par toi</span></div>`;
+}
+function toggleMine(id){
+  const c=byId[id]; if(!c) return;
+  if(myVisits[id]) delete myVisits[id]; else myVisits[id]=today();
+  store.set("hmg-my-visits",myVisits);
+  drawMarker(c); updateHeader();
+  const row=document.querySelector(".mine-row"); if(row&&selected===id) row.outerHTML=mineHtml(c);
+  if(sheetMode==="list") renderList();
+  const n=Object.keys(myVisits).filter(k=>byId[k]).length;
+  if(myVisits[id]) toast(n===1?"Première salle ajoutée ! Tes salles apparaissent en doré sur la carte.":`Ajoutée à tes salles : ${n} / ${CLUBS.length}`);
 }
 function reviewsHtml(c,st){
   const adm=isAdmin(), already=myRated[c.id];
@@ -1365,16 +1400,17 @@ function renderList(){
   const groups=[];
   if(listSort==="note"){ rows.sort((a,b)=>(avgOf(b.id)??-1)-(avgOf(a.id)??-1)||(STATS[b.id]?.n||0)-(STATS[a.id]?.n||0)||a.n.localeCompare(b.n,"fr")); groups.push(["Les mieux notées",rows]); }
   else if(listSort==="dep"){ const m={}; rows.forEach(c=>(m[c.d]=m[c.d]||[]).push(c)); Object.keys(m).sort().forEach(k=>groups.push([k+" · "+depName(m[k][0]),m[k].sort((a,b)=>a.n.localeCompare(b.n,"fr"))])); }
+  else if(listSort==="mine"&&mineOn()){ const l=rows.filter(c=>myVisits[c.id]).sort((a,b)=>myVisits[b.id].localeCompare(myVisits[a.id])||a.n.localeCompare(b.n,"fr")); if(l.length) groups.push(["Mes salles · "+l.length+" / "+CLUBS.length,l]); }
   else if(listSort==="near"&&me){ rows.sort((a,b)=>dkm(a)-dkm(b)); groups.push(["Autour de toi",rows]); }
   else groups.push(["De A à Z",rows.sort((a,b)=>a.n.localeCompare(b.n,"fr"))]);
-  const html=groups.map(([t,l])=>l.length?`<div class="grp">${esc(t)}</div>`+l.map(c=>{ const a=avgOf(c.id), v=visited(c.id);
-    return `<div class="item${selected===c.id?" sel":""}" data-open="${c.id}"><span class="dot ${v?"done":c.s?"soon":"todo"}"></span><b>${esc(c.n)}</b>
-      <span>${esc(c.c||"")} ${esc(c.cp||"")}${listSort==="near"&&me?" · "+Math.round(dkm(c))+" km":""}</span>
+  const html=groups.map(([t,l])=>l.length?`<div class="grp">${esc(t)}</div>`+l.map(c=>{ const a=avgOf(c.id), v=visited(c.id), m=mine(c.id);
+    return `<div class="item${selected===c.id?" sel":""}" data-open="${c.id}"><span class="dot ${m?"mine":v?"done":c.s?"soon":"todo"}"></span><b>${esc(c.n)}</b>
+      <span>${esc(c.c||"")} ${esc(c.cp||"")}${listSort==="near"&&me?" · "+Math.round(dkm(c))+" km":""}${listSort==="mine"&&m?" · "+frDate(myVisits[c.id]):""}</span>
       <em>${a!=null?fmt1(a):"–"}<small>${STATS[c.id]?STATS[c.id].n+" avis":"/ 10"}</small></em></div>`}).join(""):"").join("");
   sh.innerHTML=`<div class="sh-head"><h2>Toutes les salles</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
    <div class="sh-body"><div class="lst-tools"><input id="lq" type="search" placeholder="Filtrer…" value="${esc(listQ)}" aria-label="Filtrer la liste">
-     <select id="ls" aria-label="Trier">${[["note","Mieux notées"],["az","A → Z"],["dep","Département"],...(me?[["near","Autour de moi"]]:[])].map(([k,t])=>`<option value="${k}"${k===listSort?" selected":""}>${t}</option>`).join("")}</select></div>
-     <div id="lrows">${html||'<div class="empty">Aucune salle ne correspond.</div>'}</div></div>`;
+     <select id="ls" aria-label="Trier">${[["note","Mieux notées"],["az","A → Z"],["dep","Département"],...(me?[["near","Autour de moi"]]:[]),...(mineOn()?[["mine","Mes salles"]]:[])].map(([k,t])=>`<option value="${k}"${k===listSort?" selected":""}>${t}</option>`).join("")}</select></div>
+     <div id="lrows">${html||(listSort==="mine"&&mineOn()&&!q?'<div class="empty">Tu n\'as encore ajouté aucune salle. Ouvre une salle et clique sur « J\'y suis déjà allé ».</div>':'<div class="empty">Aucune salle ne correspond.</div>')}</div></div>`;
   const lq=$("lq"); lq.addEventListener("input",()=>{ listQ=lq.value; const p=lq.selectionStart; renderList(); const n=$("lq"); n.focus(); n.setSelectionRange(p,p); });
   $("ls").addEventListener("change",e=>{ listSort=e.target.value; renderList(); });
 }
@@ -1432,12 +1468,18 @@ function loginModal(){
     }catch(err){ session=null; $("lmsg").innerHTML=`<div class="msg err">${esc(err.message)}</div>`; }
   });
 }
-function applyAdminUi(){ $("adminBar").hidden=!isAdmin(); $("aShowProg").checked=db.settings.show_progress===true; drawStart(); $("bAdmin").textContent=isAdmin()?"Admin connecté":"Admin"; }
+function applyAdminUi(){ $("adminBar").hidden=!isAdmin(); $("aShowProg").checked=db.settings.show_progress===true; $("aVisitorVis").checked=db.settings.visitor_visits!==false; drawStart(); $("bAdmin").textContent=isAdmin()?"Admin connecté":"Admin"; }
 async function reloadEverything(){ try{ await loadAll(); }catch(e){ toast("Impossible de charger les avis : "+e.message,1); } computeStats(); refreshMarkers(); updateHeader(); applyAdminUi(); if(sheetMode==="club") renderClub(); else if(sheetMode==="list") renderList(); else if(sheetMode==="mod") renderMod(); else if(sheetMode==="visits") renderVisits(); }
 $("bAdmin").addEventListener("click",()=>isAdmin()?null:loginModal());
 $("aOut").addEventListener("click",async()=>{ session=null; store.set("hmg-session",null); if(routeLine){map.removeLayer(routeLine);routeLine=null;} await reloadEverything(); toast("Déconnecté."); });
 $("aShowProg").addEventListener("change",async e=>{
   const on=e.target.checked; try{ if(LIVE) await api("/rest/v1/settings?key=eq.show_progress",{method:"PATCH",body:{value:on},prefer:"return=minimal"}); db.settings.show_progress=on; if(!LIVE) demo.set("settings",db.settings); updateHeader(); toast(on?"Ta progression est maintenant visible par tous.":"Ta progression est masquée au public."); }
+  catch(err){ e.target.checked=!on; toast(err.message,1); } });
+$("aVisitorVis").addEventListener("change",async e=>{
+  const on=e.target.checked;
+  try{ if(LIVE) await api("/rest/v1/settings",{method:"POST",body:{key:"visitor_visits",value:on},prefer:"resolution=merge-duplicates,return=minimal"});
+    db.settings.visitor_visits=on; if(!LIVE) demo.set("settings",db.settings);
+    toast(on?"Les visiteurs peuvent marquer les salles où ils sont allés.":"Option coupée : les visiteurs ne voient plus « Mes salles ». Leurs choix restent sur leur appareil."); }
   catch(err){ e.target.checked=!on; toast(err.message,1); } });
 function renderMod(){
   sheetMode="mod"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
@@ -1497,6 +1539,7 @@ document.addEventListener("click",async e=>{
   const op=t.closest("[data-open]"); if(op&&!t.closest("button:not([data-open])")){ $("sugg").hidden=true; openClub(op.dataset.open,true); return; }
   const tb=t.closest("[data-tab]"); if(tb){ clubTab=tb.dataset.tab; renderClub(); return; }
   const rt=t.closest("[data-rate]"); if(rt){ draftRating=+rt.dataset.rate; document.querySelectorAll("[data-rate]").forEach(b=>{const n=+b.dataset.rate; b.className=n===draftRating?"sel":n<draftRating?"lit":""; b.setAttribute("aria-checked",n===draftRating);}); $("rSend").disabled=false; return; }
+  const mb=t.closest("[data-mine]"); if(mb){ toggleMine(mb.dataset.mine); return; }
   const vb=t.closest("[data-vote]"); if(vb){ vote(vb.dataset.vote,+vb.dataset.v); return; }
   if(t.closest("#rSend")){ sendReview(); return; }
   const hd=t.closest("[data-hide]"); if(hd){ const r=db.reviews.find(x=>x.id===hd.dataset.hide); if(!r) return; try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"PATCH",body:{hidden:!r.hidden},prefer:"return=minimal"}); r.hidden=!r.hidden; if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
