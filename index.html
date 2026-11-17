@@ -700,10 +700,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 html{height:100%;margin:0;overflow:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{position:fixed;inset:0;margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--f-b);overflow:hidden;overscroll-behavior:none;touch-action:pan-x pan-y;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 #map{position:absolute;inset:0;background:
-  radial-gradient(1200px 800px at 55% 40%,rgba(var(--a-rgb),.07),transparent 60%),
-  radial-gradient(900px 600px at 20% 90%,rgba(var(--a-rgb),.03),transparent 60%),
-  linear-gradient(rgba(var(--a-rgb),.035) 1px,transparent 1px) 0 0/48px 48px,
-  linear-gradient(90deg,rgba(var(--a-rgb),.035) 1px,transparent 1px) 0 0/48px 48px,
+  radial-gradient(1200px 800px at 55% 40%,rgba(63,216,255,.07),transparent 60%),
+  radial-gradient(900px 600px at 20% 90%,rgba(255,106,43,.05),transparent 60%),
+  linear-gradient(rgba(63,216,255,.035) 1px,transparent 1px) 0 0/48px 48px,
+  linear-gradient(90deg,rgba(63,216,255,.035) 1px,transparent 1px) 0 0/48px 48px,
   var(--bg)}
 .leaflet-container{font-family:var(--f-b)}
 .glass{background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--stroke);border-radius:var(--r);box-shadow:0 10px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
@@ -814,11 +814,11 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 #legend{position:absolute;z-index:1000;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));padding:12px 14px;display:grid;gap:6px;font-size:12px;max-width:calc(100% - 100px)}
 .lg{display:flex;align-items:center;gap:8px;color:var(--muted)}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
-.dot.todo{background:var(--todo);box-shadow:0 0 6px var(--todo)}.dot.done{background:var(--done);box-shadow:0 0 10px var(--done)}.dot.soon{background:transparent;box-shadow:none;border:1.5px dashed var(--soon);box-sizing:border-box}
+.dot.todo{background:var(--todo);box-shadow:0 0 10px var(--todo)}.dot.done{background:var(--done);box-shadow:0 0 10px var(--done)}.dot.soon{background:var(--soon);box-shadow:0 0 10px var(--soon)}
 #legend .ttl{font:600 11px var(--f-d);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
 #progBox{padding-top:4px;border-top:1px solid var(--stroke);display:grid;gap:5px}
 .bar{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--a3),var(--a1));box-shadow:0 0 12px rgba(var(--done-rgb),.6);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#2bffa0,#3fd8ff);box-shadow:0 0 12px rgba(43,255,160,.6);transition:width 1s cubic-bezier(.2,.8,.2,1)}
 #demo{color:var(--gold);font-size:11px}
 #legal{position:absolute;z-index:999;left:50%;transform:translateX(-50%);bottom:calc(4px + env(safe-area-inset-bottom,0px));font-size:10.5px;color:var(--dim);white-space:nowrap}
 #legal .osm{display:none}#legal.osm-on .osm{display:inline}
@@ -826,7 +826,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 
 /* ---------- carte : étiquettes */
 .lbl{background:none;border:0;box-shadow:none;padding:0;pointer-events:none;white-space:nowrap;text-align:center;transform:translate(-50%,-50%)}
-.lbl.dep{font:600 11px var(--f-d);letter-spacing:.22em;text-transform:uppercase;color:rgba(var(--a-rgb),.55);text-shadow:0 0 12px rgba(var(--a-rgb),.35)}
+.lbl.dep{font:600 11px var(--f-d);letter-spacing:.22em;text-transform:uppercase;color:rgba(63,216,255,.55);text-shadow:0 0 12px rgba(63,216,255,.35)}
 .lbl.dep small{display:block;font:500 9.5px var(--f-b);letter-spacing:.1em;color:rgba(147,160,184,.6)}
 .lbl.city{font:500 11.5px var(--f-b);color:rgba(238,243,255,.82);text-shadow:0 0 4px #05070d,0 0 10px #05070d}
 .lbl.city.t1{font:600 13.5px var(--f-d);letter-spacing:.04em;color:#fff}
@@ -837,18 +837,18 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .leaflet-container .leaflet-tile{background:#e8e8e8}
 /* marqueurs des salles */
 .pin{width:18px;height:18px;border-radius:50%;position:relative;cursor:pointer;transition:transform .2s}
-.pin i{position:absolute;inset:4px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 10px var(--c),0 0 3px var(--c)}
+.pin i{position:absolute;inset:4px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 14px var(--c),0 0 4px var(--c)}
 .pin.soon i{background:transparent;border:2px dashed var(--c)}
 .pin.done i{inset:2px;box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 20px var(--c)}
 .pin.done::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--c);opacity:.5;animation:ring 2.4s ease-out infinite}
 .pin:hover{transform:scale(1.35)}
 .pin.sel{transform:scale(1.5)}
-.pin.sel::before{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--cyan);box-shadow:0 0 18px var(--cyan)}
-.pin b{position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);font:700 9.5px var(--f-d);color:var(--a1);text-shadow:0 0 6px #05070d,0 0 3px #05070d;white-space:nowrap}
+.pin.sel::before{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid #3fd8ff;box-shadow:0 0 18px #3fd8ff}
+.pin b{position:absolute;left:50%;bottom:calc(100% + 1px);transform:translateX(-50%);font:700 9.5px var(--f-d);color:var(--gold);text-shadow:0 0 6px #05070d,0 0 3px #05070d;white-space:nowrap}
 .pop-in{animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
 @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes ring{0%{transform:scale(.7);opacity:.7}100%{transform:scale(1.8);opacity:0}}
-.start-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));display:grid;place-items:center;box-shadow:0 0 22px rgba(var(--a-rgb),.6)}
+.start-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:linear-gradient(135deg,#3fd8ff,#6c7bff);display:grid;place-items:center;box-shadow:0 0 22px rgba(63,216,255,.6)}
 .start-pin span{transform:rotate(45deg);font:700 12px var(--f-d);color:#05070d}
 .leaflet-tooltip.tip{background:var(--glass2);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--stroke2);color:var(--ink);border-radius:10px;font:600 12px var(--f-b);box-shadow:0 6px 20px rgba(0,0,0,.4);padding:5px 9px}
 .leaflet-tooltip.tip::before{display:none}
@@ -909,7 +909,7 @@ textarea{resize:none;min-height:62px;width:100%}
 .pin.mine i{inset:2px;box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 18px var(--c)}
 .pin.mine i::after{content:"";position:absolute;left:50%;top:44%;width:3px;height:6px;border:solid #05070d;border-width:0 2px 2px 0;transform:translate(-50%,-50%) rotate(45deg)}
 .dot.mine{background:var(--mine);box-shadow:0 0 10px var(--mine)}
-.bar.mine i{background:linear-gradient(90deg,#ffe08a,#ffc23d);box-shadow:0 0 12px rgba(255,209,102,.55)}
+.bar.mine i{background:linear-gradient(90deg,#ffd166,#ff7a3d);box-shadow:0 0 12px rgba(255,209,102,.55)}
 .chip.mine{color:var(--mine);border-color:rgba(var(--mine-rgb),.35)}
 .rev .vt{grid-column:2;display:flex;gap:7px;margin-top:5px}
 .vote{padding:5px 11px;min-height:32px;border-radius:999px;gap:6px;font:600 12.5px var(--f-b);font-variant-numeric:tabular-nums;color:var(--muted)}
@@ -1016,11 +1016,11 @@ textarea{resize:none;min-height:62px;width:100%}
 }
 
 /* ===== couleur de la marque : une seule couleur d'accent (classe t-volt / t-braise / t-glace sur <html>) ===== */
-html.t-volt{--todo:#8b97b2;--soon:#7c88a3;--soon-rgb:124,136,163;--mine:#ffffff;--mine-rgb:255,255,255;--a1:#ecff8c;--a2:#c8ff1e;--a3:#9fe000;--a-rgb:200,255,30;--a-ink:#0b0d08;--done:#c8ff1e;--done-rgb:200,255,30}
+html.t-volt{--todo:#ff6a2b;--soon:#b18cff;--soon-rgb:177,140,255;--mine:#ffd166;--mine-rgb:255,209,102;--a1:#ecff8c;--a2:#c8ff1e;--a3:#9fe000;--a-rgb:200,255,30;--a-ink:#0b0d08;--done:#2bffa0;--done-rgb:43,255,160}
 html.t-volt .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ecff8c'/%3E%3Cstop offset='.5' stop-color='%23c8ff1e'/%3E%3Cstop offset='1' stop-color='%239fe000'/%3E%3C/linearGradient%3E%3CradialGradient id='gl' cx='.25' cy='0' r='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='k'%3E%3Crect width='120' height='120' fill='%23fff'/%3E%3Cg fill='%23000' transform='translate%2860 51%29 scale%28.66%29 translate%28-60 -60%29'%3E%3Crect x='38' y='40' width='11' height='40' rx='4'/%3E%3Crect x='71' y='40' width='11' height='40' rx='4'/%3E%3Crect x='30.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='83.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='48' y='56' width='24' height='8' rx='1.5'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23g%29'/%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23gl%29'/%3E%3Cpath d='M60 104 C51 93 31 76 31 51 A29 29 0 1 1 89 51 C89 76 69 93 60 104 Z' fill='%230b0d08' mask='url%28%23k%29'/%3E%3C/svg%3E") center/100% 100% no-repeat}
-html.t-braise{--todo:#8b97b2;--soon:#7c88a3;--soon-rgb:124,136,163;--mine:#ffffff;--mine-rgb:255,255,255;--a1:#ffb070;--a2:#ff6a2b;--a3:#e8431a;--a-rgb:255,106,43;--a-ink:#0d0705;--done:#2bffa0;--done-rgb:43,255,160}
+html.t-braise{--todo:#ff6a2b;--soon:#b18cff;--soon-rgb:177,140,255;--mine:#ffd166;--mine-rgb:255,209,102;--a1:#ffb070;--a2:#ff6a2b;--a3:#e8431a;--a-rgb:255,106,43;--a-ink:#0d0705;--done:#2bffa0;--done-rgb:43,255,160}
 html.t-braise .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb070'/%3E%3Cstop offset='.5' stop-color='%23ff6a2b'/%3E%3Cstop offset='1' stop-color='%23e8431a'/%3E%3C/linearGradient%3E%3CradialGradient id='gl' cx='.25' cy='0' r='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='k'%3E%3Crect width='120' height='120' fill='%23fff'/%3E%3Cg fill='%23000' transform='translate%2860 51%29 scale%28.66%29 translate%28-60 -60%29'%3E%3Crect x='38' y='40' width='11' height='40' rx='4'/%3E%3Crect x='71' y='40' width='11' height='40' rx='4'/%3E%3Crect x='30.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='83.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='48' y='56' width='24' height='8' rx='1.5'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23g%29'/%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23gl%29'/%3E%3Cpath d='M60 104 C51 93 31 76 31 51 A29 29 0 1 1 89 51 C89 76 69 93 60 104 Z' fill='%230d0705' mask='url%28%23k%29'/%3E%3C/svg%3E") center/100% 100% no-repeat}
-html.t-glace{--todo:#8b97b2;--soon:#7c88a3;--soon-rgb:124,136,163;--mine:#ffffff;--mine-rgb:255,255,255;--a1:#9cf0ff;--a2:#3fd8ff;--a3:#1a9fe0;--a-rgb:63,216,255;--a-ink:#050b10;--done:#2bffa0;--done-rgb:43,255,160}
+html.t-glace{--todo:#ff6a2b;--soon:#b18cff;--soon-rgb:177,140,255;--mine:#ffd166;--mine-rgb:255,209,102;--a1:#9cf0ff;--a2:#3fd8ff;--a3:#1a9fe0;--a-rgb:63,216,255;--a-ink:#050b10;--done:#2bffa0;--done-rgb:43,255,160}
 html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%239cf0ff'/%3E%3Cstop offset='.5' stop-color='%233fd8ff'/%3E%3Cstop offset='1' stop-color='%231a9fe0'/%3E%3C/linearGradient%3E%3CradialGradient id='gl' cx='.25' cy='0' r='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='k'%3E%3Crect width='120' height='120' fill='%23fff'/%3E%3Cg fill='%23000' transform='translate%2860 51%29 scale%28.66%29 translate%28-60 -60%29'%3E%3Crect x='38' y='40' width='11' height='40' rx='4'/%3E%3Crect x='71' y='40' width='11' height='40' rx='4'/%3E%3Crect x='30.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='83.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='48' y='56' width='24' height='8' rx='1.5'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23g%29'/%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23gl%29'/%3E%3Cpath d='M60 104 C51 93 31 76 31 51 A29 29 0 1 1 89 51 C89 76 69 93 60 104 Z' fill='%23050b10' mask='url%28%23k%29'/%3E%3C/svg%3E") center/100% 100% no-repeat}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -1125,6 +1125,7 @@ const CITIES = [["Paris",48.853,2.349,2103778],["Marseille",43.297,5.381,886040]
 const BAD = new Set(["abruti","andouille","avorton","batard","biatch","bicot","bite","bitembois","bouffon","bougnoul","bougnoule","bougnoulisation","bougnouliser","boukak","bounioul","bouseux","branler","branleur","brise-burnes","cafre","caldoche","casse-bonbon","casse-couille","casse-couilles","chachar","chagasse","chiennasse","chier","chieur","chieurs","chinetoc","chinetoque","chintok","chleuh","chnoque","coche","con","conard","conasse","conchier","connard","connarde","connasse","conne","cons","couille","couilles","couillon","couillonner","counifle","courtaud","cretin","crevard","crevure","cricri","crotte","crouillat","crouille","crouton","cul","debile","deguelasse","demerder","drouille","du schnoc","ducon","duconnot","dugenoux","dugland","duschnock","emmanche","emmerder","emmerdeur","emmerdeuse","empafe","empapaoute","encule","enculer","enculeur","enflure","enfoire","envaselineur","epais","espingoin","etron","feignasse","fiotte","fouteur","foutre","fritz","fumier","garce","gaupe","gland","glandeur","glandeuse","glandouillou","glandu","gnoul","gnoule","gogol","goi","gouilland","gouine","gourde","gourgandine","grognasse","gueniche","guindoule","imbecile","jean-foutre","kikoo","kikou","lacheux","lavette","lopette","magot","makoume","manche","mange-merde","marchandot","margouilliste","mauviette","merdaille","merdaillon","merde","merdeux","merdouillard","michto","minable","minus","miserable","moinaille","moins-que-rien","monacaille","moricaud","nase","naze","negro","niac","niaiseux","niakoue","nique","niquer","pakos","panoufle","patarin","pecque","pedale","pede","pedoque","pequenaud","pet","petasse","peteux","pignouf","pimbeche","pisseux","pissou","pleutre","plouc","porcas","porcasse","poucav","pouf","pouffiasse","poufiasse","pounde","pourriture","punaise","putain","pute","putin","queutard","raclure","raton","ripopee","robespierrot","rosbif","roulure","sagouin","salaud","sale","salop","salopard","salope","saloperie","satrouille","schbeb","schleu","schnoc","schnock","schnoque","sent-la-pisse","sottiseux","sous-merde","stearique","tafiole","tantouserie","tantouze","tapette","tarlouze","tebe","teteux","teube","tocard","trainee","trouduc","truiasse","vaurien","vide-couilles","viedase","vier","xeropineur","yeule","youd","youpin","youpine","youpinisation","youtre","zguegue"]);
 const CSSV = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const ACC = CSSV("--a2")||"#3fd8ff", ACC1 = CSSV("--a1")||ACC, ACC3 = CSSV("--a3")||ACC;
+const MAPC = "#3fd8ff"; // la carte garde ses couleurs d'origine
 const LIVE = /^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(CONFIG.url) && CONFIG.key.length > 20;
 
 const $ = id => document.getElementById(id);
@@ -1216,7 +1217,7 @@ const mine = id => mineOn() && !!myVisits[id];
 const FEATURES = [
   {k:"feat_points", t:"Je suis à la salle + classement", d:"Le visiteur appuie sur « Je suis à la salle » : sa position est vérifiée (moins de 200 m de la salle) et il gagne 10 points, une fois par jour maximum. Classement du mois et général, série de jours d'affilée.", def:false},
   {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Visiteur 48213 » avec ses salles, ses points et sa série.", def:false},
-  {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en blanc, cochées (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
+  {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
 const feat = k => isAdmin() || featOn(k);
@@ -1262,9 +1263,9 @@ fitFrance(false); $("map").classList.toggle("far",map.getZoom()<7.5);
 map.createPane("land").style.zIndex=250; map.createPane("deps").style.zIndex=260; map.createPane("lbls").style.zIndex=450;
 map.getPane("lbls").style.pointerEvents="none";
 const nbLayer=L.polygon(OUTLINE.nb,{pane:"land",stroke:true,color:"rgba(147,160,184,.18)",weight:1,fillColor:"#0a0f1b",fillOpacity:.9,interactive:false}).addTo(map);
-const frGlow=L.polygon(OUTLINE.fr,{pane:"land",color:ACC,weight:7,opacity:.10,fill:false,interactive:false}).addTo(map);
-const frLayer=L.polygon(OUTLINE.fr,{pane:"land",color:ACC,weight:1.4,opacity:.75,fillColor:"#0d1626",fillOpacity:.92,interactive:false}).addTo(map);
-const depLayer=L.layerGroup(DEPS.map(d=>L.polygon(d.r,{pane:"deps",color:ACC,weight:.8,opacity:.22,fill:false,interactive:false}))).addTo(map);
+const frGlow=L.polygon(OUTLINE.fr,{pane:"land",color:MAPC,weight:7,opacity:.10,fill:false,interactive:false}).addTo(map);
+const frLayer=L.polygon(OUTLINE.fr,{pane:"land",color:MAPC,weight:1.4,opacity:.75,fillColor:"#0d1626",fillOpacity:.92,interactive:false}).addTo(map);
+const depLayer=L.layerGroup(DEPS.map(d=>L.polygon(d.r,{pane:"deps",color:MAPC,weight:.8,opacity:.22,fill:false,interactive:false}))).addTo(map);
 const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; contributeurs <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'});
 let tileErr=0; tiles.on("tileerror",()=>{ if(++tileErr===6&&tilesOn){ setTiles(false); toast("Le plan des rues est indisponible pour le moment.",1); } }); tiles.on("tileload",()=>{tileErr=0});
 let tilesOn=false;
@@ -1297,7 +1298,7 @@ const clubLayer=L.layerGroup().addTo(map);
 const markers={};
 let selected=null, startMarker=null, routeLine=null;
 function pinIcon(c,anim){
-  const v=visited(c.id), m=mine(c.id), a=avgOf(c.id), col=m?"var(--mine)":v?"var(--done)":c.s?"var(--soon)":"var(--todo)";
+  const v=visited(c.id), m=mine(c.id), a=avgOf(c.id), col=m?"var(--gold)":v?"var(--done)":c.s?"var(--soon)":"var(--todo)";
   const zoomTag = a!=null && map.getZoom()>=9 ? `<b>${fmt1(a)}</b>` : "";
   return L.divIcon({className:"",iconSize:[18,18],iconAnchor:[9,9],
     html:`<div class="pin${v?" done":""}${m?" mine":""}${c.s&&!v&&!m?" soon":""}${selected===c.id?" sel":""}${anim?" pop-in":""}" style="--c:${col};${anim?"animation-delay:"+anim+"ms":""}"><i></i>${zoomTag}</div>`});
@@ -1403,7 +1404,7 @@ function toggleMine(id){
   const row=document.querySelector(".mine-row"); if(row&&selected===id) row.outerHTML=mineHtml(c);
   if(sheetMode==="list") renderList();
   const n=Object.keys(myVisits).filter(k=>byId[k]).length;
-  if(myVisits[id]) toast(n===1?"Première salle ajoutée ! Tes salles apparaissent en blanc, cochées, sur la carte.":`Ajoutée à tes salles : ${n} / ${CLUBS.length}`);
+  if(myVisits[id]) toast(n===1?"Première salle ajoutée ! Tes salles apparaissent en doré sur la carte.":`Ajoutée à tes salles : ${n} / ${CLUBS.length}`);
 }
 function reviewsHtml(c,st){
   const adm=isAdmin(), already=myRated[c.id];
@@ -1560,7 +1561,7 @@ $("bMe").addEventListener("click",()=>{
   if(!navigator.geolocation){ toast("La localisation n'est pas disponible sur cet appareil.",1); return; }
   navigator.geolocation.getCurrentPosition(g=>{ me={lat:g.coords.latitude,lon:g.coords.longitude};
     if(meMarker) map.removeLayer(meMarker);
-    meMarker=L.circleMarker([me.lat,me.lon],{radius:7,color:"#fff",weight:2,fillColor:ACC,fillOpacity:1}).addTo(map).bindTooltip("Tu es ici",{className:"tip"});
+    meMarker=L.circleMarker([me.lat,me.lon],{radius:7,color:"#fff",weight:2,fillColor:MAPC,fillOpacity:1}).addTo(map).bindTooltip("Tu es ici",{className:"tip"});
     map.flyTo([me.lat,me.lon],11,{duration:1.2}); listSort="near"; openList();
   },()=>toast("Localisation refusée.",1),{enableHighAccuracy:false,timeout:10000});
 });
@@ -1821,7 +1822,7 @@ function drawRoute(keep){
   for(let k=1;k<n;k++){const l=r[r.length-1];let b=-1,bd=1e9;for(let j=1;j<n;j++)if(!used[j]&&D[l][j]<bd){bd=D[l][j];b=j}used[b]=1;r.push(b)}
   let imp=true,g=0; while(imp&&g++<60){imp=false;for(let i=1;i<n-1;i++)for(let k=i+1;k<n;k++){const a=r[i-1],b=r[i],c=r[k],d=k+1<n?r[k+1]:-1;if(D[a][c]+(d>=0?D[b][d]:0)<D[a][b]+(d>=0?D[c][d]:0)-1e-9){let lo=i,hi=k;while(lo<hi){const t=r[lo];r[lo]=r[hi];r[hi]=t;lo++;hi--}imp=true}}}
   let km=0;for(let i=1;i<n;i++)km+=D[r[i-1]][r[i]];
-  routeLine=L.polyline(r.map(i=>[P[i].lat,P[i].lon]),{color:ACC,weight:1.6,opacity:.6,dashArray:"4 6",interactive:false}).addTo(map);
+  routeLine=L.polyline(r.map(i=>[P[i].lat,P[i].lon]),{color:MAPC,weight:1.6,opacity:.6,dashArray:"4 6",interactive:false}).addTo(map);
   $("aRoute").classList.add("on"); if(!keep) toast(`Tournée : ${n-1} salles restantes, environ ${Math.round(km).toLocaleString("fr-FR")} km à vol d'oiseau.`);
 }
 $("aRoute").addEventListener("click",()=>drawRoute(false));
