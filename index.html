@@ -802,8 +802,8 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 #intro.hello p{animation-delay:.12s;font:500 15px var(--f-b);letter-spacing:.01em;text-transform:none;margin-top:12px}
 #intro .gr{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
 #introC{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px;animation-delay:.25s}
-#introC span{font:600 12.5px var(--f-b);padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--stroke);color:var(--ink)}
-#introC span b{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+#introC>span{font:600 12.5px var(--f-b);padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--stroke);color:var(--ink)}
+#introC>span b{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
 #intro .skip{position:absolute;left:0;right:0;text-align:center;bottom:calc(28px + env(safe-area-inset-bottom,0px));font-size:11.5px;color:var(--dim);letter-spacing:.06em;animation:fade 1s 1s both}
 @keyframes hi{from{opacity:0;transform:translateY(14px)}}
 
@@ -1015,6 +1015,41 @@ textarea{resize:none;min-height:62px;width:100%}
   #adminBar .mini{padding:5px 7px;font-size:11px}
 }
 
+/* ---------- profil du sportif sur l'écran d'accueil (feat_profile) */
+#intro{overflow:auto}
+#intro.prof .in{width:min(420px,calc(100% - 32px));padding:24px 0}
+#introC.prof{display:grid;justify-items:stretch;gap:12px;margin-top:22px}
+.pf{text-align:left;padding:0;border-radius:22px;overflow:hidden}
+.pf-top{width:100%;display:flex;align-items:center;gap:12px;padding:14px;background:none;border:0;border-radius:0;box-shadow:none;color:var(--ink);text-align:left;cursor:pointer}
+.pf-top:hover{background:rgba(255,255,255,.03)}
+.pf-av{position:relative;width:52px;height:52px;border-radius:50%;flex:none;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 55%,var(--a3));box-shadow:0 0 22px rgba(var(--a-rgb),.45)}
+.pf-av svg.i{width:28px;height:28px;fill:currentColor;stroke:none}
+.pf-av::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(var(--a-rgb),.6);animation:pfp 2.4s ease-out infinite}
+@keyframes pfp{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.3);opacity:0}}
+.pf-id{display:grid;gap:2px;min-width:0;flex:1}
+.pf-id small{font:600 11px var(--f-d);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.pf-id b{font:700 22px/1.1 var(--f-d);background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pf-id em{font-style:normal;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-id em i{font-style:normal;color:var(--a1);font-weight:600}
+.pf-chev{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.06);border:1px solid var(--stroke);transition:transform .35s}
+.pf.open .pf-chev{transform:rotate(180deg)}
+.pf-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.2,.8,.2,1)}
+.pf.open .pf-more{grid-template-rows:1fr}
+.pf-more>div{overflow:hidden;padding:0 14px}
+.pf.open .pf-more>div{padding-bottom:14px}
+.pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.pf-stats.n2{grid-template-columns:repeat(2,1fr)}
+.pf-stats div{display:grid;gap:2px;text-align:center;padding:10px 4px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--stroke)}
+.pf-stats b{font:700 19px/1.1 var(--f-d)}
+.pf-stats small{font-size:10px;color:var(--muted);line-height:1.2}
+.pf-stats .hot b{color:#ffb347}
+.pf .big-ck{margin-bottom:8px}
+#pf .row2 button{flex:1 1 0;justify-content:center}
+.pf .msg{margin-bottom:10px}
+.pf-hint{font-size:11.5px;color:var(--dim);text-align:center;margin:-2px 0 0;letter-spacing:.04em;animation:fade 1s .8s both}
+.pf-enter{justify-self:center;padding:12px 24px;border-radius:999px;font:700 14px var(--f-d)}
+.brand.pfable{cursor:pointer}
+
 /* ===== couleur de la marque : une seule couleur d'accent (classe t-volt / t-braise / t-glace sur <html>) ===== */
 html.t-volt{--todo:#ff6a2b;--soon:#b18cff;--soon-rgb:177,140,255;--mine:#ffd166;--mine-rgb:255,209,102;--a1:#ecff8c;--a2:#c8ff1e;--a3:#9fe000;--a-rgb:200,255,30;--a-ink:#0b0d08;--done:#2bffa0;--done-rgb:43,255,160}
 html.t-volt .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ecff8c'/%3E%3Cstop offset='.5' stop-color='%23c8ff1e'/%3E%3Cstop offset='1' stop-color='%239fe000'/%3E%3C/linearGradient%3E%3CradialGradient id='gl' cx='.25' cy='0' r='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='k'%3E%3Crect width='120' height='120' fill='%23fff'/%3E%3Cg fill='%23000' transform='translate%2860 51%29 scale%28.66%29 translate%28-60 -60%29'%3E%3Crect x='38' y='40' width='11' height='40' rx='4'/%3E%3Crect x='71' y='40' width='11' height='40' rx='4'/%3E%3Crect x='30.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='83.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='48' y='56' width='24' height='8' rx='1.5'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23g%29'/%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23gl%29'/%3E%3Cpath d='M60 104 C51 93 31 76 31 51 A29 29 0 1 1 89 51 C89 76 69 93 60 104 Z' fill='%230b0d08' mask='url%28%23k%29'/%3E%3C/svg%3E") center/100% 100% no-repeat}
@@ -1044,6 +1079,8 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><rect x="5.2" y="6" width="3.2" height="12" rx="1.3"/><rect x="15.6" y="6" width="3.2" height="12" rx="1.3"/><rect x="2.3" y="8.6" width="2.2" height="6.8" rx="1"/><rect x="19.5" y="8.6" width="2.2" height="6.8" rx="1"/><rect x="8.4" y="10.7" width="7.2" height="2.6" rx=".7"/></symbol>
   <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
   <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22c4 0 7-2.7 7-6.5 0-3.3-2.2-5.4-3.6-7.2-.4 1.8-1.4 3-2.6 3.4.4-3.4-1-6.7-3.8-8.7.2 3.4-1.6 5.4-3.2 7.4C4.8 12.2 5 13.6 5 15.5 5 19.3 8 22 12 22z"/></symbol>
   <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
@@ -1162,7 +1199,7 @@ let myNo = +store.get("hmg-visitor", 0);
 if(!(Number.isInteger(myNo) && myNo>=10000 && myNo<=99999)){ myNo = 10000 + crypto.getRandomValues(new Uint32Array(1))[0] % 90000; store.set("hmg-visitor", myNo); }
 const reviewId = () => uuid().toLowerCase().slice(0,24) + String(myNo).padStart(12,"0");
 const visitorOf = r => { const m=/-0{6,9}([1-9]\d{2,5})$/.exec((r&&r.id)||""); return m?+m[1]:null; };
-const whoHtml = r => { const n=visitorOf(r); return n?`Visiteur ${n}${n===myNo?" (toi)":""}`:"Anonyme"; };
+const whoHtml = r => { const n=visitorOf(r); return n?`Machine ${n}${n===myNo?" (toi)":""}`:"Anonyme"; };
 async function api(path, opt={}){
   const h = { apikey: CONFIG.key }; if(session && session.access_token) h.Authorization = "Bearer " + session.access_token; else if(CONFIG.key.startsWith("eyJ")) h.Authorization = "Bearer " + CONFIG.key;
   let body = opt.body;
@@ -1216,7 +1253,8 @@ const mine = id => mineOn() && !!myVisits[id];
    Une fonctionnalité masquée reste visible pour l'admin connecté, pour tester et filmer. */
 const FEATURES = [
   {k:"feat_points", t:"Je suis à la salle + classement", d:"Le visiteur appuie sur « Je suis à la salle » : sa position est vérifiée (moins de 200 m de la salle) et il gagne 10 points, une fois par jour maximum. Classement du mois et général, série de jours d'affilée.", def:false},
-  {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Visiteur 48213 » avec ses salles, ses points et sa série.", def:false},
+  {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Machine 48213 » avec un compliment, ses salles, ses points et sa série.", def:false},
+  {k:"feat_profile", t:"Profil du sportif à l'accueil", d:"À l'ouverture du site, l'accueil devient le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». On le rouvre en touchant le logo en haut à gauche.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -1330,7 +1368,7 @@ function updateHeader(){
   countUp($("sClubs"),CLUBS.length);
   const po=ptsOn(); $("sPtsBox").hidden=!po; $("stats").classList.toggle("has-pts",po); if(po) countUp($("sPts"),score.points||0);
   countUp($("sRevs"),adm?db.reviews.filter(r=>!r.hidden).length:nMyRevs);
-  $("sRevsL").textContent=adm?"avis":"mes avis"; $("sRevsBox").title=adm?"Avis publiés sur le site":"Les salles que tu as notées depuis cet appareil. Tu es le Visiteur "+myNo;
+  $("sRevsL").textContent=adm?"avis":"mes avis"; $("sRevsBox").title=adm?"Avis publiés sur le site":"Les salles que tu as notées depuis cet appareil. Tu es la Machine "+myNo;
   const pb=$("sProgBox"); pb.hidden=!(mOn||sp); pb.classList.toggle("mine",mOn);
   pb.title=mOn?"Les salles où tu es déjà allé (visible seulement par toi)":"";
   if(mOn||sp) countUp($("sProg"),mOn?nMine:nVis);
@@ -1412,7 +1450,7 @@ function reviewsHtml(c,st){
   const form = already&&!adm ? `<div class="msg">Merci ! Tu as noté cette salle ${already}/10. Les commentaires sont publiés après validation.</div>` : `
     <div class="form" id="rForm">
       <h3>Donne ta note</h3>
-      <p class="who">Tu es le <b>Visiteur ${myNo}</b>. Ce numéro s'affiche à côté de tes avis, à la place de ton nom.</p>
+      <p class="who">Tu es la <b>Machine ${myNo}</b>. Ce surnom s'affiche à côté de tes avis, à la place de ton nom.</p>
       <div class="rate" role="radiogroup" aria-label="Note sur 10">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button type="button" role="radio" aria-checked="${draftRating===n}" data-rate="${n}" class="${draftRating===n?"sel":draftRating>n?"lit":""}">${n}</button>`).join("")}</div>
       <textarea id="rText" maxlength="120" placeholder="Un commentaire ? (facultatif, 15 mots max, publié après validation)" aria-label="Commentaire, 15 mots maximum"></textarea>
       <div class="frow"><span id="rCount">0 / 15 mots</span><button class="cy" id="rSend" ${draftRating?"":"disabled"}>Publier anonymement</button></div>
@@ -1634,8 +1672,9 @@ async function setFeature(k,on){
   db.settings[k]=on; if(!LIVE) demo.set("settings",db.settings);
 }
 function applyFeatures(){
-  const po=ptsOn(), b=$("bCheck");
+  const po=ptsOn(), b=$("bCheck"), br=document.querySelector(".brand");
   b.hidden=!po; $("bRank").hidden=!po;
+  br.classList.toggle("pfable",feat("feat_profile")); br.title=feat("feat_profile")?"Ton profil":""; refreshProfile();
   b.classList.toggle("done",!!score.today); $("bCheckT").textContent=score.today?"Séance validée":"Je suis à la salle";
   b.title=score.today?"Ta séance du jour est validée. Reviens demain pour 10 points de plus.":"Tu es à la salle ? Gagne 10 points (une fois par jour)";
 }
@@ -1685,7 +1724,7 @@ async function doCheckin(){
 function ckWhy(r,c,acc){
   const n=esc(c.n);
   const t={
-    deja:[`${ic("check")}`,"ok","Séance déjà validée",`Ta séance du jour est comptée${r.club&&byId[r.club]?` à <b>${esc(byId[r.club].n)}</b>`:""}. Reviens demain pour 10 points de plus.`],
+    deja:[`${ic("check")}`,"ok","Séance déjà validée",`Ta séance du jour est comptée${r.club&&byId[r.club]?` à <b>${esc(byId[r.club].n)}</b>`:""}. Tu en veux encore : respect. Reviens demain pour 10 points de plus.`],
     loin:[ic("loc"),"","Encore un effort",`Tu es à environ ${fmtDist(r.dist||0)} de <b>${n}</b>. Rapproche-toi de l'entrée (moins de 200 m) et réessaie.`],
     precision:[ic("loc"),"","Position trop imprécise",`Ton téléphone te situe à ±${r.acc||acc} m près. Active la localisation précise (GPS), mets-toi près de l'entrée ou d'une fenêtre, puis réessaie.`],
     salle:[ic("loc"),"","Salle pas encore vérifiée",isAdmin()?`La position exacte de <b>${n}</b> n'est pas encore enregistrée. Ouvre Admin → Fonctionnalités → « Enregistrer les positions ».`:`La position exacte de <b>${n}</b> est en cours de vérification. Réessaie très bientôt.`],
@@ -1698,7 +1737,7 @@ function celebrate(c,r,before){
   const conf=Array.from({length:34},(_,i)=>{ const a=Math.PI*2*i/34+Math.random()*.4, d=110+Math.random()*120;
     return `<i style="background:${cols[i%cols.length]};--x:${Math.round(Math.cos(a)*d)}px;--y:${Math.round(Math.sin(a)*d+60)}px;--r:${Math.round(Math.random()*720-360)}deg;animation-delay:${Math.round(Math.random()*120)}ms"></i>`; }).join("");
   const ici=r.ici>1?`${r.ici}e sportif à pointer ici aujourd'hui`:"Premier sportif à pointer ici aujourd'hui";
-  ckModal(`<div class="confetti">${conf}</div><div class="plus">+10</div><h2>Séance validée !</h2><p>À <b>${esc(c.n)}</b>. Continue comme ça.</p>
+  ckModal(`<div class="confetti">${conf}</div><div class="plus">+10</div><h2>Séance validée !</h2><p>À <b>${esc(c.n)}</b>. ${pickR(["Quelle machine !","Tu es inarrêtable.","Encore une séance dans la poche. Bravo.","Ton corps te dit merci."])}</p>
     <div class="tot">Total <b id="ckTot">${before}</b> points</div>
     <div class="chips2" id="ckChips"><span>${ici}</span></div>
     <div class="row2"><button data-x data-rank>${ic("trophy")} Classement</button><button class="cy" data-x>Fermer</button></div>`);
@@ -1718,13 +1757,13 @@ async function renderRank(load=true){
   const ord=n=>n===1?"1er":n+"e";
   sh.innerHTML=`<div class="sh-head"><h2>Classement</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
     ${!featOn("feat_points")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
-    <div class="me-card"><div class="me-n"><small>Toi</small><b>Visiteur ${myNo}</b></div>
+    <div class="me-card"><div class="me-n"><small>Toi</small><b>Machine ${myNo}</b></div>
       <div><b>${mo?s.month||0:s.points||0}</b><small>points</small></div>
       <div><b>${rk?ord(rk):"–"}</b><small>rang</small></div>
       <div><b>${s.streak||0}</b><small>${(s.streak||0)>1?"jours":"jour"} d'affilée</small></div></div>
     <button class="cy big-ck${s.today?" done":""}" data-checkin>${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>
     <div class="tabs" role="tablist"><button role="tab" data-period="month" aria-selected="${mo}">Ce mois-ci</button><button role="tab" data-period="all" aria-selected="${!mo}">Depuis le début</button></div>
-    <div id="rankList">${rows===undefined?`<div class="empty">Chargement…</div>`:rows===null?`<div class="empty">Classement indisponible pour le moment.</div>`:rows.length?rows.map((r,i)=>`<div class="rk${r.me?" me":""}"><span class="p${i<3?" g"+(i+1):""}">${i+1}</span><b>Visiteur ${r.no}${r.me?" (toi)":""}</b><span>${r.clubs} salle${r.clubs>1?"s":""}</span><em>${r.points}<small> pts</small></em></div>`).join(""):`<div class="empty">Personne n'a encore pointé${mo?" ce mois-ci":""}. Sois le premier : rends-toi dans une salle et appuie sur « Je suis à la salle ».</div>`}</div>
+    <div id="rankList">${rows===undefined?`<div class="empty">Chargement…</div>`:rows===null?`<div class="empty">Classement indisponible pour le moment.</div>`:rows.length?rows.map((r,i)=>`<div class="rk${r.me?" me":""}"><span class="p${i<3?" g"+(i+1):""}">${i+1}</span><b>Machine ${r.no}${r.me?" (toi)":""}</b><span>${r.clubs} salle${r.clubs>1?"s":""}</span><em>${r.points}<small> pts</small></em></div>`).join(""):`<div class="empty">Personne n'a encore pointé${mo?" ce mois-ci":""}. Sois le premier : rends-toi dans une salle et appuie sur « Je suis à la salle ».</div>`}</div>
     <p class="rules">10 points par jour maximum, seulement sur place : ta position est vérifiée (moins de 200 m de la salle) et n'est jamais affichée. Tes points sont liés à cet appareil.</p>
   </div>`;
   if(load){ try{ rankRows[rankPeriod]=LIVE?await rpc("leaderboard",{p_period:rankPeriod,p_voter:voterId}):[]; }catch(e){ rankRows[rankPeriod]=null; if(isMissing(e)) ptsReady=false; }
@@ -1734,12 +1773,13 @@ async function renderRank(load=true){
 /* ---- message de bienvenue */
 function welcome(){
   const it=$("intro"), out=()=>it.classList.add("out");
+  if(feat("feat_profile")){ const last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today()); showProfile(last?"back":"new"); return; }
   if(!feat("feat_welcome")){ setTimeout(out,650); return; }
   const h=new Date().getHours(), last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today());
   const g=h<5?"Séance de nuit ? Respect.":h<11?"Bien réveillé ? La salle t'attend.":h<14?"La séance du midi t'attend.":h<18?"Bon après-midi, sportif.":h<23?"Bonsoir. L'heure de la séance.":"Séance de nuit ? Respect.";
   const nMine=Object.keys(myVisits).filter(id=>byId[id]).length, c=[];
   if(last){
-    $("introT").innerHTML=`Content de te revoir,<br><span class="gr">Visiteur ${myNo}</span>`;
+    $("introT").innerHTML=`Content de te revoir,<br><span class="gr">Machine ${myNo}</span>`;
     if(mineOn()&&nMine) c.push(`<b>${nMine}</b> salle${nMine>1?"s":""} visitée${nMine>1?"s":""}`);
     if(ptsOn()&&score.points) c.push(`<b>${score.points}</b> points`);
     if(ptsOn()&&score.streak>=2) c.push(`<b>${score.streak}</b> jours d'affilée`);
@@ -1748,10 +1788,67 @@ function welcome(){
     $("introT").innerHTML=`Bienvenue sur<br><span class="gr">HMG Fitness</span>`;
     c.push(`<b>${CLUBS.length}</b> salles`,`Notes sur <b>10</b>`,ptsOn()?`Défis entre <b>sportifs</b>`:`Avis et <b>photos</b>`);
   }
-  $("introS").textContent=g; $("introC").innerHTML=c.map(x=>`<span>${x}</span>`).join("");
+  $("introS").textContent=last?flatter():g; $("introC").innerHTML=c.map(x=>`<span>${x}</span>`).join("");
   it.insertAdjacentHTML("beforeend",`<div class="skip">Touche l'écran pour entrer</div>`);
   it.classList.add("hello"); it.addEventListener("click",out,{once:true}); setTimeout(out,last?2600:3000);
 }
+
+/* ---- profil du sportif sur l'écran d'accueil (feat_profile). Le site brosse dans le sens du poil. */
+const SEED = Math.random();
+const pick = a => a[Math.floor(SEED*a.length)];
+const pickR = a => a[Math.floor(Math.random()*a.length)];
+const ordFr = n => n===1?"1er":n+"e";
+const nSalles = () => Object.keys(isAdmin()?db.visits:myVisits).filter(id=>byId[id]).length;
+function level(){ const p=ptsOn()?(score.points||0):nSalles()*10;
+  return p>=1000?"Légende HMG":p>=400?"Machine de guerre":p>=150?"Acharné":p>=50?"Régulier":p>=10?"Motivé":"Recrue"; }
+function flatter(){
+  const s=score, n=nSalles(), po=ptsOn(), h=new Date().getHours();
+  if(po&&s.rank_month===1&&s.month) return "Numéro 1 du mois. Les autres te courent après.";
+  if(po&&s.streak>=3) return `${s.streak} jours d'affilée. Rien ne t'arrête.`;
+  if(po&&s.rank_month&&s.rank_month<=3&&s.month) return `${ordFr(s.rank_month)} du mois. Le podium te va très bien.`;
+  if(po&&s.today) return pick(["Séance du jour validée. Tu assures.","Séance validée. Ton corps te dit merci.","Déjà passé à la salle aujourd'hui. Respect."]);
+  if(n>=5) return `${n} salles conquises. Une vraie machine.`;
+  if(n>=1) return `${n} salle${n>1?"s":""} déjà visitée${n>1?"s":""}. Ça commence fort.`;
+  if(po&&s.points) return `${s.points} points au compteur. Continue, champion.`;
+  return h<5||h>=23?"Séance de nuit ? Respect total.":h<11?"Prêt à tout casser aujourd'hui ?":h<14?"La séance du midi t'attend, champion.":h<18?"L'après-midi parfait pour pousser lourd.":"Ce soir, on soulève lourd.";
+}
+function profCard(){
+  const po=ptsOn(), s=score, n=nSalles(), nr=Object.keys(myRated).filter(id=>byId[id]).length;
+  const sum=[`<i>${level()}</i>`, po?`${s.points||0} pts`:null, `${n} salle${n>1?"s":""}`].filter(Boolean).join(" · ");
+  const st=po?[[s.points||0,"points"],[s.rank_month?ordFr(s.rank_month):"–","ce mois-ci"],[s.streak||0,(s.streak||0)>1?"jours d'affilée":"jour d'affilée",s.streak>=2],[n,n>1?"salles":"salle"]]
+             :[[n,n>1?"salles visitées":"salle visitée"],[nr,"avis donnés"]];
+  return `<button class="pf-top" data-pf aria-expanded="false"><span class="pf-av">${ic("db")}</span><span class="pf-id"><small>Toi</small><b>Machine ${myNo}</b><em>${sum}</em></span><span class="pf-chev">${ic("chev")}</span></button>
+    <div class="pf-more"><div>
+      ${!featOn("feat_profile")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
+      <div class="pf-stats${po?"":" n2"}">${st.map(([v,l,hot])=>`<div${hot?' class="hot"':""}><b>${v}</b><small>${l}</small></div>`).join("")}</div>
+      ${po?`<button class="cy big-ck${s.today?" done":""}" data-pf-go="ck">${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>`:""}
+      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}</div>
+    </div></div>`;
+}
+let introTimer=null, pfMode=null;
+function pfOpen(o){ const p=$("pf"); if(!p) return; p.classList.toggle("open",o); p.querySelector("[data-pf]").setAttribute("aria-expanded",String(o)); const h=$("pfHint"); if(h) h.hidden=o; }
+function showProfile(mode){
+  const it=$("intro"), sk=it.querySelector(".skip"); if(sk) sk.remove(); pfMode=mode;
+  $("introT").innerHTML=mode==="new"?`Bienvenue sur<br><span class="gr">HMG Fitness</span>`:mode==="open"?`Ton <span class="gr">profil</span>`:`Content de te revoir !`;
+  $("introS").textContent=mode==="new"?"Ta légende commence ici.":flatter();
+  const c=$("introC"); c.className="prof";
+  c.innerHTML=`<div class="pf glass" id="pf">${profCard()}</div><p class="pf-hint" id="pfHint">Touche ton profil pour le déplier</p><button class="pf-enter" data-enter>Voir la carte</button>`;
+  it.classList.add("hello","prof"); it.classList.remove("out"); it.setAttribute("aria-hidden","false");
+  clearTimeout(introTimer); if(mode==="open") pfOpen(true); else introTimer=setTimeout(enterMap,7000);
+}
+function refreshProfile(){ const p=$("pf"); if(!p||$("intro").classList.contains("out")) return; const o=p.classList.contains("open"); p.innerHTML=profCard(); pfOpen(o); if(pfMode!=="new") $("introS").textContent=flatter(); }
+function enterMap(){ clearTimeout(introTimer); const it=$("intro"); it.classList.add("out"); it.setAttribute("aria-hidden","true"); }
+$("intro").addEventListener("click",e=>{
+  if(!$("intro").classList.contains("prof")) return;
+  const t=e.target;
+  if(t.closest("[data-pf]")){ clearTimeout(introTimer); pfOpen(!$("pf").classList.contains("open")); return; }
+  const g=t.closest("[data-pf-go]");
+  if(g){ enterMap(); const k=g.dataset.pfGo; if(k==="ck") doCheckin(); else if(k==="rank") renderRank(); else { listSort="mine"; openList(); } return; }
+  if(t.closest("#pf")){ clearTimeout(introTimer); return; }
+  enterMap();
+});
+document.querySelector(".brand").addEventListener("click",()=>{ if(feat("feat_profile")) showProfile("open"); });
+document.addEventListener("keydown",e=>{ const it=$("intro"); if(e.key==="Escape"&&it.classList.contains("prof")&&!it.classList.contains("out")) enterMap(); });
 
 /* ---- événements des nouveautés */
 $("aFeat").addEventListener("click",()=>sheetMode==="feat"?closeSheet():renderFeat());
