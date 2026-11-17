@@ -962,7 +962,7 @@ textarea{resize:none;min-height:62px;width:100%}
 #adminBar .who{font:600 11px var(--f-d);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:0 8px}
 .badge{min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font:700 10.5px/18px var(--f-b);text-align:center;padding:0 5px}
 #toast{position:fixed;z-index:3000;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:11px 16px;font-size:13px;animation:fade .2s;width:max-content;max-width:calc(100% - 32px);text-align:center}
-#intro{position:fixed;inset:0;z-index:4000;background:var(--bg);display:grid;place-items:center;transition:opacity .8s,visibility .8s}
+#intro{position:fixed;inset:0;z-index:4000;background:var(--bg);display:grid;place-items:center;transition:opacity .45s,visibility .45s}
 #intro.out{opacity:0;visibility:hidden}
 #intro .in{text-align:center}
 #intro .logo{width:72px;height:72px;border-radius:22px;margin:0 auto 18px;animation:spin 1.6s cubic-bezier(.6,0,.2,1)}
@@ -1056,6 +1056,9 @@ textarea{resize:none;min-height:62px;width:100%}
 .mc-t{display:grid;text-align:left;line-height:1.15}
 .mc-t small{font:600 9.5px var(--f-d);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .mc-t b{font:700 14px var(--f-d);background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+#meSay{position:fixed;z-index:1550;max-width:min(300px,calc(100vw - 16px));padding:11px 14px;border-radius:16px 4px 16px 16px;font-size:13.5px;line-height:1.4;cursor:pointer;transform-origin:top right;animation:drop .4s cubic-bezier(.2,1.2,.3,1)}
+#meSay b{color:var(--a1)}
+#meSay.out{opacity:0;transform:translateY(-6px) scale(.96);transition:opacity .4s,transform .4s}
 #meDrop{position:fixed;z-index:1600;transform-origin:top right;width:min(360px,calc(100vw - 16px));padding:0;border-radius:22px;overflow:hidden;transform-origin:top right;animation:drop .35s cubic-bezier(.2,1.2,.3,1)}
 @keyframes drop{from{opacity:0;transform:translateY(-8px) scale(.92)}to{opacity:1;transform:none}}
 .pf-say{margin:0 0 12px;font-size:14px;line-height:1.4;color:var(--ink)}
@@ -1269,7 +1272,7 @@ const mine = id => mineOn() && !!myVisits[id];
 const FEATURES = [
   {k:"feat_points", t:"Je suis à la salle + classement", d:"Le visiteur appuie sur « Je suis à la salle » : sa position est vérifiée (moins de 200 m de la salle) et il gagne 10 points, une fois par jour maximum. Classement du mois et général, série de jours d'affilée.", def:false},
   {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Machine 48213 » avec un compliment, ses salles, ses points et sa série.", def:false},
-  {k:"feat_profile", t:"Profil du sportif à l'accueil", d:"À l'ouverture du site, l'accueil devient le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». L'accueil part tout seul vers la carte après 3 secondes (sauf si on touche le profil). Sur la page de la carte, une pastille « Toi · Machine 48213 » en haut à droite déplie le même profil.", def:false},
+  {k:"feat_profile", t:"Profil du sportif", d:"Le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». La carte s'ouvre tout de suite : le bonjour s'affiche sous la pastille « Toi · Machine 48213 » en haut à droite, qui déplie le profil.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -1788,9 +1791,10 @@ async function renderRank(load=true){
 
 /* ---- message de bienvenue */
 function welcome(){
-  const it=$("intro"), out=()=>it.classList.add("out");
-  if(feat("feat_profile")){ const last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today()); showProfile(last?"back":"new"); return; }
-  if(!feat("feat_welcome")){ setTimeout(out,650); return; }
+  const it=$("intro"), out=()=>it.classList.add("out"), late=it.classList.contains("out");
+  if(late&&!feat("feat_profile")){ store.set("hmg-last-visit",today()); return; }
+  if(feat("feat_profile")){ const last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today()); applyFeatures(); out(); setTimeout(()=>meGreet(last),700); return; }
+  if(!feat("feat_welcome")){ out(); return; }
   const h=new Date().getHours(), last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today());
   const g=h<5?"Séance de nuit ? Respect.":h<11?"Bien réveillé ? La salle t'attend.":h<14?"La séance du midi t'attend.":h<18?"Bon après-midi, sportif.":h<23?"Bonsoir. L'heure de la séance.":"Séance de nuit ? Respect.";
   const nMine=Object.keys(myVisits).filter(id=>byId[id]).length, c=[];
@@ -1806,7 +1810,7 @@ function welcome(){
   }
   $("introS").textContent=last?flatter():g; $("introC").innerHTML=c.map(x=>`<span>${x}</span>`).join("");
   it.insertAdjacentHTML("beforeend",`<div class="skip">Touche l'écran pour entrer</div>`);
-  it.classList.add("hello"); it.addEventListener("click",out,{once:true}); setTimeout(out,last?2600:3000);
+  it.classList.add("hello"); it.addEventListener("click",out,{once:true}); setTimeout(out,last?1500:1900);
 }
 
 /* ---- profil du sportif sur l'écran d'accueil (feat_profile). Le site brosse dans le sens du poil. */
@@ -1866,12 +1870,21 @@ $("intro").addEventListener("click",e=>{
 });
 document.addEventListener("keydown",e=>{ const it=$("intro"); if(e.key==="Escape"&&it.classList.contains("prof")&&!it.classList.contains("out")) enterMap(); });
 
+/* bonjour sur la carte, sous la pastille du profil (la carte n'attend plus l'écran d'accueil) */
+function meGreet(last){
+  const chip=$("meChip"); if(chip.hidden||meOpen) return;
+  let b=$("meSay"); if(!b){ b=document.createElement("div"); b.id="meSay"; b.className="glass"; document.body.appendChild(b);
+    b.addEventListener("click",e=>{ e.stopPropagation(); b.remove(); openMe(); }); }
+  b.innerHTML=last?`Content de te revoir, <b>Machine ${myNo}</b> !<br>${flatter()}`:`Bienvenue, <b>Machine ${myNo}</b> !<br>Ta légende commence ici. Touche ton profil.`;
+  const r=chip.getBoundingClientRect(); b.style.top=(r.bottom+8)+"px"; b.style.right=Math.max(8,innerWidth-r.right)+"px";
+  setTimeout(()=>{ if(!b.isConnected) return; b.classList.add("out"); setTimeout(()=>b.remove(),450); },5000);
+}
 /* ---- profil sur la page de la carte : la pastille en haut à droite se déplie */
 let meOpen=false;
 function placeMeDrop(){ const d=$("meDrop"), r=$("meChip").getBoundingClientRect(), w=d.offsetWidth; d.style.top=(r.bottom+8)+"px"; d.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+"px"; }
-function openMe(){ const d=$("meDrop"); d.innerHTML=`<div class="pf open" id="pfMe">${profCard(true)}</div>`; d.querySelector("[data-pf]").setAttribute("aria-expanded","true");
+function openMe(){ const sy=$("meSay"); if(sy) sy.remove(); const d=$("meDrop"); d.innerHTML=`<div class="pf open" id="pfMe">${profCard(true)}</div>`; d.querySelector("[data-pf]").setAttribute("aria-expanded","true");
   d.hidden=false; meOpen=true; placeMeDrop(); $("meChip").setAttribute("aria-expanded","true"); }
-function closeMe(){ if(!meOpen) return; meOpen=false; $("meDrop").hidden=true; $("meChip").setAttribute("aria-expanded","false"); }
+function closeMe(){ const sy=$("meSay"); if(sy) sy.remove(); if(!meOpen) return; meOpen=false; $("meDrop").hidden=true; $("meChip").setAttribute("aria-expanded","false"); }
 $("meChip").addEventListener("click",e=>{ e.stopPropagation(); meOpen?closeMe():openMe(); });
 $("meDrop").addEventListener("click",e=>{ e.stopPropagation(); const t=e.target;
   if(t.closest("[data-pf]")){ closeMe(); return; }
@@ -1990,13 +2003,14 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
 /* ================= DÉMARRAGE ================ */
 (async function init(){
   updateLabels();
+  const introSafety=setTimeout(()=>$("intro").classList.add("out"),1200);
   if(session&&LIVE){ if(!(await refresh())) session=null; }
   try{ await loadAll(); }catch(e){ toast("Avis indisponibles pour le moment.",1); }
   computeStats(); applyAdminUi();
   const order=CLUBS.filter(c=>!isDom(c)).map(c=>({c,p:pos(c)})).filter(x=>x.p).sort((a,b)=>b.p.lat-a.p.lat);
-  order.forEach((x,i)=>drawMarker(x.c,200+Math.round(i*1100/order.length)));
+  order.forEach((x,i)=>drawMarker(x.c,60+Math.round(i*450/order.length)));
   updateHeader();
-  welcome(); refreshScore();
+  clearTimeout(introSafety); welcome(); refreshScore();
   const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900); else if(h==="admin"&&!isAdmin()) setTimeout(loginModal,900);
   const n=await geocodeMissing();
   if(isAdmin()&&LIVE) saveGeo().catch(()=>{}); // l'admin enregistre les positions exactes pour tous les visiteurs (et pour vérifier « Je suis à la salle »)
