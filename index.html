@@ -742,6 +742,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .stat b{display:block;font:700 20px/1.1 var(--f-d);font-variant-numeric:tabular-nums}
 .stat span{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
 .stat.prog b{color:var(--done)}
+.stat.prog.mine b{color:var(--gold)}
 
 /* ---------- boutons flottants */
 #fab{position:absolute;z-index:1000;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;align-items:flex-end}
@@ -981,8 +982,8 @@ textarea{resize:none;min-height:62px;width:100%}
     <div id="sugg" class="glass" hidden role="listbox"></div></div>
   <div id="stats">
     <div class="stat glass"><b id="sClubs">0</b><span>salles</span></div>
-    <div class="stat glass revs"><b id="sRevs">0</b><span>avis</span></div>
-    <div class="stat glass prog" id="sProgBox" hidden><b id="sProg">0</b><span>visitées</span></div>
+    <div class="stat glass revs" id="sRevsBox"><b id="sRevs">0</b><span id="sRevsL">avis</span></div>
+    <div class="stat glass prog" id="sProgBox" hidden><b id="sProg">0</b><span id="sProgL">visitées</span></div>
   </div>
 </header>
 
@@ -1219,12 +1220,18 @@ function countUp(el,to){ const from=+el.dataset.v||0; el.dataset.v=to; const t0=
   (function f(t){ const k=Math.min(1,(t-t0)/d), e=1-Math.pow(1-k,3); el.textContent=Math.round(from+(to-from)*e).toLocaleString("fr-FR"); if(k<1) requestAnimationFrame(f); })(t0); }
 function updateHeader(){
   const nVis=Object.keys(db.visits).filter(id=>byId[id]).length, sp=showProgress();
-  countUp($("sClubs"),CLUBS.length); countUp($("sRevs"),db.reviews.filter(r=>!r.hidden).length);
-  $("sProgBox").hidden=!sp; if(sp) countUp($("sProg"),nVis);
+  /* compteurs du haut : un visiteur voit SES avis et SES salles (gardés sur son appareil), l'admin voit le total des avis et ses visites */
+  const adm=isAdmin(), mOn=mineOn(), nMine=Object.keys(myVisits).filter(id=>byId[id]).length, nMyRevs=Object.keys(myRated).filter(id=>byId[id]).length;
+  countUp($("sClubs"),CLUBS.length);
+  countUp($("sRevs"),adm?db.reviews.filter(r=>!r.hidden).length:nMyRevs);
+  $("sRevsL").textContent=adm?"avis":"mes avis"; $("sRevsBox").title=adm?"Avis publiés sur le site":"Les salles que tu as notées depuis cet appareil";
+  const pb=$("sProgBox"); pb.hidden=!(mOn||sp); pb.classList.toggle("mine",mOn);
+  pb.title=mOn?"Les salles où tu es déjà allé (visible seulement par toi)":"";
+  if(mOn||sp) countUp($("sProg"),mOn?nMine:nVis);
   $("lgDone").hidden=!sp; $("progBox").hidden=!sp;
   $("lgTodo").textContent=sp?"À visiter":"Salle ouverte";
   if(sp){ $("progTxt").textContent=`${CONFIG.owner} : ${nVis} / ${CLUBS.length} salles visitées`; requestAnimationFrame(()=>$("progBar").style.width=(100*nVis/CLUBS.length)+"%"); }
-  const nMine=Object.keys(myVisits).filter(id=>byId[id]).length, mo=mineOn()&&nMine>0;
+  const mo=mOn&&nMine>0;
   $("lgMine").hidden=!mo; $("mineBox").hidden=!mo;
   if(mo){ $("mineTxt").textContent=`Mes salles : ${nMine} / ${CLUBS.length}`; requestAnimationFrame(()=>$("mineBar").style.width=(100*nMine/CLUBS.length)+"%"); }
   $("demo").hidden=LIVE;
