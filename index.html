@@ -1044,10 +1044,23 @@ textarea{resize:none;min-height:62px;width:100%}
 .pf-stats small{font-size:10px;color:var(--muted);line-height:1.2}
 .pf-stats .hot b{color:#ffb347}
 .pf .big-ck{margin-bottom:8px}
-#pf .row2 button{flex:1 1 0;justify-content:center}
+#pf .row2 button,#pfMe .row2 button{flex:1 1 0;justify-content:center}
 .pf .msg{margin-bottom:10px}
 .pf-hint{font-size:11.5px;color:var(--dim);text-align:center;margin:-2px 0 0;letter-spacing:.04em;animation:fade 1s .8s both}
 .pf-enter{justify-self:center;padding:12px 24px;border-radius:999px;font:700 14px var(--f-d)}
+#meChip{display:flex;align-items:center;gap:9px;padding:6px 14px 6px 6px;border-radius:999px;color:var(--ink);cursor:pointer;flex:none;align-self:center}
+#meChip .pf-av{width:38px;height:38px}
+#meChip .pf-av svg.i{width:21px;height:21px}
+#meChip .pf-av::after{inset:-4px}
+#meChip[aria-expanded="true"]{border-color:rgba(var(--a-rgb),.55)}
+.mc-t{display:grid;text-align:left;line-height:1.15}
+.mc-t small{font:600 9.5px var(--f-d);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.mc-t b{font:700 14px var(--f-d);background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+#meDrop{position:fixed;z-index:1600;transform-origin:top right;width:min(360px,calc(100vw - 16px));padding:0;border-radius:22px;overflow:hidden;transform-origin:top right;animation:drop .35s cubic-bezier(.2,1.2,.3,1)}
+@keyframes drop{from{opacity:0;transform:translateY(-8px) scale(.92)}to{opacity:1;transform:none}}
+.pf-say{margin:0 0 12px;font-size:14px;line-height:1.4;color:var(--ink)}
+@media (max-width:760px){ #meChip{padding:4px} #meChip .mc-t{display:none} #meChip .pf-av{width:34px;height:34px} #meChip .pf-av svg.i{width:19px;height:19px} }
+@media (max-width:400px){ #top:has(#meChip:not([hidden])) .brand{padding:7px 10px 7px 7px;gap:8px} #top:has(#meChip:not([hidden])) .logo{width:26px;height:26px} #top:has(#meChip:not([hidden])) .brand h1{font-size:13.5px} #top:has(#meChip:not([hidden])) .stat{padding:5px 8px} #top:has(#meChip:not([hidden])){gap:6px} #top:has(#meChip:not([hidden])) #stats{gap:5px} }
 .brand.pfable{cursor:pointer}
 
 /* ===== couleur de la marque : une seule couleur d'accent (classe t-volt / t-braise / t-glace sur <html>) ===== */
@@ -1100,7 +1113,9 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <div class="stat glass prog" id="sProgBox" hidden><b id="sProg">0</b><span id="sProgL">visitées</span></div>
     <div class="stat glass pts" id="sPtsBox" hidden role="button" tabindex="0" title="Ton classement"><b id="sPts">0</b><span>points</span></div>
   </div>
+  <button id="meChip" class="glass" hidden aria-haspopup="dialog" aria-expanded="false" title="Ton profil"><span class="pf-av"><svg class="i"><use href="#i-db"/></svg></span><span class="mc-t"><small>Toi</small><b id="meChipN">Machine</b></span></button>
 </header>
+<div id="meDrop" class="glass" hidden role="dialog" aria-label="Ton profil"></div>
 
 <div id="adminBar" class="glass" hidden>
   <span class="who">Admin</span>
@@ -1254,7 +1269,7 @@ const mine = id => mineOn() && !!myVisits[id];
 const FEATURES = [
   {k:"feat_points", t:"Je suis à la salle + classement", d:"Le visiteur appuie sur « Je suis à la salle » : sa position est vérifiée (moins de 200 m de la salle) et il gagne 10 points, une fois par jour maximum. Classement du mois et général, série de jours d'affilée.", def:false},
   {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Machine 48213 » avec un compliment, ses salles, ses points et sa série.", def:false},
-  {k:"feat_profile", t:"Profil du sportif à l'accueil", d:"À l'ouverture du site, l'accueil devient le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». On le rouvre en touchant le logo en haut à gauche.", def:false},
+  {k:"feat_profile", t:"Profil du sportif à l'accueil", d:"À l'ouverture du site, l'accueil devient le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». L'accueil part tout seul vers la carte après 3 secondes (sauf si on touche le profil). Sur la page de la carte, une pastille « Toi · Machine 48213 » en haut à droite déplie le même profil.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -1672,9 +1687,10 @@ async function setFeature(k,on){
   db.settings[k]=on; if(!LIVE) demo.set("settings",db.settings);
 }
 function applyFeatures(){
-  const po=ptsOn(), b=$("bCheck"), br=document.querySelector(".brand");
+  const po=ptsOn(), b=$("bCheck");
   b.hidden=!po; $("bRank").hidden=!po;
-  br.classList.toggle("pfable",feat("feat_profile")); br.title=feat("feat_profile")?"Ton profil":""; refreshProfile();
+  const pf=feat("feat_profile"); $("meChip").hidden=!pf; $("meChipN").textContent="Machine "+myNo; if(!pf) closeMe(); else if(meOpen) openMe();
+  refreshProfile();
   b.classList.toggle("done",!!score.today); $("bCheckT").textContent=score.today?"Séance validée":"Je suis à la salle";
   b.title=score.today?"Ta séance du jour est validée. Reviens demain pour 10 points de plus.":"Tu es à la salle ? Gagne 10 points (une fois par jour)";
 }
@@ -1812,13 +1828,14 @@ function flatter(){
   if(po&&s.points) return `${s.points} points au compteur. Continue, champion.`;
   return h<5||h>=23?"Séance de nuit ? Respect total.":h<11?"Prêt à tout casser aujourd'hui ?":h<14?"La séance du midi t'attend, champion.":h<18?"L'après-midi parfait pour pousser lourd.":"Ce soir, on soulève lourd.";
 }
-function profCard(){
+function profCard(say){
   const po=ptsOn(), s=score, n=nSalles(), nr=Object.keys(myRated).filter(id=>byId[id]).length;
   const sum=[`<i>${level()}</i>`, po?`${s.points||0} pts`:null, `${n} salle${n>1?"s":""}`].filter(Boolean).join(" · ");
   const st=po?[[s.points||0,"points"],[s.rank_month?ordFr(s.rank_month):"–","ce mois-ci"],[s.streak||0,(s.streak||0)>1?"jours d'affilée":"jour d'affilée",s.streak>=2],[n,n>1?"salles":"salle"]]
              :[[n,n>1?"salles visitées":"salle visitée"],[nr,"avis donnés"]];
   return `<button class="pf-top" data-pf aria-expanded="false"><span class="pf-av">${ic("db")}</span><span class="pf-id"><small>Toi</small><b>Machine ${myNo}</b><em>${sum}</em></span><span class="pf-chev">${ic("chev")}</span></button>
     <div class="pf-more"><div>
+      ${say?`<p class="pf-say">${flatter()}</p>`:""}
       ${!featOn("feat_profile")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
       <div class="pf-stats${po?"":" n2"}">${st.map(([v,l,hot])=>`<div${hot?' class="hot"':""}><b>${v}</b><small>${l}</small></div>`).join("")}</div>
       ${po?`<button class="cy big-ck${s.today?" done":""}" data-pf-go="ck">${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>`:""}
@@ -1834,7 +1851,7 @@ function showProfile(mode){
   const c=$("introC"); c.className="prof";
   c.innerHTML=`<div class="pf glass" id="pf">${profCard()}</div><p class="pf-hint" id="pfHint">Touche ton profil pour le déplier</p><button class="pf-enter" data-enter>Voir la carte</button>`;
   it.classList.add("hello","prof"); it.classList.remove("out"); it.setAttribute("aria-hidden","false");
-  clearTimeout(introTimer); if(mode==="open") pfOpen(true); else introTimer=setTimeout(enterMap,7000);
+  clearTimeout(introTimer); if(mode==="open") pfOpen(true); else introTimer=setTimeout(enterMap,mode==="new"?3200:2600);
 }
 function refreshProfile(){ const p=$("pf"); if(!p||$("intro").classList.contains("out")) return; const o=p.classList.contains("open"); p.innerHTML=profCard(); pfOpen(o); if(pfMode!=="new") $("introS").textContent=flatter(); }
 function enterMap(){ clearTimeout(introTimer); const it=$("intro"); it.classList.add("out"); it.setAttribute("aria-hidden","true"); }
@@ -1847,8 +1864,22 @@ $("intro").addEventListener("click",e=>{
   if(t.closest("#pf")){ clearTimeout(introTimer); return; }
   enterMap();
 });
-document.querySelector(".brand").addEventListener("click",()=>{ if(feat("feat_profile")) showProfile("open"); });
 document.addEventListener("keydown",e=>{ const it=$("intro"); if(e.key==="Escape"&&it.classList.contains("prof")&&!it.classList.contains("out")) enterMap(); });
+
+/* ---- profil sur la page de la carte : la pastille en haut à droite se déplie */
+let meOpen=false;
+function placeMeDrop(){ const d=$("meDrop"), r=$("meChip").getBoundingClientRect(), w=d.offsetWidth; d.style.top=(r.bottom+8)+"px"; d.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+"px"; }
+function openMe(){ const d=$("meDrop"); d.innerHTML=`<div class="pf open" id="pfMe">${profCard(true)}</div>`; d.querySelector("[data-pf]").setAttribute("aria-expanded","true");
+  d.hidden=false; meOpen=true; placeMeDrop(); $("meChip").setAttribute("aria-expanded","true"); }
+function closeMe(){ if(!meOpen) return; meOpen=false; $("meDrop").hidden=true; $("meChip").setAttribute("aria-expanded","false"); }
+$("meChip").addEventListener("click",e=>{ e.stopPropagation(); meOpen?closeMe():openMe(); });
+$("meDrop").addEventListener("click",e=>{ e.stopPropagation(); const t=e.target;
+  if(t.closest("[data-pf]")){ closeMe(); return; }
+  const g=t.closest("[data-pf-go]"); if(g){ closeMe(); const k=g.dataset.pfGo; if(k==="ck") doCheckin(); else if(k==="rank") renderRank(); else { listSort="mine"; openList(); } } });
+document.addEventListener("click",()=>{ if(meOpen) closeMe(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeMe(); });
+addEventListener("resize",()=>{ if(meOpen) placeMeDrop(); });
+map.on("movestart",()=>{ if(meOpen) closeMe(); });
 
 /* ---- événements des nouveautés */
 $("aFeat").addEventListener("click",()=>sheetMode==="feat"?closeSheet():renderFeat());
