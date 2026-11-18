@@ -836,6 +836,29 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.55)}
 .leaflet-container .leaflet-tile{background:#e8e8e8}
 /* marqueurs des salles */
+.leaflet-pins-pane canvas{animation:pinsIn .9s ease-out}
+.ps-ico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 10px 30px rgba(var(--a-rgb),.35);animation:spin .6s cubic-bezier(.2,1.4,.4,1)}
+.ps-ico svg{width:30px;height:30px}
+.ps-form{display:grid;gap:8px;width:100%;text-align:left}
+.ps-in{position:relative}
+.ps-in input{width:100%;padding:13px 44px 13px 14px;font:600 17px var(--f-d);letter-spacing:.02em;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--stroke2)}
+.ps-in input:focus{outline:none;border-color:rgba(var(--a-rgb),.7);box-shadow:0 0 0 3px rgba(var(--a-rgb),.15)}
+.ps-st{position:absolute;right:13px;top:50%;width:20px;height:20px;margin-top:-10px;border-radius:50%}
+.ps-st.ok{background:var(--done);box-shadow:0 0 14px var(--done)}
+.ps-st.ok::after{content:"";position:absolute;left:7px;top:3.5px;width:4px;height:9px;border:solid #05070d;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.ps-st.ko{background:var(--danger);box-shadow:0 0 12px rgba(255,93,115,.6)}
+.ps-st.ko::after{content:"!";position:absolute;inset:0;display:grid;place-items:center;font:800 13px var(--f-d);color:#05070d}
+.ps-st.wait{border:2px solid rgba(var(--a-rgb),.3);border-top-color:var(--a2);animation:spin2 .7s linear infinite}
+@keyframes spin2{to{transform:rotate(360deg)}}
+.ps-msg{font-size:12.5px;color:var(--muted);min-height:18px;padding-left:2px}.ps-msg.ok{color:var(--done)}.ps-msg.ko{color:var(--danger)}
+.ps-ideas{display:flex;flex-wrap:wrap;gap:6px}.ps-ideas:empty{display:none}
+.ps-ideas button{padding:6px 11px;border-radius:999px;font-size:12.5px;background:rgba(var(--a-rgb),.1);border-color:rgba(var(--a-rgb),.35)}
+.ps-form .cy{width:100%;justify-content:center;padding:13px;font-size:14px;margin-top:4px}
+.ck .gr{background:linear-gradient(135deg,var(--a1),var(--a2) 55%,var(--a3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.form .who a{color:var(--a2);font-weight:600;text-decoration:none;white-space:nowrap}
+html.moving{--glass:rgba(14,20,34,.84);--glass2:rgba(22,30,50,.9)}
+html.moving .glass,html.moving #search{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+@keyframes pinsIn{from{opacity:0;transform:scale(.96)}}
 .pin{width:18px;height:18px;border-radius:50%;position:relative;cursor:pointer;transition:transform .2s}
 .pin i{position:absolute;inset:4px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(5,7,13,.85),0 0 14px var(--c),0 0 4px var(--c)}
 .pin.soon i{background:transparent;border:2px dashed var(--c)}
@@ -1093,7 +1116,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
   <symbol id="i-loc" viewBox="0 0 24 24"><path d="M12 22s-8-6.5-8-12a8 8 0 0 1 16 0c0 5.5-8 12-8 12z"/><circle cx="12" cy="10" r="3"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
 <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 <symbol id="i-db" viewBox="0 0 24 24"><rect x="5.2" y="6" width="3.2" height="12" rx="1.3"/><rect x="15.6" y="6" width="3.2" height="12" rx="1.3"/><rect x="2.3" y="8.6" width="2.2" height="6.8" rx="1"/><rect x="19.5" y="8.6" width="2.2" height="6.8" rx="1"/><rect x="8.4" y="10.7" width="7.2" height="2.6" rx=".7"/></symbol>
@@ -1217,7 +1240,14 @@ let myNo = +store.get("hmg-visitor", 0);
 if(!(Number.isInteger(myNo) && myNo>=10000 && myNo<=99999)){ myNo = 10000 + crypto.getRandomValues(new Uint32Array(1))[0] % 90000; store.set("hmg-visitor", myNo); }
 const reviewId = () => uuid().toLowerCase().slice(0,24) + String(myNo).padStart(12,"0");
 const visitorOf = r => { const m=/-0{6,9}([1-9]\d{2,5})$/.exec((r&&r.id)||""); return m?+m[1]:null; };
-const whoHtml = r => { const n=visitorOf(r); return n?`Machine ${n}${n===myNo?" (toi)":""}`:"Anonyme"; };
+/* pseudos uniques (feat_pseudo) : le visiteur choisit un pseudo à la place de « Machine 48213 » */
+let myPseudo = store.get("hmg-pseudo", null);
+let PSEUDOS = {};
+const psOn = () => feat("feat_pseudo");
+const nameOf = no => (psOn() && (PSEUDOS[no] || (no===myNo && myPseudo))) || "Machine "+no;
+const myName = () => nameOf(myNo);
+const meIs = () => psOn()&&myPseudo ? myPseudo : "la Machine "+myNo;
+const whoHtml = r => { const n=visitorOf(r); return n?`${esc(nameOf(n))}${n===myNo?" (toi)":""}`:"Anonyme"; };
 async function api(path, opt={}){
   const h = { apikey: CONFIG.key }; if(session && session.access_token) h.Authorization = "Bearer " + session.access_token; else if(CONFIG.key.startsWith("eyJ")) h.Authorization = "Bearer " + CONFIG.key;
   let body = opt.body;
@@ -1244,19 +1274,22 @@ async function loadAll(){
     return;
   }
   const adm = isAdmin();
-  const [rv,ph,st,vi,ge] = await Promise.all([
+  const [rv,ph,st,vi,ge,ps] = await Promise.all([
     api("/rest/v1/reviews?select=id,club_id,rating,comment,created_at,hidden,up,down&order=created_at.desc&limit=10000")
       .then(x=>{ VOTES=true; return x; })
       .catch(()=>{ VOTES=false; return api("/rest/v1/reviews?select=id,club_id,rating,comment,created_at,hidden&order=created_at.desc&limit=10000"); }),
     api("/rest/v1/photos?select=id,club_id,path,approved,by_admin,created_at&order=created_at.desc&limit=5000"),
     api("/rest/v1/settings?select=key,value"),
     api("/rest/v1/visits?select="+(adm?"club_id,visited_on,note":"club_id,visited_on")).catch(()=>[]),
-    api("/rest/v1/club_geo?select=club_id,lat,lon").catch(()=>[])
+    api("/rest/v1/club_geo?select=club_id,lat,lon").catch(()=>[]),
+    rpc("pseudo_list").catch(()=>({}))
   ]);
   db.reviews = rv||[]; db.photos = (ph||[]).filter(p=>/^(pending|admin)\/[a-z0-9-]{1,80}\/[0-9a-f-]{36}\.jpg$/.test(p.path));
   db.settings = Object.fromEntries((st||[]).map(s=>[s.key,s.value]));
   db.visits = Object.fromEntries((vi||[]).map(v=>[v.club_id,{d:v.visited_on,n:v.note||""}]));
   db.geo = Object.fromEntries((ge||[]).map(g=>[g.club_id,{lat:g.lat,lon:g.lon}]));
+  PSEUDOS = (ps && typeof ps==="object") ? ps : {};
+  if(PSEUDOS[myNo] && PSEUDOS[myNo]!==myPseudo){ myPseudo=PSEUDOS[myNo]; store.set("hmg-pseudo",myPseudo); }
 }
 function migrateOldVisits(){ const old=store.get("fp-visited-v1",{}); const o={}; for(const k in old) if(byId[k]) o[k]={d:(old[k]&&old[k].d)||today(),n:(old[k]&&old[k].n)||""}; return o; }
 const photoUrl = p => p.dataUrl || (CONFIG.url + "/storage/v1/object/public/photos/" + p.path);
@@ -1273,6 +1306,7 @@ const FEATURES = [
   {k:"feat_points", t:"Je suis à la salle + classement", d:"Le visiteur appuie sur « Je suis à la salle » : sa position est vérifiée (moins de 200 m de la salle) et il gagne 10 points, une fois par jour maximum. Classement du mois et général, série de jours d'affilée.", def:false},
   {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Machine 48213 » avec un compliment, ses salles, ses points et sa série.", def:false},
   {k:"feat_profile", t:"Profil du sportif", d:"Le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». La carte s'ouvre tout de suite : le bonjour s'affiche sous la pastille « Toi · Machine 48213 » en haut à droite, qui déplie le profil.", def:false},
+  {k:"feat_pseudo", t:"Pseudos uniques", d:"À sa première visite, le visiteur choisit son pseudo (unique : personne d'autre ne peut le prendre). Il remplace « Machine 48213 » sur ses avis, au classement et dans son profil. Gros mots et noms réservés (HMG, Mino, Admin) refusés.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -1312,6 +1346,7 @@ async function geocodeMissing(){
 
 /* ================= CARTE ================ */
 const FR_BOUNDS=[[41.3,-5.2],[51.15,9.6]];
+const TOUCH_DEV = matchMedia("(pointer:coarse)").matches;
 const map = L.map("map",{zoomControl:false,minZoom:5,maxZoom:18,maxBounds:[[38.5,-11],[54,15]],maxBoundsViscosity:.8,zoomSnap:.25,zoomDelta:.75,wheelPxPerZoomLevel:90,attributionControl:false,preferCanvas:false});
 const isMobile = () => innerWidth<=760;
 function fitFrance(anim){ map.fitBounds(FR_BOUNDS,{paddingTopLeft:[10,isMobile()?130:90],paddingBottomRight:[isMobile()?60:20,isMobile()?150:20],animate:!!anim}); }
@@ -1342,34 +1377,61 @@ function updateLabels(){
   }
   lblLayer.eachLayer(l=>{ if(!want.has(l)) lblLayer.removeLayer(l); });
   want.forEach(l=>{ if(!lblLayer.hasLayer(l)) lblLayer.addLayer(l); });
-  const o=Math.min(.55,Math.max(.18,(z-5)*.09)); depLayer.eachLayer(p=>p.setStyle({opacity:tilesOn?.35:o}));
+  const o=tilesOn?.35:Math.round(Math.min(.55,Math.max(.18,(z-5)*.09))*100)/100; if(o!==depOp){ depOp=o; depLayer.eachLayer(p=>p.setStyle({opacity:o})); }
 }
-map.on("zoomend moveend",updateLabels);
+let depOp=null, lblRaf=0;
+map.on("zoomend moveend",()=>{ cancelAnimationFrame(lblRaf); lblRaf=requestAnimationFrame(updateLabels); });
+/* pendant qu'on fait glisser la carte sur téléphone, les panneaux en verre coupent le flou (très coûteux à recalculer à chaque image) */
+if(TOUCH_DEV){ let mvT=0; const root=document.documentElement;
+  const on=()=>{ clearTimeout(mvT); root.classList.add("moving"); }, off=()=>{ clearTimeout(mvT); mvT=setTimeout(()=>root.classList.remove("moving"),220); };
+  map.on("movestart zoomstart",on); map.on("moveend zoomend",off); }
 map.on("zoomend",()=>$("map").classList.toggle("far",map.getZoom()<7.5));
 function setTiles(on){ tilesOn=on; if(on){ tiles.addTo(map); frLayer.setStyle({fillOpacity:0}); nbLayer.setStyle({fillOpacity:0}); } else { map.removeLayer(tiles); frLayer.setStyle({fillOpacity:.92}); nbLayer.setStyle({fillOpacity:.9}); }
   $("bTiles").classList.toggle("on",on); $("legal").classList.toggle("osm-on",on); $("bTiles").setAttribute("aria-pressed",on); updateLabels(); }
 
-/* marqueurs */
+/* marqueurs : dessinés sur un seul canvas (et non 375 éléments de page) pour une carte fluide sur téléphone.
+   Chaque style de pastille est dessiné une fois dans une petite image, puis recopiée : très rapide. */
+map.createPane("pins").style.zIndex=600;
+const TOUCH = TOUCH_DEV;
+const pinRenderer=L.canvas({pane:"pins",padding:.4,tolerance:TOUCH?12:4});
 const clubLayer=L.layerGroup().addTo(map);
 const markers={};
 let selected=null, startMarker=null, routeLine=null;
-function pinIcon(c,anim){
-  const v=visited(c.id), m=mine(c.id), a=avgOf(c.id), col=m?"var(--gold)":v?"var(--done)":c.s?"var(--soon)":"var(--todo)";
-  const zoomTag = a!=null && map.getZoom()>=9 ? `<b>${fmt1(a)}</b>` : "";
-  return L.divIcon({className:"",iconSize:[18,18],iconAnchor:[9,9],
-    html:`<div class="pin${v?" done":""}${m?" mine":""}${c.s&&!v&&!m?" soon":""}${selected===c.id?" sel":""}${anim?" pop-in":""}" style="--c:${col};${anim?"animation-delay:"+anim+"ms":""}"><i></i>${zoomTag}</div>`});
+const PINCOL={}; const pinCol=k=>PINCOL[k]||(PINCOL[k]=CSSV("--"+k)||({gold:"#ffd166",done:"#2bffa0",soon:"#b18cff",todo:"#ff6a2b"})[k]);
+const SPR=new Map(), DPR=Math.min(3,devicePixelRatio||1), SPS=64;
+function sprite(kind,colKey,sel,far){
+  const key=kind+colKey+(sel?1:0)+(far?1:0); let cv=SPR.get(key); if(cv) return cv;
+  cv=document.createElement("canvas"); cv.width=cv.height=SPS*DPR; const x=cv.getContext("2d"); x.scale(DPR,DPR); x.translate(SPS/2,SPS/2);
+  const col=pinCol(colKey), big=kind==="done"||kind==="mine", k=sel?1.5:1;
+  let r=(big?(far?5:7):(far?3.5:5))*k;
+  if(kind==="done"){ x.globalAlpha=.5; x.lineWidth=1.5; x.strokeStyle=col; x.beginPath(); x.arc(0,0,14*k,0,7); x.stroke(); x.globalAlpha=1; }
+  if(kind==="soon"){ x.fillStyle="rgba(5,7,13,.6)"; x.beginPath(); x.arc(0,0,r+1,0,7); x.fill(); x.lineWidth=2.4; x.setLineDash([3.4,2]); x.strokeStyle=col; x.shadowColor=col; x.shadowBlur=12; x.beginPath(); x.arc(0,0,r,0,7); x.stroke(); x.stroke(); x.setLineDash([]); x.shadowBlur=0; }
+  else { x.shadowColor=col; x.shadowBlur=big?22:16; x.fillStyle=col; x.beginPath(); x.arc(0,0,r,0,7); x.fill(); x.fill(); x.shadowBlur=4; x.fill(); x.shadowBlur=0;
+    x.lineWidth=2; x.strokeStyle="rgba(5,7,13,.85)"; x.beginPath(); x.arc(0,0,r+1,0,7); x.stroke(); }
+  if(kind==="mine"){ x.strokeStyle="#05070d"; x.lineWidth=2*k; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); x.moveTo(-r*.42,0); x.lineTo(-r*.08,r*.36); x.lineTo(r*.45,-r*.34); x.stroke(); }
+  if(sel){ x.shadowColor="#3fd8ff"; x.shadowBlur=18; x.lineWidth=2; x.strokeStyle="#3fd8ff"; x.beginPath(); x.arc(0,0,18*k*.95,0,7); x.stroke(); }
+  SPR.set(key,cv); return cv;
 }
-function drawMarker(c,anim){
+let FARZ=map.getZoom()<7.5, TAGZ=map.getZoom()>=9; const TAGFONT="700 9.5px "+(CSSV("--f-d")||"sans-serif");
+const Pin=L.CircleMarker.extend({
+  _updateBounds(){ const p=[30,34]; this._pxBounds=new L.Bounds(this._point.subtract(p),this._point.add(p)); },
+  _updatePath(){ const R=this._renderer; if(!R._drawing||this._empty()) return; const ctx=R._ctx, p=this._point, c=this.club, sel=selected===c.id;
+    const v=visited(c.id), m=mine(c.id), kind=m?"mine":v?"done":c.s?"soon":"todo", col=m?"gold":v?"done":c.s?"soon":"todo";
+    const sp=sprite(kind,col,sel,FARZ&&isMobile()); ctx.drawImage(sp,p.x-SPS/2,p.y-SPS/2,SPS,SPS);
+    if(TAGZ){ const a=avgOf(c.id); if(a!=null){ ctx.font=TAGFONT; ctx.textAlign="center"; ctx.textBaseline="bottom"; ctx.lineWidth=3; ctx.strokeStyle="#05070d"; ctx.fillStyle=pinCol("gold");
+      const t=fmt1(a), y=p.y-(sel?16:10); ctx.strokeText(t,p.x,y); ctx.fillText(t,p.x,y); } } }
+});
+function drawMarker(c){
   const p=pos(c); if(!p||isDom(c)) return;
-  if(markers[c.id]){ markers[c.id].setIcon(pinIcon(c)); markers[c.id].setLatLng([p.lat,p.lon]); return; }
-  const m=L.marker([p.lat,p.lon],{icon:pinIcon(c,anim),riseOnHover:true,keyboard:true,title:c.n,alt:c.n});
-  m.bindTooltip(()=>{ const a=avgOf(c.id); return esc(c.n)+(a!=null?` · ${fmt1(a)}/10`:""); },{className:"tip",direction:"top",offset:[0,-8]});
+  let m=markers[c.id];
+  if(m){ m.setLatLng([p.lat,p.lon]); if(selected===c.id) m.bringToFront(); m.redraw(); return; }
+  m=new Pin([p.lat,p.lon],{renderer:pinRenderer,radius:9,stroke:false,fill:true,fillOpacity:0,bubblingMouseEvents:false}); m.club=c;
+  if(!TOUCH) m.bindTooltip(()=>{ const a=avgOf(c.id); return esc(c.n)+(a!=null?` · ${fmt1(a)}/10`:""); },{className:"tip",direction:"top",offset:[0,-8]});
   m.on("click",()=>openClub(c.id));
   clubLayer.addLayer(m); markers[c.id]=m;
 }
 function refreshMarkers(){ CLUBS.forEach(c=>drawMarker(c)); }
-let lastTagZoom=null;
-map.on("zoomend",()=>{ const t=map.getZoom()>=9; if(t!==lastTagZoom){ lastTagZoom=t; refreshMarkers(); } });
+map.on("zoomend",()=>{ const f=map.getZoom()<7.5, t=map.getZoom()>=9; if(f!==FARZ||t!==TAGZ){ FARZ=f; TAGZ=t; for(const id in markers) markers[id].redraw(); } });
 function drawStart(){
   if(startMarker){ map.removeLayer(startMarker); startMarker=null; }
   if(!isAdmin()) return;
@@ -1386,7 +1448,7 @@ function updateHeader(){
   countUp($("sClubs"),CLUBS.length);
   const po=ptsOn(); $("sPtsBox").hidden=!po; $("stats").classList.toggle("has-pts",po); if(po) countUp($("sPts"),score.points||0);
   countUp($("sRevs"),adm?db.reviews.filter(r=>!r.hidden).length:nMyRevs);
-  $("sRevsL").textContent=adm?"avis":"mes avis"; $("sRevsBox").title=adm?"Avis publiés sur le site":"Les salles que tu as notées depuis cet appareil. Tu es la Machine "+myNo;
+  $("sRevsL").textContent=adm?"avis":"mes avis"; $("sRevsBox").title=adm?"Avis publiés sur le site":"Les salles que tu as notées depuis cet appareil. Tu es "+meIs();
   const pb=$("sProgBox"); pb.hidden=!(mOn||sp); pb.classList.toggle("mine",mOn);
   pb.title=mOn?"Les salles où tu es déjà allé (visible seulement par toi)":"";
   if(mOn||sp) countUp($("sProg"),mOn?nMine:nVis);
@@ -1468,7 +1530,7 @@ function reviewsHtml(c,st){
   const form = already&&!adm ? `<div class="msg">Merci ! Tu as noté cette salle ${already}/10. Les commentaires sont publiés après validation.</div>` : `
     <div class="form" id="rForm">
       <h3>Donne ta note</h3>
-      <p class="who">Tu es la <b>Machine ${myNo}</b>. Ce surnom s'affiche à côté de tes avis, à la place de ton nom.</p>
+      <p class="who">${psOn()&&myPseudo?`Tu es <b>${esc(myPseudo)}</b>. Ton pseudo s'affiche à côté de tes avis. <a href="#" data-pseudo>Changer</a>`:`Tu es la <b>Machine ${myNo}</b>. Ce surnom s'affiche à côté de tes avis, à la place de ton nom.${psOn()?` <a href="#" data-pseudo>Choisir mon pseudo</a>`:""}`}</p>
       <div class="rate" role="radiogroup" aria-label="Note sur 10">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button type="button" role="radio" aria-checked="${draftRating===n}" data-rate="${n}" class="${draftRating===n?"sel":draftRating>n?"lit":""}">${n}</button>`).join("")}</div>
       <textarea id="rText" maxlength="120" placeholder="Un commentaire ? (facultatif, 15 mots max, publié après validation)" aria-label="Commentaire, 15 mots maximum"></textarea>
       <div class="frow"><span id="rCount">0 / 15 mots</span><button class="cy" id="rSend" ${draftRating?"":"disabled"}>Publier anonymement</button></div>
@@ -1692,7 +1754,7 @@ async function setFeature(k,on){
 function applyFeatures(){
   const po=ptsOn(), b=$("bCheck");
   b.hidden=!po; $("bRank").hidden=!po;
-  const pf=feat("feat_profile"); $("meChip").hidden=!pf; $("meChipN").textContent="Machine "+myNo; if(!pf) closeMe(); else if(meOpen) openMe();
+  const pf=feat("feat_profile"); $("meChip").hidden=!pf; $("meChipN").textContent=myName(); if(!pf) closeMe(); else if(meOpen) openMe();
   refreshProfile();
   b.classList.toggle("done",!!score.today); $("bCheckT").textContent=score.today?"Séance validée":"Je suis à la salle";
   b.title=score.today?"Ta séance du jour est validée. Reviens demain pour 10 points de plus.":"Tu es à la salle ? Gagne 10 points (une fois par jour)";
@@ -1776,30 +1838,96 @@ async function renderRank(load=true){
   const ord=n=>n===1?"1er":n+"e";
   sh.innerHTML=`<div class="sh-head"><h2>Classement</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
     ${!featOn("feat_points")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
-    <div class="me-card"><div class="me-n"><small>Toi</small><b>Machine ${myNo}</b></div>
+    <div class="me-card"><div class="me-n"><small>Toi</small><b>${esc(myName())}</b></div>
       <div><b>${mo?s.month||0:s.points||0}</b><small>points</small></div>
       <div><b>${rk?ord(rk):"–"}</b><small>rang</small></div>
       <div><b>${s.streak||0}</b><small>${(s.streak||0)>1?"jours":"jour"} d'affilée</small></div></div>
     <button class="cy big-ck${s.today?" done":""}" data-checkin>${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>
     <div class="tabs" role="tablist"><button role="tab" data-period="month" aria-selected="${mo}">Ce mois-ci</button><button role="tab" data-period="all" aria-selected="${!mo}">Depuis le début</button></div>
-    <div id="rankList">${rows===undefined?`<div class="empty">Chargement…</div>`:rows===null?`<div class="empty">Classement indisponible pour le moment.</div>`:rows.length?rows.map((r,i)=>`<div class="rk${r.me?" me":""}"><span class="p${i<3?" g"+(i+1):""}">${i+1}</span><b>Machine ${r.no}${r.me?" (toi)":""}</b><span>${r.clubs} salle${r.clubs>1?"s":""}</span><em>${r.points}<small> pts</small></em></div>`).join(""):`<div class="empty">Personne n'a encore pointé${mo?" ce mois-ci":""}. Sois le premier : rends-toi dans une salle et appuie sur « Je suis à la salle ».</div>`}</div>
+    <div id="rankList">${rows===undefined?`<div class="empty">Chargement…</div>`:rows===null?`<div class="empty">Classement indisponible pour le moment.</div>`:rows.length?rows.map((r,i)=>`<div class="rk${r.me?" me":""}"><span class="p${i<3?" g"+(i+1):""}">${i+1}</span><b>${esc(nameOf(r.no))}${r.me?" (toi)":""}</b><span>${r.clubs} salle${r.clubs>1?"s":""}</span><em>${r.points}<small> pts</small></em></div>`).join(""):`<div class="empty">Personne n'a encore pointé${mo?" ce mois-ci":""}. Sois le premier : rends-toi dans une salle et appuie sur « Je suis à la salle ».</div>`}</div>
     <p class="rules">10 points par jour maximum, seulement sur place : ta position est vérifiée (moins de 200 m de la salle) et n'est jamais affichée. Tes points sont liés à cet appareil.</p>
   </div>`;
   if(load){ try{ rankRows[rankPeriod]=LIVE?await rpc("leaderboard",{p_period:rankPeriod,p_voter:voterId}):[]; }catch(e){ rankRows[rankPeriod]=null; if(isMissing(e)) ptsReady=false; }
     if(sheetMode==="rank") renderRank(false); }
 }
 
+
+/* ---- pseudo unique (feat_pseudo) */
+const needPseudo = () => psOn() && !myPseudo && !store.get("hmg-pseudo-later",false);
+const PS_RE = /^[A-Za-z0-9À-ÖØ-öø-ÿ][A-Za-z0-9À-ÖØ-öø-ÿ _.-]{1,18}[A-Za-z0-9À-ÖØ-öø-ÿ]$/;
+const psKey = s => fold(s).replace(/[^a-z0-9]/g,"");
+function psLocal(v){
+  if(!v) return "vide";
+  if(v.length<3) return "court";
+  if(!PS_RE.test(v)||/[ _.-]{2}/.test(v)||psKey(v).length<3) return "invalide";
+  if(!isAdmin()&&(/^machine\d*$/.test(psKey(v))||/(admin|moderat|hmg|fitnesspark|anonyme)/.test(psKey(v))||["mino","toi","moi","visiteur"].includes(psKey(v)))) return "reserve";
+  if(hasBad(v.replace(/\d/g," "))) return "mot";
+  for(const no in PSEUDOS) if(+no!==myNo&&psKey(PSEUDOS[no])===psKey(v)) return "pris";
+  return "ok";
+}
+const PS_MSG = { vide:"", court:"Encore un effort : 3 caractères minimum.", invalide:"Lettres, chiffres, espace, point, tiret ou _ (3 à 20 caractères).", reserve:"Ce nom est réservé. Trouve-toi un nom de légende.",
+  mot:"On garde ça propre ici. Un autre pseudo ?", pris:"Déjà pris par une autre machine. Essaie une variante.", vite:"Doucement, champion : attends quelques secondes avant de rechanger.", toi:"C'est déjà ton pseudo.", ok:"Libre ! Il n'attend que toi." };
+const psIdeas = v => { const b=(v||"").replace(/[^A-Za-z0-9À-ÖØ-öø-ÿ]/g,"").slice(0,14)||"Titan"; const r=()=>Math.floor(10+Math.random()*89);
+  return [...new Set([b+r(), b+"_"+["Fit","Pro","Gym","Max"][Math.floor(Math.random()*4)], b+"."+r()])].filter(x=>psLocal(x)==="ok").slice(0,3); };
+let psTimer=0, psSeq=0;
+function pseudoModal(first){
+  const m=ckModal(`<div class="ps-ico">${ic("pen")}</div>
+    <h2>${myPseudo?"Change ton pseudo":"Choisis ton pseudo"}</h2>
+    <p>${myPseudo?`Aujourd'hui tu es <b>${esc(myPseudo)}</b>.`:`Pour l'instant tu es la <b>Machine ${myNo}</b>.`} Ton pseudo est <b>unique</b> : personne d'autre ne pourra le porter. Il s'affiche sur tes avis et au classement.</p>
+    <form id="psForm" class="ps-form" autocomplete="off">
+      <div class="ps-in"><input id="psIn" maxlength="20" placeholder="Ex. : Titan_77" aria-label="Ton pseudo" value="${esc(myPseudo||"")}" autocapitalize="off" spellcheck="false" enterkeyhint="done"><span id="psSt" class="ps-st" aria-hidden="true"></span></div>
+      <div id="psMsg" class="ps-msg" aria-live="polite">3 à 20 caractères.</div>
+      <div id="psIdeas" class="ps-ideas"></div>
+      <button class="cy" id="psGo" type="submit" disabled>${myPseudo?"Valider mon nouveau pseudo":"C'est mon pseudo"}</button>
+    </form>
+    <button class="ghost" data-x id="psLater">${myPseudo?"Annuler":first?"Plus tard, je reste Machine "+myNo:"Plus tard"}</button>`);
+  const inp=$("psIn"), go=$("psGo");
+  const show=(st,v)=>{ const ok=st==="ok"; $("psMsg").textContent=PS_MSG[st]||PS_MSG.invalide; $("psMsg").className="ps-msg "+(st==="ok"?"ok":st==="wait"||st==="vide"||st==="court"?"":"ko");
+    $("psSt").className="ps-st "+(st==="ok"?"ok":st==="wait"?"wait":st==="vide"?"":"ko"); go.disabled=!ok;
+    const ideas=st==="pris"||st==="reserve"?psIdeas(v):[]; $("psIdeas").innerHTML=ideas.map(x=>`<button type="button" data-idea="${esc(x)}">${esc(x)}</button>`).join(""); };
+  const check=()=>{ const v=inp.value.trim().replace(/\s+/g," "); const loc=psLocal(v); clearTimeout(psTimer); const seq=++psSeq;
+    if(loc!=="ok"||(myPseudo&&psKey(v)===psKey(myPseudo))){ show(myPseudo&&psKey(v)===psKey(myPseudo)?"toi":loc,v); return; }
+    if(!LIVE){ show("ok",v); return; }
+    show("wait",v); $("psMsg").textContent="Je vérifie qu'il est libre…";
+    psTimer=setTimeout(async()=>{ try{ const r=await rpc("pseudo_check",{p_pseudo:v,p_voter:voterId}); if(seq===psSeq) show(r==="toi"?"toi":r,v); }catch(e){ if(seq===psSeq) show("ok",v); } },320); };
+  inp.addEventListener("input",check);
+  m.querySelector("#psIdeas").addEventListener("click",e=>{ const b=e.target.closest("[data-idea]"); if(!b) return; inp.value=b.dataset.idea; check(); inp.focus(); });
+  $("psLater").addEventListener("click",()=>{ if(!myPseudo) store.set("hmg-pseudo-later",true); });
+  m.addEventListener("click",e=>{ if(e.target===m&&!myPseudo) store.set("hmg-pseudo-later",true); });
+  $("psForm").addEventListener("submit",async e=>{ e.preventDefault(); const v=inp.value.trim().replace(/\s+/g," "); if(psLocal(v)!=="ok"||go.disabled) return;
+    go.disabled=true; go.textContent="Un instant…";
+    try{
+      const r=LIVE?await rpc("set_pseudo",{p_voter:voterId,p_no:myNo,p_pseudo:v}):{ok:true,pseudo:v,no:myNo};
+      if(!r||!r.ok){ show((r&&r.why)||"invalide",v); go.textContent=myPseudo?"Valider mon nouveau pseudo":"C'est mon pseudo"; return; }
+      if(r.no&&r.no!==myNo){ myNo=r.no; store.set("hmg-visitor",myNo); }
+      const wasNew=!myPseudo; myPseudo=r.pseudo; store.set("hmg-pseudo",myPseudo); store.set("hmg-pseudo-later",false);
+      for(const k in PSEUDOS) if(PSEUDOS[k]===myPseudo) delete PSEUDOS[k]; PSEUDOS[myNo]=myPseudo;
+      psWelcome(wasNew);
+      updateHeader(); applyFeatures(); if(sheetMode==="club") renderClub(); else if(sheetMode==="rank") renderRank(false); else if(sheetMode==="mod") renderMod();
+    }catch(err){ $("psMsg").textContent=/ouverte/.test(err.message)?"Les pseudos arrivent très bientôt.":err.message; $("psMsg").className="ps-msg ko"; go.disabled=false; go.textContent=myPseudo?"Valider mon nouveau pseudo":"C'est mon pseudo"; }
+  });
+  check(); setTimeout(()=>{ try{ inp.focus({preventScroll:true}); }catch(e){} }, TOUCH_DEV?350:50);
+}
+function psWelcome(wasNew){
+  const cols=[ACC,ACC1,ACC3,"#ffffff",ACC,"#ffffff"];
+  const conf=Array.from({length:30},(_,i)=>{ const a=Math.PI*2*i/30+Math.random()*.4, d=100+Math.random()*110;
+    return `<i style="background:${cols[i%cols.length]};--x:${Math.round(Math.cos(a)*d)}px;--y:${Math.round(Math.sin(a)*d+60)}px;--r:${Math.round(Math.random()*720-360)}deg;animation-delay:${Math.round(Math.random()*120)}ms"></i>`; }).join("");
+  ckModal(`<div class="confetti">${conf}</div><div class="ps-ico ok">${ic("check")}</div><h2>${wasNew?"Bienvenue":"Enchanté"}, <span class="gr">${esc(myPseudo)}</span> !</h2>
+    <p>${pickR(["Un nom de champion. Il est à toi, et à personne d'autre.","Ça sonne comme un futur numéro 1.","Retiens bien ce nom : bientôt en haut du classement.","Nom de légende validé. La salle n'a qu'à bien se tenir."])}</p>
+    <button class="cy" data-x>Voir la carte</button>`);
+}
+
 /* ---- message de bienvenue */
 function welcome(){
   const it=$("intro"), out=()=>it.classList.add("out"), late=it.classList.contains("out");
   if(late&&!feat("feat_profile")){ store.set("hmg-last-visit",today()); return; }
-  if(feat("feat_profile")){ const last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today()); applyFeatures(); out(); setTimeout(()=>meGreet(last),700); return; }
+  if(feat("feat_profile")){ const last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today()); applyFeatures(); out(); if(!needPseudo()) setTimeout(()=>meGreet(last),700); return; }
   if(!feat("feat_welcome")){ out(); return; }
   const h=new Date().getHours(), last=store.get("hmg-last-visit",null); store.set("hmg-last-visit",today());
   const g=h<5?"Séance de nuit ? Respect.":h<11?"Bien réveillé ? La salle t'attend.":h<14?"La séance du midi t'attend.":h<18?"Bon après-midi, sportif.":h<23?"Bonsoir. L'heure de la séance.":"Séance de nuit ? Respect.";
   const nMine=Object.keys(myVisits).filter(id=>byId[id]).length, c=[];
   if(last){
-    $("introT").innerHTML=`Content de te revoir,<br><span class="gr">Machine ${myNo}</span>`;
+    $("introT").innerHTML=`Content de te revoir,<br><span class="gr">${esc(myName())}</span>`;
     if(mineOn()&&nMine) c.push(`<b>${nMine}</b> salle${nMine>1?"s":""} visitée${nMine>1?"s":""}`);
     if(ptsOn()&&score.points) c.push(`<b>${score.points}</b> points`);
     if(ptsOn()&&score.streak>=2) c.push(`<b>${score.streak}</b> jours d'affilée`);
@@ -1837,13 +1965,13 @@ function profCard(say){
   const sum=[`<i>${level()}</i>`, po?`${s.points||0} pts`:null, `${n} salle${n>1?"s":""}`].filter(Boolean).join(" · ");
   const st=po?[[s.points||0,"points"],[s.rank_month?ordFr(s.rank_month):"–","ce mois-ci"],[s.streak||0,(s.streak||0)>1?"jours d'affilée":"jour d'affilée",s.streak>=2],[n,n>1?"salles":"salle"]]
              :[[n,n>1?"salles visitées":"salle visitée"],[nr,"avis donnés"]];
-  return `<button class="pf-top" data-pf aria-expanded="false"><span class="pf-av">${ic("db")}</span><span class="pf-id"><small>Toi</small><b>Machine ${myNo}</b><em>${sum}</em></span><span class="pf-chev">${ic("chev")}</span></button>
+  return `<button class="pf-top" data-pf aria-expanded="false"><span class="pf-av">${ic("db")}</span><span class="pf-id"><small>Toi</small><b>${esc(myName())}</b><em>${sum}</em></span><span class="pf-chev">${ic("chev")}</span></button>
     <div class="pf-more"><div>
       ${say?`<p class="pf-say">${flatter()}</p>`:""}
       ${!featOn("feat_profile")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
       <div class="pf-stats${po?"":" n2"}">${st.map(([v,l,hot])=>`<div${hot?' class="hot"':""}><b>${v}</b><small>${l}</small></div>`).join("")}</div>
       ${po?`<button class="cy big-ck${s.today?" done":""}" data-pf-go="ck">${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>`:""}
-      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}</div>
+      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}${psOn()?`<button data-pf-go="pseudo">${ic("pen")} ${myPseudo?"Changer de pseudo":"Choisir mon pseudo"}</button>`:""}</div>
     </div></div>`;
 }
 let introTimer=null, pfMode=null;
@@ -1864,7 +1992,7 @@ $("intro").addEventListener("click",e=>{
   const t=e.target;
   if(t.closest("[data-pf]")){ clearTimeout(introTimer); pfOpen(!$("pf").classList.contains("open")); return; }
   const g=t.closest("[data-pf-go]");
-  if(g){ enterMap(); const k=g.dataset.pfGo; if(k==="ck") doCheckin(); else if(k==="rank") renderRank(); else { listSort="mine"; openList(); } return; }
+  if(g){ enterMap(); const k=g.dataset.pfGo; if(k==="ck") doCheckin(); else if(k==="rank") renderRank(); else if(k==="pseudo") pseudoModal(); else { listSort="mine"; openList(); } return; }
   if(t.closest("#pf")){ clearTimeout(introTimer); return; }
   enterMap();
 });
@@ -1875,7 +2003,7 @@ function meGreet(last){
   const chip=$("meChip"); if(chip.hidden||meOpen) return;
   let b=$("meSay"); if(!b){ b=document.createElement("div"); b.id="meSay"; b.className="glass"; document.body.appendChild(b);
     b.addEventListener("click",e=>{ e.stopPropagation(); b.remove(); openMe(); }); }
-  b.innerHTML=last?`Content de te revoir, <b>Machine ${myNo}</b> !<br>${flatter()}`:`Bienvenue, <b>Machine ${myNo}</b> !<br>Ta légende commence ici. Touche ton profil.`;
+  b.innerHTML=last?`Content de te revoir, <b>${esc(myName())}</b> !<br>${flatter()}`:`Bienvenue, <b>${esc(myName())}</b> !<br>Ta légende commence ici. Touche ton profil.`;
   const r=chip.getBoundingClientRect(); b.style.top=(r.bottom+8)+"px"; b.style.right=Math.max(8,innerWidth-r.right)+"px";
   setTimeout(()=>{ if(!b.isConnected) return; b.classList.add("out"); setTimeout(()=>b.remove(),450); },5000);
 }
@@ -1888,7 +2016,7 @@ function closeMe(){ const sy=$("meSay"); if(sy) sy.remove(); if(!meOpen) return;
 $("meChip").addEventListener("click",e=>{ e.stopPropagation(); meOpen?closeMe():openMe(); });
 $("meDrop").addEventListener("click",e=>{ e.stopPropagation(); const t=e.target;
   if(t.closest("[data-pf]")){ closeMe(); return; }
-  const g=t.closest("[data-pf-go]"); if(g){ closeMe(); const k=g.dataset.pfGo; if(k==="ck") doCheckin(); else if(k==="rank") renderRank(); else { listSort="mine"; openList(); } } });
+  const g=t.closest("[data-pf-go]"); if(g){ closeMe(); const k=g.dataset.pfGo; if(k==="ck") doCheckin(); else if(k==="rank") renderRank(); else if(k==="pseudo") pseudoModal(); else { listSort="mine"; openList(); } } });
 document.addEventListener("click",()=>{ if(meOpen) closeMe(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeMe(); });
 addEventListener("resize",()=>{ if(meOpen) placeMeDrop(); });
@@ -1980,6 +2108,7 @@ document.addEventListener("click",async e=>{
   const mb=t.closest("[data-mine]"); if(mb){ toggleMine(mb.dataset.mine); return; }
   const vb=t.closest("[data-vote]"); if(vb){ vote(vb.dataset.vote,+vb.dataset.v); return; }
   if(t.closest("#rSend")){ sendReview(); return; }
+  if(t.closest("[data-pseudo]")){ e.preventDefault(); pseudoModal(); return; }
   const hd=t.closest("[data-hide]"); if(hd){ const r=db.reviews.find(x=>x.id===hd.dataset.hide); if(!r) return; try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"PATCH",body:{hidden:!r.hidden},prefer:"return=minimal"}); r.hidden=!r.hidden; if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
   const dr=t.closest("[data-delrev]"); if(dr){ if(dr.dataset.sure!=="1"){ dr.dataset.sure="1"; dr.textContent="Sûr ?"; return; } const r=db.reviews.find(x=>x.id===dr.dataset.delrev); try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"DELETE"}); db.reviews=db.reviews.filter(x=>x!==r); if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
   const ap=t.closest("[data-approve]"); if(ap){ const p=db.photos.find(x=>x.id===ap.dataset.approve); try{ if(LIVE) await api("/rest/v1/photos?id=eq."+p.id,{method:"PATCH",body:{approved:true},prefer:"return=minimal"}); p.approved=true; afterMod(p.club_id);}catch(err){toast(err.message,1)} return; }
@@ -2011,6 +2140,7 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
   order.forEach((x,i)=>drawMarker(x.c,60+Math.round(i*450/order.length)));
   updateHeader();
   clearTimeout(introSafety); welcome(); refreshScore();
+  if(needPseudo()) setTimeout(()=>{ if(needPseudo()&&!document.querySelector(".modal")) pseudoModal(true); }, feat("feat_profile")?650:(store.get("hmg-last-visit",null)?1700:2100));
   const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900); else if(h==="admin"&&!isAdmin()) setTimeout(loginModal,900);
   const n=await geocodeMissing();
   if(isAdmin()&&LIVE) saveGeo().catch(()=>{}); // l'admin enregistre les positions exactes pour tous les visiteurs (et pour vérifier « Je suis à la salle »)
