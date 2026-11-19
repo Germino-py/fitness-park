@@ -1133,6 +1133,10 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
   #bCheck .ck-plus{margin-left:2px;padding:1px 5px;font-size:10px}
   #bCheck::before{inset:-4px}
 }
+
+/* Zones mortes : les boîtes invisibles qui entourent les boutons et la légende laissent passer le doigt vers la carte */
+#fab,#legal,#legend{pointer-events:none}
+#fab>*,#legal a,#legal button{pointer-events:auto}
 </style>
 </head>
 <body>
