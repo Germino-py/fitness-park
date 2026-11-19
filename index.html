@@ -1373,16 +1373,24 @@ async function geocodeMissing(){
 /* ================= CARTE ================ */
 const FR_BOUNDS=[[41.3,-5.2],[51.15,9.6]];
 const TOUCH_DEV = matchMedia("(pointer:coarse)").matches;
-const map = L.map("map",{zoomControl:false,minZoom:5,maxZoom:18,maxBounds:[[38.5,-11],[54,15]],maxBoundsViscosity:.8,zoomSnap:.25,zoomDelta:.75,wheelPxPerZoomLevel:90,attributionControl:false,preferCanvas:false});
+const map = L.map("map",{zoomControl:false,minZoom:5,maxZoom:18,maxBounds:[[24,-34],[64,38]],maxBoundsViscosity:.5,zoomSnap:TOUCH_DEV?0:.25,bounceAtZoomLimits:false,zoomDelta:.75,wheelPxPerZoomLevel:90,attributionControl:false,preferCanvas:false});
 const isMobile = () => innerWidth<=760;
 function fitFrance(anim){ map.fitBounds(FR_BOUNDS,{paddingTopLeft:[10,isMobile()?130:90],paddingBottomRight:[isMobile()?60:20,isMobile()?150:20],animate:!!anim}); }
 fitFrance(false); $("map").classList.toggle("far",map.getZoom()<7.5);
 map.createPane("land").style.zIndex=250; map.createPane("deps").style.zIndex=260; map.createPane("lbls").style.zIndex=450;
+/* Les contours (France, pays voisins, départements) ne sont recalculés que si on zoome ou si on sort de la zone déjà dessinée,
+   au lieu de l'être à chaque fin de glissement : la carte ne « bloque » plus quand on lâche le doigt. */
+const lazyUpdate = Base => Base.extend({ _update(){ const m=this._map;
+  if(m && this._bounds && this._zoom===m.getZoom() && !m._animatingZoom){ const v=L.bounds(m.containerPointToLayerPoint([0,0]),m.containerPointToLayerPoint(m.getSize()));
+    if(this._bounds.contains(v)) return; }
+  Base.prototype._update.call(this); } });
+const LazySVG=lazyUpdate(L.SVG), LazyCanvas=lazyUpdate(L.Canvas);
+const landR=new LazySVG({pane:"land",padding:.6}), depsR=new LazySVG({pane:"deps",padding:.6});
 map.getPane("lbls").style.pointerEvents="none";
-const nbLayer=L.polygon(OUTLINE.nb,{pane:"land",stroke:true,color:"rgba(147,160,184,.18)",weight:1,fillColor:"#0a0f1b",fillOpacity:.9,interactive:false}).addTo(map);
-const frGlow=L.polygon(OUTLINE.fr,{pane:"land",color:MAPC,weight:7,opacity:.10,fill:false,interactive:false}).addTo(map);
-const frLayer=L.polygon(OUTLINE.fr,{pane:"land",color:MAPC,weight:1.4,opacity:.75,fillColor:"#0d1626",fillOpacity:.92,interactive:false}).addTo(map);
-const depLayer=L.layerGroup(DEPS.map(d=>L.polygon(d.r,{pane:"deps",color:MAPC,weight:.8,opacity:.22,fill:false,interactive:false}))).addTo(map);
+const nbLayer=L.polygon(OUTLINE.nb,{pane:"land",renderer:landR,stroke:true,color:"rgba(147,160,184,.18)",weight:1,fillColor:"#0a0f1b",fillOpacity:.9,interactive:false}).addTo(map);
+const frGlow=L.polygon(OUTLINE.fr,{pane:"land",renderer:landR,color:MAPC,weight:7,opacity:.10,fill:false,interactive:false}).addTo(map);
+const frLayer=L.polygon(OUTLINE.fr,{pane:"land",renderer:landR,color:MAPC,weight:1.4,opacity:.75,fillColor:"#0d1626",fillOpacity:.92,interactive:false}).addTo(map);
+const depLayer=L.layerGroup(DEPS.map(d=>L.polygon(d.r,{pane:"deps",renderer:depsR,color:MAPC,weight:.8,opacity:.22,fill:false,interactive:false}))).addTo(map);
 const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; contributeurs <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'});
 let tileErr=0; tiles.on("tileerror",()=>{ if(++tileErr===6&&tilesOn){ setTiles(false); toast("Le plan des rues est indisponible pour le moment.",1); } }); tiles.on("tileload",()=>{tileErr=0});
 let tilesOn=false;
@@ -1419,7 +1427,7 @@ function setTiles(on){ tilesOn=on; if(on){ tiles.addTo(map); frLayer.setStyle({f
    Chaque style de pastille est dessiné une fois dans une petite image, puis recopiée : très rapide. */
 map.createPane("pins").style.zIndex=600;
 const TOUCH = TOUCH_DEV;
-const pinRenderer=L.canvas({pane:"pins",padding:.4,tolerance:TOUCH?12:4});
+const pinRenderer=new LazyCanvas({pane:"pins",padding:.4,tolerance:TOUCH?12:4});
 const clubLayer=L.layerGroup().addTo(map);
 const markers={};
 let selected=null, startMarker=null, routeLine=null;
