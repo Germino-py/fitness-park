@@ -815,7 +815,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 #legend{position:absolute;z-index:1000;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));padding:12px 14px;display:grid;gap:6px;font-size:12px;max-width:calc(100% - 100px)}
 .lg{display:flex;align-items:center;gap:8px;color:var(--muted)}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
-.dot.todo{background:var(--todo);box-shadow:0 0 10px var(--todo)}.dot.done{background:var(--done);box-shadow:0 0 10px var(--done)}.dot.soon{background:var(--soon);box-shadow:0 0 10px var(--soon)}
+.dot.todo{background:var(--todo);box-shadow:0 0 10px var(--todo)}.dot.done{background:var(--done);box-shadow:0 0 10px var(--done)}.dot.soon{background:repeating-linear-gradient(-45deg,var(--soon) 0 2.4px,#1a1030 2.4px 4px);border-radius:2px;transform:rotate(45deg) scale(.86);box-shadow:0 0 0 1px rgba(255,255,255,.75)}
 #legend .ttl{font:600 11px var(--f-d);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
 #progBox{padding-top:4px;border-top:1px solid var(--stroke);display:grid;gap:5px}
 .bar{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
@@ -837,7 +837,6 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.55)}
 .leaflet-container .leaflet-tile{background:#e8e8e8}
 /* marqueurs des salles */
-.leaflet-pins-pane canvas{animation:pinsIn .9s ease-out}
 .ps-ico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 10px 30px rgba(var(--a-rgb),.35);animation:spin .6s cubic-bezier(.2,1.4,.4,1)}
 .ps-ico svg{width:30px;height:30px}
 .ps-form{display:grid;gap:8px;width:100%;text-align:left}
@@ -1098,6 +1097,32 @@ html.t-braise .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.
 html.t-glace{--todo:#ff6a2b;--soon:#b18cff;--soon-rgb:177,140,255;--mine:#ffd166;--mine-rgb:255,209,102;--a1:#9cf0ff;--a2:#3fd8ff;--a3:#1a9fe0;--a-rgb:63,216,255;--a-ink:#050b10;--done:#2bffa0;--done-rgb:43,255,160}
 html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%239cf0ff'/%3E%3Cstop offset='.5' stop-color='%233fd8ff'/%3E%3Cstop offset='1' stop-color='%231a9fe0'/%3E%3C/linearGradient%3E%3CradialGradient id='gl' cx='.25' cy='0' r='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.35'/%3E%3Cstop offset='.5' stop-color='%23fff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='k'%3E%3Crect width='120' height='120' fill='%23fff'/%3E%3Cg fill='%23000' transform='translate%2860 51%29 scale%28.66%29 translate%28-60 -60%29'%3E%3Crect x='38' y='40' width='11' height='40' rx='4'/%3E%3Crect x='71' y='40' width='11' height='40' rx='4'/%3E%3Crect x='30.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='83.5' y='48' width='6' height='24' rx='2.5'/%3E%3Crect x='48' y='56' width='24' height='8' rx='1.5'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23g%29'/%3E%3Crect x='2' y='2' width='116' height='116' rx='30' fill='url%28%23gl%29'/%3E%3Cpath d='M60 104 C51 93 31 76 31 51 A29 29 0 1 1 89 51 C89 76 69 93 60 104 Z' fill='%23050b10' mask='url%28%23k%29'/%3E%3C/svg%3E") center/100% 100% no-repeat}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* points mis en valeur */
+.stat.pts{border-color:rgba(var(--a-rgb),.45);background:linear-gradient(135deg,rgba(var(--a-rgb),.18),rgba(var(--a-rgb),.05)),var(--glass);box-shadow:0 0 22px rgba(var(--a-rgb),.25),inset 0 1px 0 rgba(255,255,255,.08)}
+.stat.pts b{display:flex;align-items:center;justify-content:flex-end;gap:4px;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--a2)}
+.stat.pts b svg.i{width:15px;height:15px;color:var(--a2);filter:drop-shadow(0 0 6px rgba(var(--a-rgb),.8))}
+.stat.pts b em{font-style:normal;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat.pts span{color:rgba(var(--a-rgb),.85)}
+.stat.pts.top3 span{color:var(--gold)}
+.ck-plus{margin-left:8px;padding:2px 7px;border-radius:999px;background:#05070d;color:var(--a2);font:800 11.5px var(--f-d);letter-spacing:.02em}
+.ck-plus[hidden]{display:none}
+.pts-ban{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 12px;padding:12px 14px;border-radius:16px;text-align:left;white-space:normal;
+  background:linear-gradient(120deg,rgba(var(--a-rgb),.22),rgba(var(--a-rgb),.06) 60%,rgba(255,255,255,.03));border:1px solid rgba(var(--a-rgb),.45);box-shadow:0 8px 28px rgba(var(--a-rgb),.16)}
+.pts-ban:hover{background:linear-gradient(120deg,rgba(var(--a-rgb),.3),rgba(var(--a-rgb),.08) 60%,rgba(255,255,255,.04));border-color:rgba(var(--a-rgb),.6)}
+.pb-ico{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 0 18px rgba(var(--a-rgb),.5)}
+.pb-ico svg{width:20px;height:20px}
+.pb-t{flex:1;display:grid;gap:1px}.pb-t b{font:800 17px/1.1 var(--f-d);color:var(--a2);letter-spacing:.01em}.pb-t small{font-size:12px;color:var(--muted)}
+.pb-go{flex:none;padding:8px 13px;border-radius:999px;font:700 12.5px var(--f-d);color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2))}
+.pts-ban.done{background:rgba(var(--done-rgb),.07);border-color:rgba(var(--done-rgb),.3);box-shadow:none}.pts-ban.done .pb-ico{background:rgba(var(--done-rgb),.15);color:var(--done);box-shadow:none}.pts-ban.done .pb-t b{color:var(--done)}
+/* logo plus discret */
+.brand{padding:7px 13px 7px 8px;gap:9px}
+.brand .logo{width:30px;height:30px;border-radius:9px}
+.brand h1{font:700 14px/1.05 var(--f-d);letter-spacing:.03em}
+.brand h1 b{font-weight:500;letter-spacing:.02em}
+.brand small{font-size:10.5px;margin-top:1px}
+@media (max-width:760px){ .brand{padding:6px 10px 6px 6px;gap:7px} .brand .logo{width:24px;height:24px;border-radius:8px} .brand h1{font-size:12px} }
+@media (max-width:400px){ #top:has(#meChip:not([hidden])) .brand h1 b{display:none} #top:has(#meChip:not([hidden])) .brand .logo{width:22px;height:22px} #top:has(#meChip:not([hidden])) .brand h1{font-size:12px} }
 </style>
 </head>
 <body>
@@ -1130,7 +1155,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 <div id="map" role="application" aria-label="Carte des Fitness Park de France"></div>
 
 <header id="top">
-  <div class="brand glass"><div class="logo" aria-hidden="true"></div><div><h1>HMG <b>FITNESS</b></h1><small>Explore. Note. Conquiers.</small></div></div>
+  <div class="brand glass"><div class="logo" aria-hidden="true"></div><div><h1>HMG <b>Fitness</b></h1><small>Explore. Note. Conquiers.</small></div></div>
   <div id="searchBox"><svg class="i"><use href="#i-search"/></svg>
     <input id="search" type="search" placeholder="Rechercher une salle, une ville, un département…" autocomplete="off" aria-label="Rechercher une salle">
     <div id="sugg" class="glass" hidden role="listbox"></div></div>
@@ -1138,7 +1163,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
     <div class="stat glass clubs"><b id="sClubs">0</b><span>salles</span></div>
     <div class="stat glass revs" id="sRevsBox"><b id="sRevs">0</b><span id="sRevsL">avis</span></div>
     <div class="stat glass prog" id="sProgBox" hidden><b id="sProg">0</b><span id="sProgL">visitées</span></div>
-    <div class="stat glass pts" id="sPtsBox" hidden role="button" tabindex="0" title="Ton classement"><b id="sPts">0</b><span>points</span></div>
+    <div class="stat glass pts" id="sPtsBox" hidden role="button" tabindex="0" title="Tes points et ton classement"><b><svg class="i"><use href="#i-bolt"/></svg><em id="sPts">0</em></b><span id="sPtsL">points</span></div>
   </div>
   <button id="meChip" class="glass" hidden aria-haspopup="dialog" aria-expanded="false" title="Ton profil"><span class="pf-av"><svg class="i"><use href="#i-db"/></svg></span><span class="mc-t"><small>Toi</small><b id="meChipN">Machine</b></span></button>
 </header>
@@ -1166,7 +1191,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 </div>
 
 <div id="fab">
-  <button id="bCheck" hidden aria-label="Je suis à la salle : gagner 10 points"><svg class="i"><use href="#i-bolt"/></svg><span id="bCheckT">Je suis à la salle</span></button>
+  <button id="bCheck" hidden aria-label="Je suis à la salle : gagner 10 points"><svg class="i"><use href="#i-bolt"/></svg><span id="bCheckT">Je suis à la salle</span><span class="ck-plus" id="bCheckP">+10</span></button>
   <div class="grp glass">
     <button id="bZin" aria-label="Zoomer" title="Zoomer"><svg class="i"><use href="#i-plus"/></svg></button>
     <button id="bZout" aria-label="Dézoomer" title="Dézoomer"><svg class="i"><use href="#i-minus"/></svg></button>
@@ -1406,19 +1431,36 @@ function sprite(kind,colKey,sel,far){
   const col=pinCol(colKey), big=kind==="done"||kind==="mine", k=sel?1.5:1;
   let r=(big?(far?5:7):(far?3.5:5))*k;
   if(kind==="done"){ x.globalAlpha=.5; x.lineWidth=1.5; x.strokeStyle=col; x.beginPath(); x.arc(0,0,14*k,0,7); x.stroke(); x.globalAlpha=1; }
-  if(kind==="soon"){ x.fillStyle="rgba(5,7,13,.6)"; x.beginPath(); x.arc(0,0,r+1,0,7); x.fill(); x.lineWidth=2.4; x.setLineDash([3.4,2]); x.strokeStyle=col; x.shadowColor=col; x.shadowBlur=12; x.beginPath(); x.arc(0,0,r,0,7); x.stroke(); x.stroke(); x.setLineDash([]); x.shadowBlur=0; }
+  if(kind==="soon"){ /* chantier : petit panneau carré à bandes, net, sans flou */
+    const h=(far?4.6:6)*k, rr=2*k, sq=()=>{ x.beginPath(); x.roundRect?x.roundRect(-h,-h,2*h,2*h,rr):x.rect(-h,-h,2*h,2*h); };
+    x.save(); x.rotate(Math.PI/4); sq(); x.fillStyle="#05070d"; x.lineWidth=4; x.strokeStyle="rgba(5,7,13,.9)"; x.stroke(); x.fill();
+    sq(); x.clip(); x.fillStyle=col; x.fillRect(-h,-h,2*h,2*h); x.fillStyle="#1a1030"; x.rotate(-Math.PI/4);
+    for(let i=-4;i<=4;i++){ x.beginPath(); const o=i*3.6*k; x.moveTo(o-12*k,-12*k); x.lineTo(o-12*k+1.6*k,-12*k); x.lineTo(o+12*k+1.6*k,12*k); x.lineTo(o+12*k,12*k); x.closePath(); x.fill(); }
+    x.restore(); x.save(); x.rotate(Math.PI/4); sq(); x.lineWidth=1.2; x.strokeStyle="rgba(255,255,255,.85)"; x.stroke(); x.restore(); }
   else { x.shadowColor=col; x.shadowBlur=big?22:16; x.fillStyle=col; x.beginPath(); x.arc(0,0,r,0,7); x.fill(); x.fill(); x.shadowBlur=4; x.fill(); x.shadowBlur=0;
     x.lineWidth=2; x.strokeStyle="rgba(5,7,13,.85)"; x.beginPath(); x.arc(0,0,r+1,0,7); x.stroke(); }
   if(kind==="mine"){ x.strokeStyle="#05070d"; x.lineWidth=2*k; x.lineCap="round"; x.lineJoin="round"; x.beginPath(); x.moveTo(-r*.42,0); x.lineTo(-r*.08,r*.36); x.lineTo(r*.45,-r*.34); x.stroke(); }
   if(sel){ x.shadowColor="#3fd8ff"; x.shadowBlur=18; x.lineWidth=2; x.strokeStyle="#3fd8ff"; x.beginPath(); x.arc(0,0,18*k*.95,0,7); x.stroke(); }
   SPR.set(key,cv); return cv;
 }
+/* apparition au lancement : une onde part de Lognes (le départ de HMG) et allume les salles une à une */
+let PIN_T0=0, pinAnimRaf=0; const PIN_DUR=520, PIN_SPREAD=1300;
+const easeBack=t=>{ const c=1.9; t-=1; return 1+(c+1)*t*t*t+c*t*t; };
+function pinWave(){ PIN_T0=performance.now()+120; let maxD=0; const o=CONFIG.start;
+  for(const id in markers){ const m=markers[id], ll=m.getLatLng(); m._d=Math.hypot(ll.lat-o.lat,(ll.lng-o.lon)*.68); if(m._d>maxD) maxD=m._d; }
+  for(const id in markers){ const m=markers[id]; m._delay=Math.pow(m._d/(maxD||1),.75)*PIN_SPREAD; }
+  cancelAnimationFrame(pinAnimRaf); const end=PIN_T0+PIN_SPREAD+PIN_DUR+60;
+  (function f(){ pinRenderer._redrawBounds=null; pinRenderer._redraw(); if(performance.now()<end) pinAnimRaf=requestAnimationFrame(f); else PIN_T0=0; })(); }
 let FARZ=map.getZoom()<7.5, TAGZ=map.getZoom()>=9; const TAGFONT="700 9.5px "+(CSSV("--f-d")||"sans-serif");
 const Pin=L.CircleMarker.extend({
   _updateBounds(){ const p=[30,34]; this._pxBounds=new L.Bounds(this._point.subtract(p),this._point.add(p)); },
   _updatePath(){ const R=this._renderer; if(!R._drawing||this._empty()) return; const ctx=R._ctx, p=this._point, c=this.club, sel=selected===c.id;
     const v=visited(c.id), m=mine(c.id), kind=m?"mine":v?"done":c.s?"soon":"todo", col=m?"gold":v?"done":c.s?"soon":"todo";
-    const sp=sprite(kind,col,sel,FARZ&&isMobile()); ctx.drawImage(sp,p.x-SPS/2,p.y-SPS/2,SPS,SPS);
+    const sp=sprite(kind,col,sel,FARZ&&isMobile());
+    if(PIN_T0){ const t=(performance.now()-PIN_T0-(this._delay||0))/PIN_DUR; if(t<=0) return;
+      if(t<1){ const sc=Math.max(0,easeBack(t)), w=SPS*sc; ctx.globalAlpha=Math.min(1,t*2.5); ctx.drawImage(sp,p.x-w/2,p.y-w/2,w,w);
+        ctx.globalAlpha=(1-t)*.8; ctx.strokeStyle=pinCol(col); ctx.lineWidth=1.6; ctx.beginPath(); ctx.arc(p.x,p.y,4+t*16,0,7); ctx.stroke(); ctx.globalAlpha=1; return; } }
+    ctx.drawImage(sp,p.x-SPS/2,p.y-SPS/2,SPS,SPS);
     if(TAGZ){ const a=avgOf(c.id); if(a!=null){ ctx.font=TAGFONT; ctx.textAlign="center"; ctx.textBaseline="bottom"; ctx.lineWidth=3; ctx.strokeStyle="#05070d"; ctx.fillStyle=pinCol("gold");
       const t=fmt1(a), y=p.y-(sel?16:10); ctx.strokeText(t,p.x,y); ctx.fillText(t,p.x,y); } } }
 });
@@ -1497,6 +1539,10 @@ function renderClub(){
         ${st.n} avis de la communauté
         ${st.n?`<div class="dist" title="Répartition des notes de 1 à 10">${st.dist.map(n=>`<i style="height:${Math.max(8,100*n/maxd)}%;opacity:${n?1:.25}"></i>`).join("")}</div>`:""}</div>
     </div>
+    ${ptsOn()&&!c.s&&!isDom(c)?`<button class="pts-ban${score.today?" done":""}" data-checkin-here>
+      <span class="pb-ico">${ic(score.today?"check":"bolt")}</span>
+      <span class="pb-t">${score.today?`<b>Séance du jour validée</b><small>${score.today===c.id?"Ici même. Respect.":"Reviens demain pour 10 points de plus."}</small>`:`<b>+10 points</b><small>chaque jour où tu t'entraînes ici</small>`}</span>
+      ${score.today?"":`<span class="pb-go">J'y suis</span>`}</button>`:""}
     <div class="acts">
       <a class="btn pri" href="${gmaps}" target="_blank" rel="noopener">${ic("nav")} Itinéraire</a>
       <a class="btn" href="${esc(c.u)}" target="_blank" rel="noopener">${ic("ext")} Site officiel</a>
@@ -1757,7 +1803,8 @@ function applyFeatures(){
   b.hidden=!po; $("bRank").hidden=!po;
   const pf=feat("feat_profile"); $("meChip").hidden=!pf; $("meChipN").textContent=myName(); if(!pf) closeMe(); else if(meOpen) openMe();
   refreshProfile();
-  b.classList.toggle("done",!!score.today); $("bCheckT").textContent=score.today?"Séance validée":"Je suis à la salle";
+  b.classList.toggle("done",!!score.today); $("bCheckT").textContent=score.today?"Séance validée":"Je suis à la salle"; $("bCheckP").hidden=!!score.today;
+  const rk=score.rank_month; $("sPtsL").textContent=rk&&score.month?(rk===1?"1er du mois":rk+"e du mois"):"points"; $("sPtsBox").classList.toggle("top3",!!(rk&&rk<=3&&score.month));
   b.title=score.today?"Ta séance du jour est validée. Reviens demain pour 10 points de plus.":"Tu es à la salle ? Gagne 10 points (une fois par jour)";
 }
 
@@ -2109,6 +2156,7 @@ document.addEventListener("click",async e=>{
   const mb=t.closest("[data-mine]"); if(mb){ toggleMine(mb.dataset.mine); return; }
   const vb=t.closest("[data-vote]"); if(vb){ vote(vb.dataset.vote,+vb.dataset.v); return; }
   if(t.closest("#rSend")){ sendReview(); return; }
+  if(t.closest("[data-checkin-here]")){ if(!score.today) doCheckin(); else renderRank(); return; }
   if(t.closest("[data-pseudo]")){ e.preventDefault(); pseudoModal(); return; }
   const hd=t.closest("[data-hide]"); if(hd){ const r=db.reviews.find(x=>x.id===hd.dataset.hide); if(!r) return; try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"PATCH",body:{hidden:!r.hidden},prefer:"return=minimal"}); r.hidden=!r.hidden; if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
   const dr=t.closest("[data-delrev]"); if(dr){ if(dr.dataset.sure!=="1"){ dr.dataset.sure="1"; dr.textContent="Sûr ?"; return; } const r=db.reviews.find(x=>x.id===dr.dataset.delrev); try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"DELETE"}); db.reviews=db.reviews.filter(x=>x!==r); if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
@@ -2138,7 +2186,7 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
   try{ await loadAll(); }catch(e){ toast("Avis indisponibles pour le moment.",1); }
   computeStats(); applyAdminUi();
   const order=CLUBS.filter(c=>!isDom(c)).map(c=>({c,p:pos(c)})).filter(x=>x.p).sort((a,b)=>b.p.lat-a.p.lat);
-  order.forEach((x,i)=>drawMarker(x.c,60+Math.round(i*450/order.length)));
+  order.forEach(x=>drawMarker(x.c)); pinWave();
   updateHeader();
   clearTimeout(introSafety); welcome(); refreshScore();
   if(needPseudo()) setTimeout(()=>{ if(needPseudo()&&!document.querySelector(".modal")) pseudoModal(true); }, feat("feat_profile")?650:(store.get("hmg-last-visit",null)?1700:2100));
