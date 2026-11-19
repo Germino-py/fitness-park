@@ -1137,6 +1137,68 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 /* Zones mortes : les boîtes invisibles qui entourent les boutons et la légende laissent passer le doigt vers la carte */
 #fab,#legal,#legend{pointer-events:none}
 #fab>*,#legal a,#legal button{pointer-events:auto}
+
+/* Ange de la semaine */
+#angel{position:fixed;inset:0;z-index:3000;overflow:hidden;background:radial-gradient(120% 80% at 50% 35%,rgba(30,36,70,.74),rgba(3,5,10,.92));animation:fade .45s;touch-action:none;-webkit-user-select:none;user-select:none;cursor:pointer}
+#angel.out{opacity:0;transition:opacity .45s}
+#angel>*{position:absolute;left:0;top:0;will-change:transform}
+#angel>.ang-defs{width:0;height:0;overflow:hidden}
+.ang-fly{width:150px;height:164px;margin:-82px 0 0 -75px;z-index:3}
+.ang-bob{width:100%;height:100%;animation:angBob 1.7s ease-in-out infinite}
+@keyframes angBob{50%{transform:translateY(-9px)}}
+.ag{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 16px rgba(255,236,190,.45)) drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+.ag g{transform-box:view-box;transform-origin:0 0}
+.ag .ag-halo{animation:agHalo 2.2s ease-in-out infinite}
+@keyframes agHalo{50%{transform:translateY(-4px)}}
+.ag .flap{animation:agFlap .34s ease-in-out infinite alternate}
+@keyframes agFlap{from{transform:rotate(10deg)}to{transform:rotate(-16deg)}}
+.ag .ag-eyes{transform-origin:0 -36px;animation:agBlink 3.4s infinite}
+@keyframes agBlink{0%,91%,97%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}}
+.ag .wink-r,.ag .ag-kiss{display:none}
+.ag.wink .eye-r{display:none}.ag.wink .wink-r{display:inline}
+.ag.kiss .ag-mouth{display:none}.ag.kiss .ag-kiss{display:inline}
+.ag .ag-star{animation:agStar 1.2s ease-in-out infinite}
+@keyframes agStar{50%{transform:scale(1.25) rotate(20deg)}}
+.ang-carry{position:absolute!important;left:50%!important;top:70%!important;width:72px;margin-left:-30px;transform:rotate(-6deg);filter:drop-shadow(0 0 10px rgba(255,209,102,.7))}
+.ang-hat{width:96px;height:88px;margin:-44px 0 0 -48px;z-index:2;filter:drop-shadow(0 8px 16px rgba(0,0,0,.5))}
+.ang-hat svg,.ang-med svg,.ang-crown svg,.ang-carry svg{width:100%;height:100%;display:block}
+.ang-med{width:104px;height:130px;margin:-65px 0 0 -52px;z-index:4;filter:drop-shadow(0 0 22px rgba(255,209,102,.6))}
+.ang-med.glow{animation:angGlow 1.8s ease-in-out infinite}
+@keyframes angGlow{50%{filter:drop-shadow(0 0 34px rgba(255,209,102,.95))}}
+.ang-heart{width:170px;height:132px;margin:-66px 0 0 -85px;z-index:2}
+.ang-heart .hb{width:100%;height:100%;filter:drop-shadow(0 0 20px rgba(255,79,139,.55))}
+.ang-heart .hb.beat{animation:angBeat 1.3s ease-in-out infinite}
+@keyframes angBeat{0%,100%{transform:scale(1)}15%{transform:scale(1.08)}30%{transform:scale(.99)}45%{transform:scale(1.05)}}
+.ang-heart svg{width:100%;height:100%;overflow:visible}
+.ang-av{width:150px;margin:-56px 0 0 -75px;display:grid;justify-items:center;gap:10px;z-index:2}
+.ang-av .ab{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 0 0 6px rgba(var(--a-rgb),.15),0 0 40px rgba(var(--a-rgb),.45)}
+.ang-av .ab svg.i{width:50px;height:50px}
+.ang-av b{font:700 17px var(--f-d);color:#fff;text-align:center;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ang-av.glow .ab{animation:angAv 1.6s ease-in-out infinite}
+@keyframes angAv{50%{box-shadow:0 0 0 10px rgba(255,209,102,.2),0 0 60px rgba(255,209,102,.6)}}
+.ang-crown{width:80px;height:58px;margin:-29px 0 0 -40px;z-index:4;filter:drop-shadow(0 0 14px rgba(255,209,102,.8))}
+.spk{width:var(--s,10px);height:var(--s,10px);margin:calc(var(--s,10px)/-2) 0 0 calc(var(--s,10px)/-2);background:var(--c,#ffd166);pointer-events:none;z-index:5;
+  clip-path:polygon(50% 0,61% 38%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 38%)}
+.spk.hrt{clip-path:path("M5 9 C1.5 6.5 0 4.6 0 3 C0 1.3 1.3 0 2.8 0 C3.8 0 4.6 .5 5 1.3 C5.4 .5 6.2 0 7.2 0 C8.7 0 10 1.3 10 3 C10 4.6 8.5 6.5 5 9Z");width:10px;height:10px;margin:-5px 0 0 -5px;scale:calc(var(--s,10px)/10px)}
+.ang-card{left:50%!important;top:auto!important;bottom:calc(26px + env(safe-area-inset-bottom,0px));width:min(370px,calc(100% - 32px));padding:20px 18px 16px;text-align:center;border-radius:24px;transform:translateX(-50%);
+  background:linear-gradient(160deg,rgba(26,30,52,.94),rgba(12,16,28,.94));border:1px solid rgba(255,209,102,.35);box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 50px rgba(255,209,102,.14);opacity:0;z-index:6;cursor:default}
+.ang-card.in{animation:angCard .65s cubic-bezier(.2,1.35,.4,1) forwards}
+@keyframes angCard{from{opacity:0;transform:translate(-50%,40px) scale(.92)}to{opacity:1;transform:translate(-50%,0)}}
+.ang-card .k{font:700 11px var(--f-d);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.ang-card h2{margin:6px 0 8px;font:800 23px/1.15 var(--f-d);background:linear-gradient(90deg,#fff6c2,#ffd166 60%,#ffb347);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ang-card p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.5}.ang-card p b{color:var(--ink)}
+.ang-card button{width:100%;justify-content:center;padding:13px;font-size:14.5px}
+.ang-card .ang-test{display:block;margin-top:8px;font:600 11px var(--f-b);color:var(--dim);font-style:normal}
+/* couronne sur la pastille du profil toute la semaine */
+#meChip{position:relative}
+#meChip.crowned::after{content:"";position:absolute;left:50%;top:-12px;width:24px;height:17px;margin-left:-12px;pointer-events:none;filter:drop-shadow(0 0 5px rgba(255,209,102,.9));animation:agHalo 2.2s ease-in-out infinite;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 72'%3E%3Cpath d='M8 58 4 16l24 20L50 6l22 30 24-20-4 42Z' fill='%23ffd166' stroke='%23d08c00' stroke-width='5' stroke-linejoin='round'/%3E%3Crect x='7' y='52' width='86' height='14' rx='4' fill='%23ffc233' stroke='%23d08c00' stroke-width='4'/%3E%3Ccircle cx='50' cy='8' r='7' fill='%233fd8ff'/%3E%3C/svg%3E") no-repeat center/contain}
+/* admin : choix de l'animation */
+.ang-pick{display:grid;gap:8px}
+.ang-pick label{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--stroke);cursor:pointer}
+.ang-pick label.on{border-color:rgba(var(--a-rgb),.55);background:rgba(var(--a-rgb),.07)}
+.ang-pick input{accent-color:var(--a2);width:18px;height:18px;margin:0}
+.ang-pick small{display:block;color:var(--muted);font-size:11.5px;line-height:1.4;margin-top:2px}
 </style>
 </head>
 <body>
@@ -1347,6 +1409,7 @@ const FEATURES = [
   {k:"feat_welcome", t:"Message de bienvenue", d:"À l'ouverture du site : un accueil selon l'heure (« La séance du midi t'attend »), et pour un habitué « Content de te revoir, Machine 48213 » avec un compliment, ses salles, ses points et sa série.", def:false},
   {k:"feat_profile", t:"Profil du sportif", d:"Le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». La carte s'ouvre tout de suite : le bonjour s'affiche sous la pastille « Toi · Machine 48213 » en haut à droite, qui déplie le profil.", def:false},
   {k:"feat_pseudo", t:"Pseudos uniques", d:"À sa première visite, le visiteur choisit son pseudo (unique : personne d'autre ne peut le prendre). Il remplace « Machine 48213 » sur ses avis, au classement et dans son profil. Gros mots et noms réservés (HMG, Mino, Admin) refusés.", def:false},
+  {k:"feat_angel", t:"Ange de la semaine", d:"Le sportif qui a validé au moins 3 séances (« Je suis à la salle ») la semaine précédente, du lundi au dimanche, voit un petit ange venir le féliciter à sa première visite de la semaine. Tu choisis l'animation ci-dessous et tu peux la tester.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -1802,6 +1865,8 @@ function renderFeat(){
     <p style="margin:0 0 12px;color:var(--muted);font-size:13px">Chaque nouveauté reste <b style="color:var(--ink)">masquée au public</b> tant que tu ne l'actives pas. Toi, connecté en admin, tu les vois toutes pour les tester et les filmer.</p>
     ${FEATURES.map(f=>{ const on=featOn(f.k); return `<div class="feat"><div><b>${esc(f.t)}</b><p>${esc(f.d)}</p><span class="st${on?" on":""}">${on?"Visible par tout le monde":"Masqué : visible seulement par toi"}</span></div>
       <label class="toggle" aria-label="${esc(f.t)}"><input type="checkbox" data-feat="${f.k}"${on?" checked":""}></label>
+      ${f.k==="feat_angel"?`<div class="sub"><b>Animation choisie</b><div class="ang-pick">${ANGEL_STYLES.map(a=>`<label class="${angelStyle()===a.k?"on":""}"><input type="radio" name="angSt" value="${a.k}" data-angel-style${angelStyle()===a.k?" checked":""}><span><b>${esc(a.t)}</b><small>${esc(a.d)}</small></span><button type="button" class="mini" data-angel-test="${a.k}">Tester</button></label>`).join("")}</div>
+        <div>Le test joue l'animation tout de suite, même si l'option est masquée. Les visiteurs ne la voient qu'une fois par semaine.</div></div>`:""}
       ${f.k==="feat_points"?`<div class="sub">
         <div id="fDb">${dbState===true?`<span class="ok">✓ Base de données prête.</span>`:dbState===false?`<span class="ko">À faire une seule fois : copie le script et colle-le dans Supabase (SQL Editor → Run).</span><div class="row"><button class="mini cy" id="fCopy">Copier le script</button><a class="btn mini" href="${SUPA_SQL}" target="_blank" rel="noopener">Ouvrir Supabase ${ic("ext")}</a></div>`:`Vérification de la base…`}</div>
         <div><b>Positions vérifiées : ${g.saved} / ${g.total} salles.</b> Le serveur s'en sert pour vérifier qu'on est bien à la salle.${g.saved<g.total?`<div class="row" style="margin-top:6px"><button class="mini" id="fGeo">Enregistrer les positions</button></div>`:""}</div>
@@ -1823,7 +1888,7 @@ async function setFeature(k,on){
 function applyFeatures(){
   const po=ptsOn(), b=$("bCheck");
   b.hidden=!po; $("bRank").hidden=!po;
-  const pf=feat("feat_profile"); $("meChip").hidden=!pf; $("meChipN").textContent=myName(); if(!pf) closeMe(); else if(meOpen) openMe();
+  const pf=feat("feat_profile"); $("meChip").hidden=!pf; $("meChip").classList.toggle("crowned",crowned()&&angelStyle()==="couronne"); $("meChipN").textContent=myName(); if(!pf) closeMe(); else if(meOpen) openMe();
   refreshProfile();
   b.classList.toggle("done",!!score.today); $("bCheckT").innerHTML=score.today?`<span class="t-l">Séance validée</span><span class="t-s">Validée</span>`:`<span class="t-l">Je suis à la salle</span><span class="t-s">À la salle</span>`; $("bCheckP").hidden=!!score.today;
   const rk=score.rank_month; $("sPtsL").textContent=rk&&score.month?(rk===1?"1er du mois":rk+"e du mois"):"points"; $("sPtsBox").classList.toggle("top3",!!(rk&&rk<=3&&score.month));
@@ -1987,6 +2052,181 @@ function psWelcome(wasNew){
     <button class="cy" data-x>Voir la carte</button>`);
 }
 
+/* ================= ANGE DE LA SEMAINE (feat_angel) =================
+   Si le sportif a validé au moins 3 séances la semaine précédente (lundi → dimanche),
+   un petit ange vient le féliciter à sa première visite de la semaine. L'admin choisit l'animation. */
+const ANGEL_STYLES=[
+  {k:"magie",t:"Le tour de magie",d:"L'ange arrive, tapote trois fois un chapeau haut-de-forme avec sa baguette et en fait sortir une médaille d'or."},
+  {k:"coeur",t:"Le cœur magique",d:"L'ange dessine un cœur avec sa baguette. Le cœur bat, éclate en petits cœurs, puis l'ange envoie un bisou."},
+  {k:"couronne",t:"La couronne",d:"L'ange apporte une couronne d'or et la pose sur la tête du sportif : « Machine de la semaine ». Sa pastille de profil garde la couronne toute la semaine."}];
+const angelStyle=()=>{ const v=db.settings.angel_style; return ANGEL_STYLES.some(a=>a.k===v)?v:"magie"; };
+const isoWeek=()=>{ const d=new Date(), t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())), wd=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-wd);
+  const y=t.getUTCFullYear(); return y+"-"+String(Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7)).padStart(2,"0"); };
+const crowned=()=>featOn("feat_angel")&&store.get("hmg-crown-week",null)===isoWeek();
+const ANGEL_SVG=`<svg class="ag" viewBox="-110 -125 220 240" aria-hidden="true">
+  <g class="ag-halo"><ellipse cx="0" cy="-97" rx="28" ry="7.5" fill="none" stroke="url(#agGold)" stroke-width="5.5"/><ellipse cx="0" cy="-97" rx="28" ry="7.5" fill="none" stroke="#fffbe0" stroke-width="1.2" opacity=".9"/></g>
+  <g transform="translate(-16,6)"><g class="flap">
+    <path d="M0,0 C-14,-30 -50,-46 -78,-28 C-68,-22 -72,-12 -64,-8 C-74,-2 -70,10 -58,10 C-64,20 -50,28 -38,20 C-30,26 -14,20 0,0Z" fill="url(#agWing)" stroke="#c4d6f7" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M-12,-4 Q-38,-14 -62,-20 M-16,4 Q-36,2 -54,0 M-16,10 Q-28,14 -40,16" fill="none" stroke="#c4d6f7" stroke-width="1.5" stroke-linecap="round"/></g></g>
+  <g transform="translate(16,6) scale(-1,1)"><g class="flap">
+    <path d="M0,0 C-14,-30 -50,-46 -78,-28 C-68,-22 -72,-12 -64,-8 C-74,-2 -70,10 -58,10 C-64,20 -50,28 -38,20 C-30,26 -14,20 0,0Z" fill="url(#agWing)" stroke="#c4d6f7" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M-12,-4 Q-38,-14 -62,-20 M-16,4 Q-36,2 -54,0 M-16,10 Q-28,14 -40,16" fill="none" stroke="#c4d6f7" stroke-width="1.5" stroke-linecap="round"/></g></g>
+  <ellipse cx="-11" cy="82" rx="7" ry="4.5" fill="#ffd3bb"/><ellipse cx="11" cy="82" rx="7" ry="4.5" fill="#ffd3bb"/>
+  <path d="M-20,-6 C-26,20 -38,50 -46,74 Q-38,82 -30,76 Q-22,84 -14,77 Q-7,85 0,78 Q7,85 14,77 Q22,84 30,76 Q38,82 46,74 C38,50 26,20 20,-6Z" fill="url(#agRobe)" stroke="#d3def5" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M-14,0 Q0,9 14,0" fill="none" stroke="url(#agGold)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M0,22 l2.4,5.2 5.6,.6 -4.2,3.8 1.2,5.6 -5,-2.9 -5,2.9 1.2,-5.6 -4.2,-3.8 5.6,-.6Z" fill="#c8ff1e" stroke="#9fe000" stroke-width=".8" stroke-linejoin="round"/>
+  <g transform="translate(-19,8)"><g class="arm-l"><path d="M0,0 Q-10,14 -14,28" fill="none" stroke="#f3f7ff" stroke-width="11" stroke-linecap="round"/><path d="M0,0 Q-10,14 -14,28" fill="none" stroke="#d3def5" stroke-width="1.2" stroke-linecap="round" opacity=".7" transform="translate(4,0)"/><circle cx="-14" cy="31" r="6" fill="url(#agSkin)"/></g></g>
+  <g class="ag-head">
+    <circle cx="0" cy="-38" r="34" fill="url(#agSkin)"/>
+    <g fill="url(#agHair)"><circle cx="-28" cy="-55" r="9"/><circle cx="-18" cy="-66" r="12"/><circle cx="-3" cy="-72" r="13"/><circle cx="12" cy="-69" r="12"/><circle cx="25" cy="-58" r="9.5"/></g>
+    <path d="M-2,-80 q8,-10 14,-2 q4,6 -3,8" fill="none" stroke="#f6b93b" stroke-width="3.2" stroke-linecap="round"/>
+    <g class="ag-eyes">
+      <g><ellipse cx="-12" cy="-36" rx="4.6" ry="6.2" fill="#2a1f3d"/><circle cx="-10.3" cy="-38.6" r="1.9" fill="#fff"/><circle cx="-13.3" cy="-33.4" r=".9" fill="#fff"/></g>
+      <g class="eye-r"><ellipse cx="12" cy="-36" rx="4.6" ry="6.2" fill="#2a1f3d"/><circle cx="13.7" cy="-38.6" r="1.9" fill="#fff"/><circle cx="10.7" cy="-33.4" r=".9" fill="#fff"/></g>
+      <path class="wink-r" d="M6,-36 Q12,-41.5 18,-36" fill="none" stroke="#2a1f3d" stroke-width="2.8" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="-22" cy="-24" rx="7" ry="4.4" fill="#ff8fab" opacity=".55"/><ellipse cx="22" cy="-24" rx="7" ry="4.4" fill="#ff8fab" opacity=".55"/>
+    <ellipse cx="0" cy="-28" rx="1.7" ry="1.2" fill="#f0a487"/>
+    <path class="ag-mouth" d="M-6,-21 Q0,-14.5 6,-21" fill="none" stroke="#8a3d55" stroke-width="2.6" stroke-linecap="round"/>
+    <path class="ag-kiss" d="M-1.5,-22 a3,3 0 1 1 3,0 a3,3 0 1 1 -3,0" fill="#c2506f"/>
+  </g>
+  <g transform="translate(19,8)"><g class="arm-r">
+    <path d="M0,0 Q14,6 22,16" fill="none" stroke="#f3f7ff" stroke-width="11" stroke-linecap="round"/>
+    <line x1="22" y1="17" x2="50" y2="-25" stroke="#4b3a6e" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="24" cy="17" r="6" fill="url(#agSkin)"/>
+    <g transform="translate(52,-28)"><g class="ag-star"><path d="M0,-11 L3.2,-3.4 11,-3.4 4.8,1.6 7,9.4 0,4.8 -7,9.4 -4.8,1.6 -11,-3.4 -3.2,-3.4Z" fill="url(#agGold)" stroke="#fff6c2" stroke-width="1"/></g></g>
+  </g></g>
+</svg>`;
+const ANGEL_DEFS=`<svg class="ang-defs" width="0" height="0" aria-hidden="true"><defs>
+    <radialGradient id="agSkin" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#fff3ea"/><stop offset="1" stop-color="#ffcfb4"/></radialGradient>
+    <linearGradient id="agRobe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe8fb"/></linearGradient>
+    <linearGradient id="agWing" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfe0ff"/></linearGradient>
+    <linearGradient id="agGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6c2"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#f2a300"/></linearGradient>
+    <linearGradient id="agHair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a6"/><stop offset="1" stop-color="#f6b93b"/></linearGradient>
+  </defs></svg>`;
+const HAT_SVG=`<svg viewBox="0 0 100 92"><ellipse cx="50" cy="80" rx="47" ry="10" fill="#10131f" stroke="#2c3350" stroke-width="2"/><path d="M22,79 L27,16 Q50,8 73,16 L78,79 Q50,88 22,79Z" fill="#1a1f33" stroke="#2c3350" stroke-width="2"/><path d="M24,58 Q50,66 76,58 L77,70 Q50,78 23,70Z" fill="#c8ff1e"/><ellipse cx="50" cy="16" rx="23" ry="6.5" fill="#262d47"/><path d="M33,24 L30,54" stroke="rgba(255,255,255,.14)" stroke-width="4" stroke-linecap="round"/></svg>`;
+const MEDAL=n=>`<svg viewBox="0 0 120 150"><path d="M30,0 L56,58 L42,64 L14,4Z" fill="#c8ff1e"/><path d="M90,0 L64,58 L78,64 L106,4Z" fill="#9fe000"/><circle cx="60" cy="95" r="46" fill="url(#agGold)" stroke="#fff3b0" stroke-width="3"/><circle cx="60" cy="95" r="36" fill="none" stroke="#e39b00" stroke-width="2.5" stroke-dasharray="3 4"/><text x="60" y="104" text-anchor="middle" font-family="Space Grotesk,Inter,sans-serif" font-weight="700" font-size="40" fill="#5b3a00">${n}</text><text x="60" y="123" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700" font-size="10" letter-spacing="1.5" fill="#7a5000">SÉANCES</text></svg>`;
+const CROWN_SVG=`<svg viewBox="0 0 100 72"><path d="M8,58 L4,16 L28,36 L50,6 L72,36 L96,16 L92,58Z" fill="url(#agGold)" stroke="#d08c00" stroke-width="2.5" stroke-linejoin="round"/><rect x="7" y="54" width="86" height="12" rx="4" fill="url(#agGold)" stroke="#d08c00" stroke-width="2.2"/><circle cx="4" cy="16" r="5" fill="#ff6b9a" stroke="#fff" stroke-width="1.2"/><circle cx="50" cy="6" r="6" fill="#3fd8ff" stroke="#fff" stroke-width="1.2"/><circle cx="96" cy="16" r="5" fill="#ff6b9a" stroke="#fff" stroke-width="1.2"/><circle cx="50" cy="60" r="4.5" fill="#c8ff1e"/><circle cx="28" cy="60" r="3.2" fill="#3fd8ff"/><circle cx="72" cy="60" r="3.2" fill="#3fd8ff"/><path d="M18,48 L20,30" stroke="#fffbe0" stroke-width="3" stroke-linecap="round" opacity=".7"/></svg>`;
+const HEART_D="M0,34 C-46,4 -66,-28 -38,-50 C-20,-63 -4,-52 0,-40 C4,-52 20,-63 38,-50 C66,-28 46,4 0,34Z";
+let angelBusy=false;
+async function playAngel(style,n,test){
+  if(angelBusy) return; angelBusy=true; try{ closeMe(); }catch(e){}
+  const W=innerWidth, H=innerHeight, cx=W/2, cy=Math.max(200,Math.min(H*.38,H/2-110));
+  const stage=document.createElement("div"); stage.id="angel"; stage.setAttribute("role","dialog"); stage.setAttribute("aria-label","Félicitations"); document.body.appendChild(stage); stage.innerHTML=ANGEL_DEFS;
+  let spd=matchMedia("(prefers-reduced-motion: reduce)").matches?4:1, shown=false, closed=false;
+  const z=ms=>new Promise(r=>setTimeout(r,ms/spd));
+  const an=(el,kf,o)=>{ const a=el.animate(kf,{fill:"forwards",...o}); a.playbackRate=spd; return a.finished.catch(()=>{}); };
+  const close=()=>{ if(closed) return; closed=true; stage.classList.add("out"); setTimeout(()=>{ stage.remove(); angelBusy=false; },480); };
+  stage.addEventListener("click",e=>{ if(e.target.closest("[data-ang-ok]")||shown){ close(); return; }
+    spd=5; stage.getAnimations({subtree:true}).forEach(a=>{ try{ a.playbackRate=5; }catch(_){} }); });
+  setTimeout(()=>{ if(!closed) close(); },22000);
+  const name=esc(myName());
+  const card=(k,h,p,btn)=>{ const c=document.createElement("div"); c.className="ang-card"; c.innerHTML=`<small class="k">${k}</small><h2>${h}</h2><p>${p}</p><button class="cy" data-ang-ok>${btn}</button>${test?`<em class="ang-test">Aperçu admin</em>`:""}`; stage.appendChild(c); requestAnimationFrame(()=>c.classList.add("in")); shown=true; };
+  /* paillettes */
+  const spk=(x,y,o={})=>{ const cols=o.cols||["#ffd166","#fff6c2","#ffffff","#c8ff1e"]; for(let i=0;i<(o.n||10);i++){ const s=document.createElement("i"); s.className=o.heart?"spk hrt":"spk";
+      const a=(o.a0??0)+Math.random()*(o.spread??Math.PI*2), d=(o.d||60)*(.5+Math.random()*.7), sz=(o.s||10)*(.6+Math.random()*.8), c=cols[i%cols.length];
+      s.style.cssText=`--s:${sz}px;--c:${c}`; stage.appendChild(s);
+      const fx=x+Math.cos(a)*d, fy=y+Math.sin(a)*d;
+      an(s,[{transform:`translate(${x}px,${y}px) scale(0) rotate(0deg)`,opacity:1},{transform:`translate(${x+(fx-x)*.7}px,${y+(fy-y)*.7}px) scale(1) rotate(${o.heart?0:90}deg)`,opacity:1,offset:.45},{transform:`translate(${fx}px,${fy+(o.g??14)}px) scale(.25) rotate(${o.heart?0:200}deg)`,opacity:0}],{duration:(o.t||1000)*(.7+Math.random()*.6),easing:"cubic-bezier(.2,.7,.3,1)"}).then(()=>s.remove()); } };
+  /* l'ange */
+  const fly=document.createElement("div"); fly.className="ang-fly"; fly.innerHTML=`<div class="ang-bob">${ANGEL_SVG}</div>`; stage.appendChild(fly);
+  const svg=fly.querySelector("svg"), st={x:0,y:0,r:0};
+  const tf=(x,y,r=0,s=1)=>`translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`;
+  const place=(x,y,r=0)=>{ st.x=x; st.y=y; st.r=r; fly.style.transform=tf(x,y,r); };
+  const go=async(pts,dur,ease="cubic-bezier(.45,.05,.3,1)")=>{ const kf=[{transform:tf(st.x,st.y,st.r)}].concat(pts.map(p=>({transform:tf(p.x,p.y,p.r||0)})));
+    const a=fly.animate(kf,{duration:dur,easing:ease,fill:"forwards"}); a.playbackRate=spd; await a.finished.catch(()=>{}); const L=pts[pts.length-1]; place(L.x,L.y,L.r||0); a.cancel(); };
+  const arm=svg.querySelector(".arm-r"), armL=svg.querySelector(".arm-l");
+  const tap=()=>an(arm,[{transform:"rotate(0deg)"},{transform:"rotate(34deg)"},{transform:"rotate(0deg)"}],{duration:320,easing:"ease-in-out",fill:"none"});
+  const wave=()=>an(armL,[{transform:"rotate(0deg)"},{transform:"rotate(-70deg)"},{transform:"rotate(-35deg)"},{transform:"rotate(-70deg)"},{transform:"rotate(-35deg)"},{transform:"rotate(0deg)"}],{duration:1300,easing:"ease-in-out",fill:"none"});
+  const wink=()=>{ svg.classList.add("wink"); setTimeout(()=>svg.classList.remove("wink"),900/spd); };
+  let trailT=0; const trail=on=>{ clearInterval(trailT); if(on) trailT=setInterval(()=>{ const r=fly.getBoundingClientRect(); spk(r.left+r.width*.5,r.top+r.height*.62,{n:2,d:18,s:9,g:22,t:900}); },60); };
+  const bye=async()=>{ trail(true); await go([{x:st.x+50,y:st.y-60,r:8},{x:W+160,y:-170,r:18}],1500,"cubic-bezier(.55,0,.85,.45)"); trail(false); fly.remove(); };
+
+  if(style==="coeur"){
+    place(W+130,cy+160,14);
+    await go([{x:W*.82,y:cy-10,r:6},{x:cx+78,y:cy-120,r:0}],1500);
+    const hx=cx-14, hy=cy+46;
+    const hw=document.createElement("div"); hw.className="ang-heart"; hw.style.transform=`translate(${hx}px,${hy}px)`;
+    hw.innerHTML=`<div class="hb"><svg viewBox="-75 -72 150 116"><defs><linearGradient id="agHeartG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8fb8"/><stop offset=".55" stop-color="#ff4f8b"/><stop offset="1" stop-color="#ff2e63"/></linearGradient></defs>
+      <path class="hf" d="${HEART_D}" fill="url(#agHeartG)" opacity="0"/><path class="hs" d="${HEART_D}" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M-30,-38 Q-40,-26 -34,-12" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="5" stroke-linecap="round" class="hl" opacity="0"/>
+      <text class="hn" x="0" y="-6" text-anchor="middle" font-family="Space Grotesk,Inter,sans-serif" font-weight="700" font-size="34" fill="#fff" opacity="0">${n}</text>
+      <text class="hn" x="0" y="11" text-anchor="middle" font-family="Inter,sans-serif" font-weight="800" font-size="9" letter-spacing="1.6" fill="#fff" opacity="0">SÉANCES</text></svg></div>`;
+    stage.appendChild(hw);
+    const ps=hw.querySelector(".hs"), L=ps.getTotalLength(); ps.style.strokeDasharray=L; ps.style.strokeDashoffset=L;
+    const swirl=an(arm,[{transform:"rotate(0deg)"},{transform:"rotate(30deg)"},{transform:"rotate(-8deg)"},{transform:"rotate(30deg)"},{transform:"rotate(-8deg)"},{transform:"rotate(30deg)"},{transform:"rotate(0deg)"}],{duration:1800,easing:"ease-in-out",fill:"none"});
+    const draw=an(ps,[{strokeDashoffset:L},{strokeDashoffset:0}],{duration:1800,easing:"cubic-bezier(.5,.1,.4,1)"});
+    const t0=performance.now(); const drawSpk=setInterval(()=>{ const k=Math.min(1,(performance.now()-t0)*spd/1800); const pt=ps.getPointAtLength(L*k), m=ps.getScreenCTM(); if(!m) return;
+      spk(m.a*pt.x+m.c*pt.y+m.e, m.b*pt.x+m.d*pt.y+m.f,{n:2,d:16,s:9,g:8,t:700}); if(k>=1) clearInterval(drawSpk); },70);
+    await Promise.all([swirl,draw]); clearInterval(drawSpk);
+    an(hw.querySelector(".hf"),[{opacity:0},{opacity:1}],{duration:450}); an(hw.querySelector(".hl"),[{opacity:0},{opacity:1}],{duration:450});
+    hw.querySelectorAll(".hn").forEach(t=>an(t,[{opacity:0},{opacity:1}],{duration:500,delay:200}));
+    await z(350);
+    const hb=hw.querySelector(".hb");
+    await an(hb,[{transform:"scale(1)"},{transform:"scale(1.16)"},{transform:"scale(.98)"},{transform:"scale(1.12)"},{transform:"scale(1)"}],{duration:950,easing:"ease-in-out",fill:"none"});
+    spk(hx,hy-6,{n:16,d:150,s:15,g:40,heart:true,cols:["#ff4f8b","#ff8fb8","#ffd166","#ffffff"],t:1300});
+    hb.classList.add("beat");
+    card("Cœur de champion",`${n} séances la semaine dernière !`,`Ta régularité fait chaud au cœur, <b>${name}</b>. Tu es une vraie machine.`,"Merci l'ange !");
+    await z(500);
+    svg.classList.add("kiss"); await z(350);
+    const k=document.createElement("i"); k.className="spk hrt kiss"; k.style.cssText="--s:22px;--c:#ff4f8b"; stage.appendChild(k);
+    const r=fly.getBoundingClientRect();
+    await an(k,[{transform:`translate(${r.left+r.width*.5}px,${r.top+r.height*.4}px) scale(.3)`,opacity:1},{transform:`translate(${cx}px,${cy+60}px) scale(2.2)`,opacity:.9,offset:.7},{transform:`translate(${cx}px,${cy+80}px) scale(3.2)`,opacity:0}],{duration:1200,easing:"cubic-bezier(.3,.6,.4,1)"});
+    k.remove(); svg.classList.remove("kiss");
+    await wave(); await bye();
+  } else if(style==="couronne"){
+    const ax=cx, ay=cy+64;
+    const av=document.createElement("div"); av.className="ang-av"; av.style.transform=`translate(${ax}px,${ay}px)`;
+    av.innerHTML=`<div class="ab">${ic("db")}</div><b>${name}</b>`; stage.appendChild(av);
+    an(av.querySelector(".ab"),[{transform:"scale(0)"},{transform:"scale(1.12)",offset:.7},{transform:"scale(1)"}],{duration:700,easing:"ease-out"});
+    an(av.querySelector("b"),[{opacity:0,transform:"translateY(8px)"},{opacity:1,transform:"none"}],{duration:500,delay:300});
+    const cr=document.createElement("div"); cr.className="ang-carry"; cr.innerHTML=CROWN_SVG; fly.appendChild(cr);
+    place(-140,cy-230,-18);
+    await go([{x:cx*.55,y:cy-200,r:-6},{x:cx-6,y:cy-150,r:0}],1600);
+    await z(250);
+    const r0=cr.getBoundingClientRect(); cr.remove();
+    const cw=document.createElement("div"); cw.className="ang-crown"; cw.innerHTML=CROWN_SVG; stage.appendChild(cw);
+    const sx=r0.left+r0.width/2, sy=r0.top+r0.height/2, ex=ax, ey=ay-62;
+    go([{x:st.x-30,y:st.y-30,r:-6}],700);
+    await an(cw,[{transform:`translate(${sx}px,${sy}px) rotate(0deg)`},{transform:`translate(${sx+(ex-sx)*.35+18}px,${sy+(ey-sy)*.35}px) rotate(10deg)`,offset:.3},{transform:`translate(${sx+(ex-sx)*.7-14}px,${sy+(ey-sy)*.7}px) rotate(-9deg)`,offset:.65},{transform:`translate(${ex}px,${ey+6}px) rotate(3deg)`,offset:.88},{transform:`translate(${ex}px,${ey}px) rotate(-8deg)`}],{duration:1500,easing:"ease-in-out"});
+    spk(ex,ey,{n:20,d:110,s:13,g:20,t:1200});
+    av.classList.add("glow");
+    card("Machine de la semaine",`${n} séances la semaine dernière !`,`La couronne te va à merveille, <b>${name}</b>. Tu la gardes toute la semaine.`,"Je la garde !");
+    store.set("hmg-crown-week",isoWeek()); try{ applyFeatures(); }catch(e){}
+    wink();
+    await an(fly.querySelector(".ang-bob"),[{transform:"rotate(0deg)"},{transform:"rotate(22deg) translateY(6px)"},{transform:"rotate(22deg) translateY(6px)",offset:.6},{transform:"rotate(0deg)"}],{duration:1100,easing:"ease-in-out",fill:"none"});
+    await wave(); await bye();
+  } else {
+    place(-130,cy-200,-20);
+    await go([{x:cx*.45,y:cy-110,r:-10},{x:cx-72,y:cy+8,r:0}],1500);
+    const hx=cx+52, hy=cy+96;
+    const hat=document.createElement("div"); hat.className="ang-hat"; hat.innerHTML=HAT_SVG; stage.appendChild(hat);
+    await an(hat,[{transform:`translate(${hx}px,${hy-320}px) rotate(-24deg)`,opacity:0},{transform:`translate(${hx}px,${hy}px) rotate(5deg)`,opacity:1,offset:.68},{transform:`translate(${hx}px,${hy-14}px) rotate(-3deg)`,opacity:1,offset:.84},{transform:`translate(${hx}px,${hy}px) rotate(0deg)`,opacity:1}],{duration:850,easing:"ease-out"});
+    await z(200);
+    for(let i=0;i<3;i++){ await tap(); spk(hx,hy-34,{n:6+i*3,d:36+i*10,s:8,g:6,t:700});
+      an(hat,[{transform:`translate(${hx}px,${hy}px) scale(1)`},{transform:`translate(${hx}px,${hy}px) scale(1.06,.92)`},{transform:`translate(${hx}px,${hy}px) scale(1)`}],{duration:220}); await z(90); }
+    await z(150);
+    spk(hx,hy-40,{n:26,d:140,s:13,g:30,t:1300});
+    const med=document.createElement("div"); med.className="ang-med"; med.innerHTML=MEDAL(n); stage.appendChild(med);
+    const my=Math.max(150,cy-118);
+    await an(med,[{transform:`translate(${hx}px,${hy-30}px) scale(.15) rotateY(0deg)`,opacity:0},{transform:`translate(${(hx+cx)/2+20}px,${my-30}px) scale(.9) rotateY(400deg)`,opacity:1,offset:.55},{transform:`translate(${cx}px,${my-6}px) scale(1.12) rotateY(680deg)`,opacity:1,offset:.82},{transform:`translate(${cx}px,${my}px) scale(1) rotateY(720deg)`,opacity:1}],{duration:1500,easing:"cubic-bezier(.2,.75,.3,1)"});
+    med.classList.add("glow"); spk(cx,my,{n:14,d:90,s:11,g:10});
+    card("Tour de magie !",`${n} séances la semaine dernière !`,`Abracadabra, <b>${name}</b> : tu es une vraie machine. Continue comme ça !`,"Merci l'ange !");
+    wink(); await wave();
+    an(hat,[{transform:`translate(${hx}px,${hy}px) scale(1)`,opacity:1},{transform:`translate(${hx}px,${hy}px) scale(1.25)`,opacity:.6,offset:.4},{transform:`translate(${hx}px,${hy}px) scale(0)`,opacity:0}],{duration:500}).then(()=>hat.remove());
+    spk(hx,hy-10,{n:12,d:50,s:14,g:-10,cols:["#ffffff","#e8eefc","#c8d4ee"],t:800});
+    await bye();
+  }
+}
+let angelChecked=false;
+async function angelCheck(){
+  if(angelChecked||!featOn("feat_angel")||!LIVE) return; angelChecked=true;
+  try{ const r=await rpc("prev_week",{p_voter:voterId}); if(!r||!(r.n>=3)||store.get("hmg-angel-week",null)===r.week) return;
+    for(let i=0;i<40&&(document.querySelector(".modal")||!$("intro").classList.contains("out")||!$("sheet").hidden&&sheetMode!=="club");i++) await new Promise(res=>setTimeout(res,500));
+    store.set("hmg-angel-week",r.week); playAngel(angelStyle(),r.n);
+  }catch(e){}
+}
+
 /* ---- message de bienvenue */
 function welcome(){
   const it=$("intro"), out=()=>it.classList.add("out"), late=it.classList.contains("out");
@@ -2101,6 +2341,7 @@ $("sPtsBox").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e
 document.addEventListener("click",async e=>{
   const t=e.target;
   if(t.closest("[data-checkin]")){ doCheckin(); return; }
+  const at=t.closest("[data-angel-test]"); if(at){ e.preventDefault(); playAngel(at.dataset.angelTest,3,true); return; }
   if(t.closest("[data-rank]")){ renderRank(); return; }
   const pr=t.closest("[data-period]"); if(pr){ rankPeriod=pr.dataset.period; renderRank(rankRows[rankPeriod]===undefined); return; }
   if(t.closest("#fCopy")){ const b=t.closest("#fCopy"); const txt=sqlText||await fetch(SQL_URL,{cache:"no-store"}).then(r=>r.text()).catch(()=>"");
@@ -2111,6 +2352,7 @@ document.addEventListener("click",async e=>{
     renderFeat(); return; }
 });
 document.addEventListener("change",async e=>{
+  if(e.target.matches&&e.target.matches("[data-angel-style]")){ const v=e.target.value; try{ await setFeature("angel_style",v); toast("Animation de l'ange : "+ANGEL_STYLES.find(a=>a.k===v).t+"."); }catch(err){ toast(err.message,1); } if(sheetMode==="feat") renderFeat(); return; }
   const k=e.target.dataset&&e.target.dataset.feat; if(!k) return;
   const on=e.target.checked;
   try{ await setFeature(k,on); toast(on?"Activé : tout le monde le voit maintenant.":"Masqué au public. Toi, tu le vois toujours.");
@@ -2211,6 +2453,7 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
   order.forEach(x=>drawMarker(x.c)); pinWave();
   updateHeader();
   clearTimeout(introSafety); welcome(); refreshScore();
+  setTimeout(angelCheck,1600);
   if(needPseudo()) setTimeout(()=>{ if(needPseudo()&&!document.querySelector(".modal")) pseudoModal(true); }, feat("feat_profile")?650:(store.get("hmg-last-visit",null)?1700:2100));
   const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900); else if(h==="admin"&&!isAdmin()) setTimeout(loginModal,900);
   const n=await geocodeMissing();
