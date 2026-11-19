@@ -1194,6 +1194,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
   border:1px solid rgba(255,255,255,.18);background:rgba(20,24,40,.62);color:#fff;font:600 12.5px var(--f-b);cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 #angel>.ang-snd svg{width:18px;height:18px;flex:none}
 #angel>.ang-snd.off{color:var(--dim)}
+#angel>.ang-snd.ask{border-color:rgba(255,209,102,.5);color:#fff6c2}
 #angel>.ang-snd.lock{border-color:rgba(255,209,102,.65);color:#fff6c2;animation:angSnd 1.6s ease-out infinite}
 @keyframes angSnd{0%{box-shadow:0 0 0 0 rgba(255,209,102,.5)}100%{box-shadow:0 0 0 12px rgba(255,209,102,0)}}
 /* couronne sur la pastille du profil toute la semaine */
@@ -2119,11 +2120,18 @@ const HEART_D="M0,34 C-46,4 -66,-28 -38,-50 C-20,-63 -4,-52 0,-40 C4,-52 20,-63 
 const SND={ctx:null,want:false,unlockedAt:0,padV:null,sc:null,onchange:null,LOUD:1.9,
   on(){ return store.get("hmg-sound",true)!==false; },
   ready(){ return !!this.ctx&&this.ctx.state==="running"; },
+  forced(){ return store.get("hmg-sound-force",false)===true; },
+  canForce(){ return !!navigator.audioSession&&matchMedia("(pointer:coarse)").matches&&!this.forced(); },
+  force(){ store.set("hmg-sound-force",true); try{ navigator.audioSession.type="playback"; }catch(e){} },
+  /* après l'ange : on endort le son pour rendre la main à la musique et économiser la batterie */
+  sleep(){ this.want=false; setTimeout(()=>{ if(!angelBusy&&this.ready()) this.ctx.suspend().catch(()=>{}); },2600); },
   fresh(){ return performance.now()-this.unlockedAt<900; },
   init(){
     if(this.ctx) return this.ctx;
     const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
-    try{ if(navigator.audioSession) navigator.audioSession.type="ambient"; }catch(e){}  // se mélange à la musique du sportif, respecte le mode silencieux
+    /* iPhone : par défaut le son se mélange à la musique du sportif et respecte le mode silencieux.
+       S'il touche « Pas de son ? », on passe en « playback » : le son sort même en silencieux (sa musique se met en pause le temps de l'ange). */
+    try{ if(navigator.audioSession) navigator.audioSession.type=this.forced()?"playback":"ambient"; }catch(e){}
     let c; try{ c=this.ctx=new AC({latencyHint:"interactive"}); }catch(e){ return null; }
     c.onstatechange=()=>{ try{ this.onchange&&this.onchange(); }catch(e){} };
     const comp=c.createDynamicsCompressor(); comp.threshold.value=-18; comp.knee.value=14; comp.ratio.value=3.5; comp.attack.value=.003; comp.release.value=.25;
@@ -2242,17 +2250,20 @@ async function playAngel(style,n,test){
   let spd=matchMedia("(prefers-reduced-motion: reduce)").matches?4:1, shown=false, closed=false;
   const sfx=(nm,a)=>{ if(!closed&&(spd===1||nm==="fanfare")) SND.play(nm,a); };
   const sb=stage.querySelector("[data-ang-snd]");
-  const sndUI=()=>{ const on=SND.on(), lock=on&&!SND.ready(); sb.className="ang-snd"+(on?"":" off")+(lock?" lock":"");
-    sb.innerHTML=(on?SPK_ON:SPK_OFF)+(lock?"<span>Touche pour le son</span>":""); sb.setAttribute("aria-label",on?"Couper le son":"Activer le son"); };
+  const sndUI=()=>{ const on=SND.on(), lock=on&&!SND.ready(), ask=on&&!lock&&SND.canForce(); sb.className="ang-snd"+(on?"":" off")+(lock?" lock":"")+(ask?" ask":"");
+    sb.innerHTML=(on?SPK_ON:SPK_OFF)+(lock?"<span>Touche pour le son</span>":ask?"<span>Pas de son ?</span>":""); sb.setAttribute("aria-label",on?"Couper le son":"Activer le son"); };
   SND.onchange=()=>{ if(closed) return; sndUI(); if(SND.ready()&&SND.on()) SND.pad(); };
   sndUI(); if(SND.on()) SND.pad();
   const z=ms=>new Promise(r=>setTimeout(r,ms/spd));
   const an=(el,kf,o)=>{ const a=el.animate(kf,{fill:"forwards",...o}); a.playbackRate=spd; return a.finished.catch(()=>{}); };
-  const close=()=>{ if(closed) return; closed=true; SND.onchange=null; SND.padOff(); stage.classList.add("out"); setTimeout(()=>{ stage.remove(); angelBusy=false; },480); };
+  const close=()=>{ if(closed) return; closed=true; SND.onchange=null; SND.padOff(); SND.sleep(); stage.classList.add("out"); setTimeout(()=>{ stage.remove(); angelBusy=false; },480); };
   stage.addEventListener("click",e=>{
     const fr=SND.fresh(); SND.unlockedAt=0;
     if(e.target.closest("[data-ang-snd]")){ const wake=fr||!SND.ready();
-      if(!SND.on()){ SND.mute(false); SND.unlock(); SND.pad(); } else if(wake){ SND.unlock(); SND.pad(); } else { SND.mute(true); }
+      if(!SND.on()){ SND.mute(false); SND.unlock(); SND.pad(); }
+      else if(wake){ if(SND.canForce()) SND.force(); SND.unlock(); SND.pad(); }
+      else if(SND.canForce()) SND.force();   // iPhone en silencieux : on force le son
+      else SND.mute(true);
       SND.unlockedAt=0; sndUI(); return; }
     if(e.target.closest("[data-ang-ok]")||shown){ close(); return; }
     if(fr&&SND.on()) return;   // ce toucher vient d'allumer le son : on laisse l'animation à sa vitesse
