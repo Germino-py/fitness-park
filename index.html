@@ -1463,6 +1463,100 @@ body.gm-on #game{opacity:1;visibility:visible}
   .gm-pick button svg{height:110px}
 }
 
+/* saisons */
+#game .gm-sky{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+.gm-sky i{position:absolute;top:-24px;width:var(--s);height:var(--s);background:var(--c);opacity:var(--o);animation:gmFall var(--d) linear var(--dl) infinite;will-change:transform}
+.gm-sky[data-s=hiver] i{border-radius:50%;box-shadow:0 0 6px rgba(255,255,255,.85)}
+.gm-sky[data-s=automne] i{border-radius:0 80% 0 80%;height:calc(var(--s)*.62)}
+.gm-sky[data-s=printemps] i{border-radius:60% 0 60% 0;height:calc(var(--s)*.6)}
+.gm-sky[data-s=ete] i{top:auto;bottom:-12px;border-radius:50%;box-shadow:0 0 10px #ffd166;animation-name:gmRise}
+@keyframes gmFall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(calc(var(--dx)*.5 + 18px),56vh) rotate(calc(var(--r)*.5))}100%{transform:translate(var(--dx),112vh) rotate(var(--r))}}
+@keyframes gmRise{0%{transform:translate(0,0);opacity:0}15%{opacity:var(--o)}100%{transform:translate(var(--dx),-85vh);opacity:0}}
+.gm-sky .sun{position:absolute;right:-110px;top:40px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,170,.5),rgba(255,190,80,.16) 45%,transparent 70%);animation:gmSun 7s ease-in-out infinite alternate}
+.gm-sky .sun::after{content:"";position:absolute;inset:-70px;border-radius:50%;background:repeating-conic-gradient(rgba(255,230,150,.13) 0 6deg,transparent 6deg 18deg);-webkit-mask:radial-gradient(circle,#000 25%,transparent 68%);mask:radial-gradient(circle,#000 25%,transparent 68%);animation:gmSpin 70s linear infinite}
+@keyframes gmSun{to{transform:scale(1.08);opacity:.85}}
+@keyframes gmSpin{to{transform:rotate(360deg)}}
+.gm-tint{position:absolute;inset:0;pointer-events:none}
+#game[data-ssn=hiver] .gm-tint{background:linear-gradient(rgba(190,225,255,.10),rgba(235,245,255,.07))}
+#game[data-ssn=automne] .gm-tint{background:linear-gradient(rgba(255,150,60,.08),rgba(255,120,40,.04))}
+#game[data-ssn=printemps] .gm-tint{background:linear-gradient(rgba(255,160,215,.06),transparent)}
+#game[data-ssn=ete] .gm-tint{background:linear-gradient(rgba(255,215,120,.10),transparent 70%)}
+.gm-hud .w .ssn{color:#fff;opacity:.85;letter-spacing:.14em}
+.gm-hero.cold>svg{animation:gmShiver 3.4s infinite}
+@keyframes gmShiver{0%,76%,100%{transform:none}78%,82%,86%{transform:translateX(-1.3px)}80%,84%,88%{transform:translateX(1.3px)}}
+@media (prefers-reduced-motion:reduce){ .gm-sky i{display:none} .gm-hero.cold>svg{animation:none} }
+body.gm-on #meSay{display:none}
+
+/* ===================== Espace admin : barre compacte + Centre de contrôle (verre, Volt) ===================== */
+#adminBar{flex-wrap:nowrap;gap:4px;padding:5px;border-radius:999px;border:1px solid rgba(var(--a-rgb),.3);box-shadow:0 12px 34px rgba(0,0,0,.4),0 0 26px rgba(var(--a-rgb),.12),inset 0 1px 0 rgba(255,255,255,.08)}
+#adminBar .who{display:inline-flex;align-items:center;gap:7px;padding:0 8px 0 10px;font:800 10.5px var(--f-d);letter-spacing:.22em;color:var(--a2)}
+#adminBar .who i{width:7px;height:7px;border-radius:50%;background:var(--a2);box-shadow:0 0 10px var(--a2);animation:ccPulse 2s infinite}
+#adminBar .ab{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;font:700 12.5px var(--f-d);letter-spacing:.01em;white-space:nowrap;background:rgba(255,255,255,.05);border:1px solid var(--stroke);color:var(--ink);box-shadow:none}
+#adminBar .ab:hover{border-color:rgba(var(--a-rgb),.45);background:rgba(var(--a-rgb),.08)}
+#adminBar .ab.cy{background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));border-color:transparent;color:var(--a-ink);box-shadow:0 4px 18px rgba(var(--a-rgb),.38)}
+#adminBar .ab.out{width:36px;height:36px;padding:0;justify-content:center;color:var(--muted)}
+#adminBar .ab.out:hover{color:#ff7a7a;border-color:rgba(255,90,90,.45);background:rgba(255,90,90,.08)}
+#adminBar .ab .badge{margin:0 -4px 0 0}
+@media (max-width:760px){
+  #adminBar{left:50%;right:auto;transform:translateX(-50%);width:max-content;max-width:calc(100% - 16px);justify-content:center;border-radius:999px}
+  #adminBar .who{display:inline-flex;padding:0 4px 0 8px;letter-spacing:.16em}
+  #adminBar .ab{padding:7px 11px;font-size:12px} }
+@media (max-width:480px){ #adminBar .who{font-size:0;letter-spacing:0;gap:0;padding:0 6px 0 9px} #adminBar .ab{padding:7px 10px;gap:6px} }
+@media (max-width:350px){ #adminBar .ab:not(.cy) .t{display:none} #adminBar .ab{padding:7px 9px} }
+@keyframes ccPulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.sheet .cc-head{align-items:center;gap:12px;position:relative}
+.sheet .cc-head::after{content:"";position:absolute;left:16px;right:16px;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--a-rgb),.55),transparent)}
+.cc-logo{width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;color:var(--a-ink);background:radial-gradient(circle at 28% 22%,rgba(255,255,255,.55),transparent 46%),linear-gradient(135deg,var(--a1),var(--a2) 55%,var(--a3));box-shadow:0 6px 22px rgba(var(--a-rgb),.45),inset 0 -2px 6px rgba(0,0,0,.18)}
+.cc-logo svg.i{width:21px;height:21px;stroke-width:2.3}
+.cc-t{flex:1;min-width:0}
+.cc-t small{display:block;font:800 9.5px var(--f-d);letter-spacing:.26em;text-transform:uppercase;color:var(--a2)}
+.cc-t h2{margin:3px 0 0}
+.sh-body.cc{padding-top:14px}
+.cc-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cc-st{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:13px 14px;border-radius:18px;text-align:left;background:linear-gradient(160deg,rgba(255,255,255,.075),rgba(255,255,255,.015));border:1px solid var(--stroke);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.cc-st::before{content:"";position:absolute;right:-34px;top:-34px;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle,rgba(var(--a-rgb),.2),transparent 70%);pointer-events:none}
+.cc-st b{font:800 27px/1 var(--f-d);color:#fff;letter-spacing:-.01em}
+.cc-st span{font:600 11.5px/1.25 var(--f-b);color:var(--muted)}
+.cc-st.main b{color:var(--a2);text-shadow:0 0 20px rgba(var(--a-rgb),.55)}
+button.cc-st{font:inherit;color:inherit;cursor:pointer}
+button.cc-st:hover{border-color:rgba(var(--a-rgb),.4)}
+.cc-st.hot{border-color:rgba(255,90,90,.5);background:linear-gradient(160deg,rgba(255,90,90,.16),rgba(255,255,255,.02))}
+.cc-st.hot::before{background:radial-gradient(circle,rgba(255,90,90,.3),transparent 70%)}
+.cc-st.hot b{color:#ff8a8a}
+.cc-sec{display:flex;align-items:center;gap:10px;margin:22px 2px 10px;font:800 10.5px var(--f-d);letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.cc-sec::after{content:"";order:2;flex:1;height:1px;background:linear-gradient(90deg,var(--stroke),transparent)}
+.cc-sec em{order:3;font:700 11px var(--f-b);font-style:normal;letter-spacing:.02em;text-transform:none;color:var(--a2)}
+.cc-grid{display:grid;gap:8px}
+.cc-f{display:grid;grid-template-columns:42px 1fr auto;gap:4px 12px;align-items:center;padding:12px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--stroke);transition:border-color .3s,background .3s}
+.cc-f.on{background:linear-gradient(150deg,rgba(var(--a-rgb),.1),rgba(255,255,255,.02) 62%);border-color:rgba(var(--a-rgb),.3)}
+.cc-ic{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;align-self:start;background:rgba(255,255,255,.06);border:1px solid var(--stroke);color:var(--muted)}
+.cc-f.on .cc-ic{background:rgba(var(--a-rgb),.13);border-color:rgba(var(--a-rgb),.4);color:var(--a2);box-shadow:0 0 18px rgba(var(--a-rgb),.2)}
+.cc-ic svg.i{width:20px;height:20px}
+.cc-tx{min-width:0}
+.cc-tx b{display:block;font:700 14.5px/1.2 var(--f-d);color:#fff}
+.cc-tx span{display:block;margin-top:3px;font-size:12px;line-height:1.38;color:var(--muted)}
+.cc-tx em{display:inline-flex;align-items:center;gap:6px;margin-top:7px;font:700 10.5px var(--f-b);font-style:normal;color:var(--dim)}
+.cc-tx em::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.cc-f.on .cc-tx em{color:var(--a2)}
+.cc-f.on .cc-tx em::before{box-shadow:0 0 8px var(--a2);animation:ccPulse 2s infinite}
+.cc-f>.toggle{align-self:start;margin-top:2px}
+.cc-act,.cc-more{grid-column:2/4}
+.cc-act{display:flex;gap:6px;margin-top:6px}
+.cc-act .mini{padding:7px 12px;font-size:12px;border-radius:10px;gap:6px}
+.cc-more{margin-top:4px}
+.cc-more summary{cursor:pointer;list-style:none;padding:6px 0;font:600 12px var(--f-b);color:var(--muted)}
+.cc-more summary b{color:var(--ink)}
+.cc-more summary::-webkit-details-marker{display:none}
+.cc-more summary::after{content:"";display:inline-block;width:6px;height:6px;margin-left:8px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.cc-more[open] summary::after{transform:translateY(1px) rotate(-135deg)}
+.cc-more .ang-pick{margin-top:4px}
+.cc-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cc-tools>button{justify-content:center;padding:12px 10px;border-radius:14px;font:700 12.5px var(--f-d);gap:7px}
+.cc-tools>button.on{border-color:rgba(var(--a-rgb),.5);color:var(--a2);background:rgba(var(--a-rgb),.08)}
+.cc-tools .cc-tg{grid-column:1/-1;justify-content:space-between;flex-direction:row-reverse;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--stroke);font-size:12.5px;color:var(--ink)}
+.cc-warn{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;border-radius:14px;font-size:12px;line-height:1.4;color:var(--gold);background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.3)}
+
 </style>
 </head>
 <body>
@@ -1513,13 +1607,11 @@ body.gm-on #game{opacity:1;visibility:visible}
 <div id="meDrop" class="glass" hidden role="dialog" aria-label="Ton profil"></div>
 
 <div id="adminBar" class="glass" hidden>
-  <span class="who">Admin</span>
-  <button id="aMod" class="mini">Modération <span class="badge" id="aPend" hidden>0</span></button>
-  <button id="aVisits" class="mini">Mes visites</button>
-  <label class="toggle mini" style="padding:0 6px"><input type="checkbox" id="aShowProg"> Progression publique</label>
-  <button id="aFeat" class="mini">Fonctionnalités</button>
-  <button id="aRoute" class="mini">Tournée</button>
-  <button id="aOut" class="mini ghost">Quitter</button>
+  <span class="who"><i></i>Admin</span>
+  <button id="aMod" class="ab"><svg class="i"><use href="#i-shield"/></svg><span class="t">Modération</span><span class="badge" id="aPend" hidden>0</span></button>
+  <button id="aFeat" class="ab cy"><svg class="i"><use href="#i-sliders"/></svg><span class="t">Centre de contrôle</span></button>
+  <button id="aOut" class="ab out" title="Quitter l'espace admin" aria-label="Quitter l'espace admin"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.4 7.4a8 8 0 1 0 11.2 0"/></svg></button>
+  <div hidden><button id="aVisits"></button><input type="checkbox" id="aShowProg"><button id="aRoute"></button></div>
 </div>
 
 <div id="legend" class="glass">
@@ -2129,25 +2221,51 @@ async function saveGeo(){
   await api("/rest/v1/club_geo",{method:"POST",body:rows,prefer:"resolution=merge-duplicates,return=minimal"});
   rows.forEach(r=>db.geo[r.club_id]=r); return rows.length;
 }
+/* ---- Centre de contrôle (admin) : les chiffres du moment, les nouveautés à allumer, les outils de la tournée.
+   Plus de bloc technique (script de base, Supabase) : la base est installée. */
+const CC_F={
+  feat_points:{t:"Séances et classement",s:"+10 points par séance vérifiée sur place, classement du mois.",i:"bolt"},
+  feat_welcome:{t:"Message de bienvenue",s:"Un mot d'accueil selon l'heure, un compliment aux habitués.",i:"flame"},
+  feat_profile:{t:"Profil du sportif",s:"La pastille « Toi » : niveau, points et série.",i:"db"},
+  feat_pseudo:{t:"Pseudos uniques",s:"Chacun choisit son nom, gros mots refusés.",i:"pen"},
+  feat_angel:{t:"Ange de la semaine",s:"Félicite ceux qui ont fait 3 séances la semaine passée.",i:"trophy"},
+  feat_game:{t:"Aventure HMG",s:"Le héros en caleçon qui s'habille et se muscle à chaque séance, au fil des saisons.",i:"hero"}};
+let ccStats=null, ccAngOpen=false;
+async function ccLoad(){
+  try{ const rows=LIVE?(await rpc("leaderboard",{p_period:"all",p_voter:voterId}))||[]:[]; ccStats={n:rows.length,s:rows.reduce((a,r)=>a+Math.round((r.points||0)/10),0)}; }
+  catch(e){ ccStats={n:null,s:null}; }
+  if(sheetMode==="feat") renderFeat(); }
 function renderFeat(){
   if(!isAdmin()) return;
-  sheetMode="feat"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
-  const g=geoStats();
-  sh.innerHTML=`<div class="sh-head"><h2>Fonctionnalités</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
-    <p style="margin:0 0 12px;color:var(--muted);font-size:13px">Chaque nouveauté reste <b style="color:var(--ink)">masquée au public</b> tant que tu ne l'actives pas. Toi, connecté en admin, tu les vois toutes pour les tester et les filmer.</p>
-    ${FEATURES.map(f=>{ const on=featOn(f.k); return `<div class="feat"><div><b>${esc(f.t)}</b><p>${esc(f.d)}</p><span class="st${on?" on":""}">${on?"Visible par tout le monde":"Masqué : visible seulement par toi"}</span></div>
-      <label class="toggle" aria-label="${esc(f.t)}"><input type="checkbox" data-feat="${f.k}"${on?" checked":""}></label>
-      ${f.k==="feat_angel"?`<div class="sub"><b>Animation choisie</b><div class="ang-pick">${ANGEL_STYLES.map(a=>`<label class="${angelStyle()===a.k?"on":""}"><input type="radio" name="angSt" value="${a.k}" data-angel-style${angelStyle()===a.k?" checked":""}><span><b>${esc(a.t)}</b><small>${esc(a.d)}</small></span><button type="button" class="mini" data-angel-test="${a.k}">Tester</button></label>`).join("")}</div>
-        <div>Le test joue l'animation tout de suite, même si l'option est masquée. Les visiteurs ne la voient qu'une fois par semaine.</div></div>`:""}
-      ${f.k==="feat_game"?`<div class="sub"><b>Tester l'aventure</b><div class="row" style="margin-top:6px"><button class="mini cy" data-gm-open>Ouvrir l'aventure</button></div><div>En mode test (toi seul), des boutons « +1 séance », « +5 » et « Remise à zéro » s'affichent dans le jeu pour filmer : ils ne changent que ton affichage, jamais la base. « Masquer » les cache pour la vidéo.</div></div>`:""}
-      ${f.k==="feat_points"?`<div class="sub">
-        <div id="fDb">${dbState===true?`<span class="ok">✓ Base de données prête.</span>`:dbState===false?`<span class="ko">À faire une seule fois : copie le script et colle-le dans Supabase (SQL Editor → Run).</span><div class="row"><button class="mini cy" id="fCopy">Copier le script</button><a class="btn mini" href="${SUPA_SQL}" target="_blank" rel="noopener">Ouvrir Supabase ${ic("ext")}</a></div>`:`Vérification de la base…`}</div>
-        <div><b>Positions vérifiées : ${g.saved} / ${g.total} salles.</b> Le serveur s'en sert pour vérifier qu'on est bien à la salle.${g.saved<g.total?`<div class="row" style="margin-top:6px"><button class="mini" id="fGeo">Enregistrer les positions</button></div>`:""}</div>
-      </div>`:""}</div>`; }).join("")}
+  const sh=$("sheet"), was=sheetMode==="feat"&&!sh.hidden, body0=sh.querySelector(".sh-body"), sc=was&&body0?body0.scrollTop:0;
+  sheetMode="feat"; sh.hidden=false; sh.classList.add("big"); const sy=$("meSay"); if(sy) sy.remove();
+  const pend=db.photos.filter(p=>!p.approved).length+db.reviews.filter(r=>r.hidden).length, revs=db.reviews.filter(r=>!r.hidden).length;
+  const list=FEATURES.filter(f=>CC_F[f.k]), onN=list.filter(f=>featOn(f.k)).length, ang=ANGEL_STYLES.find(a=>a.k===angelStyle())||ANGEL_STYLES[0];
+  const st=(v,l,cls,act)=>`<${act?`button type="button" data-cc="${act}"`:"div"} class="cc-st${cls?" "+cls:""}"><b>${v==null?"–":v}</b><span>${l}</span></${act?"button":"div"}>`;
+  sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("sliders")}</div><div class="cc-t"><small>HMG · Espace admin</small><h2>Centre de contrôle</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
+  <div class="sh-body cc">
+    <div class="cc-stats">${st(ccStats&&ccStats.n!=null?ccStats.n+(ccStats.n>=50?"+":""):null,"sportifs en jeu","main")}${st(ccStats?ccStats.s:null,"séances validées")}${st(pend,pend?"à valider, touche ici":"à valider",pend?"hot":"","mod")}${st(revs,"avis publiés")}</div>
+    <div class="cc-sec"><span>Fonctionnalités</span><em>${onN}/${list.length} en ligne</em></div>
+    <div class="cc-grid">${list.map(f=>{ const m=CC_F[f.k], on=featOn(f.k); return `<div class="cc-f${on?" on":""}">
+      <div class="cc-ic">${ic(m.i)}</div>
+      <div class="cc-tx"><b>${esc(m.t)}</b><span>${esc(m.s)}</span><em>${on?"En ligne pour tout le monde":"Caché : toi seul le vois"}</em></div>
+      <label class="toggle" aria-label="${esc(m.t)}"><input type="checkbox" data-feat="${f.k}"${on?" checked":""}></label>
+      ${f.k==="feat_game"?`<div class="cc-act"><button type="button" class="mini cy" data-gm-open>${ic("hero")} Ouvrir l'aventure</button></div>`:""}
+      ${f.k==="feat_angel"?`<details class="cc-more"${ccAngOpen?" open":""}><summary>Animation : <b>${esc(ang.t)}</b></summary><div class="ang-pick">${ANGEL_STYLES.map(a=>`<label class="${angelStyle()===a.k?"on":""}"><input type="radio" name="angSt" value="${a.k}" data-angel-style${angelStyle()===a.k?" checked":""}><span><b>${esc(a.t)}</b><small>${esc(a.d)}</small></span><button type="button" class="mini" data-angel-test="${a.k}">Tester</button></label>`).join("")}</div></details>`:""}
+    </div>`; }).join("")}</div>
+    <div class="cc-sec"><span>Ma tournée des salles</span></div>
+    <div class="cc-tools"><button type="button" data-cc="visits">${ic("check")} Mes visites</button><button type="button" data-cc="route" class="${routeLine?"on":""}">${ic("nav")} ${routeLine?"Effacer le tracé":"Tracer ma tournée"}</button>
+      <label class="toggle cc-tg"><input type="checkbox" data-cc-prog${db.settings.show_progress===true?" checked":""}><span>Ma progression visible par tous</span></label></div>
   </div>`;
-  if(dbState===null) checkDb();
-  if(sqlText===null) fetch(SQL_URL,{cache:"no-store"}).then(r=>r.ok?r.text():"").then(t=>sqlText=t).catch(()=>sqlText="");
+  const nb=sh.querySelector(".sh-body"); if(sc) nb.scrollTop=sc;
+  const mo=sh.querySelector(".cc-more"); if(mo) mo.addEventListener("toggle",()=>ccAngOpen=mo.open);
+  if(!was) ccLoad();
 }
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-cc]"); if(!b) return; const k=b.dataset.cc;
+  if(k==="mod") renderMod(); else if(k==="visits") renderVisits(); else if(k==="route"){ closeSheet(); drawRoute(false); } });
+document.addEventListener("change",e=>{ if(!(e.target.matches&&e.target.matches("[data-cc-prog]"))) return; const t=$("aShowProg"); t.checked=e.target.checked; t.dispatchEvent(new Event("change")); });
+$("adminBar").addEventListener("click",()=>{ const s=$("meSay"); if(s) s.remove(); },true);
+
 async function checkDb(){
   if(!LIVE){ dbState=true; return; }
   try{ await rpc("leaderboard",{p_period:"all"}); dbState=true; ptsReady=true; }
@@ -2783,7 +2901,7 @@ function renderMod(){
   sheetMode="mod"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const pend=db.photos.filter(p=>!p.approved), pendR=db.reviews.filter(r=>r.hidden), last=db.reviews.filter(r=>!r.hidden).slice(0,150);
   const revRow=r=>`<div class="rev${r.hidden?" hid":""}" style="opacity:1"><div class="n">${r.rating}</div><div class="t"><b data-open="${r.club_id}" style="cursor:pointer">${esc(byId[r.club_id]?.n||r.club_id)}</b> · ${r.comment?esc(r.comment):"<i>sans commentaire</i>"}</div><div class="d">${whoHtml(r)} · ${frDateTime(r.created_at)}${VOTES&&r.comment&&!r.hidden?` · <span style="color:var(--done)">${r.up||0} d'accord</span> · <span style="color:var(--danger)">${r.down||0} pas d'accord</span>`:""}</div><div class="adm"><button class="mini${r.hidden?" cy":""}" data-hide="${r.id}">${r.hidden?"Publier":"Masquer"}</button><button class="mini danger" data-delrev="${r.id}">Suppr.</button></div></div>`;
-  sh.innerHTML=`<div class="sh-head"><h2>Modération</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
+  sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("shield")}</div><div class="cc-t"><small>HMG · Espace admin</small><h2>Modération</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
    <div class="grp">Photos à valider (${pend.length})</div>
    ${pend.length?`<div class="gal">${pend.map(p=>`<figure data-img="${p.id}"><img src="${esc(photoUrl(p))}" alt="" loading="lazy"><span class="tag p">${esc(byId[p.club_id]?.n||p.club_id)}</span><div class="adm"><button class="mini" data-approve="${p.id}">Valider</button><button class="mini danger" data-delph="${p.id}">Suppr.</button></div></figure>`).join("")}</div>`:`<div class="empty">Rien à valider.</div>`}
    <div class="grp">Commentaires à valider (${pendR.length})</div>
@@ -2796,7 +2914,7 @@ function renderVisits(){
   sheetMode="visits"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const ids=Object.keys(db.visits).filter(id=>byId[id]).sort((a,b)=>(db.visits[b].d||"").localeCompare(db.visits[a].d||""));
   const local=migrateOldVisits(), toImport=Object.keys(local).filter(k=>!db.visits[k]);
-  sh.innerHTML=`<div class="sh-head"><h2>Mes visites · ${ids.length} / ${CLUBS.length}</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
+  sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("check")}</div><div class="cc-t"><small>Ma tournée des salles</small><h2>Mes visites · ${ids.length} / ${CLUBS.length}</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
     <div class="bar" style="margin-bottom:14px"><i style="width:${100*ids.length/CLUBS.length}%"></i></div>
     ${LIVE&&toImport.length?`<div class="form"><p style="margin:0;font-size:13px">Cet appareil contient ${toImport.length} visite(s) de l'ancienne carte.</p><button class="cy" id="vImport">Les importer</button></div>`:""}
     ${ids.length?ids.map(id=>`<div class="item" data-open="${id}"><span class="dot done"></span><b>${esc(byId[id].n)}</b><span>${frDate(db.visits[id].d)}${db.visits[id].n?" · "+esc(db.visits[id].n):""}</span><em></em></div>`).join(""):`<div class="empty">Aucune visite. Ouvre une salle sur la carte et clique sur « Marquer comme visitée ».</div>`}
@@ -2921,6 +3039,12 @@ const GM_MUS=[{d:0,n:"Crevette",w:.9,t:"Tout commence ici"},{d:5,n:"Affûté",w:
   {d:30,n:"Massif",w:1.2,t:"Les portes deviennent étroites"},{d:50,n:"Titan",w:1.3,t:"La salle tremble à ton arrivée"},{d:80,n:"Colosse",w:1.4,t:"Une légende vivante"}];
 const gmMusLv=d=>{ let l=0; GM_MUS.forEach((m,i)=>{ if(d>=m.d) l=i; }); return l; };
 const gmHeroLv=()=>gmMusLv(gmS.seen==null?gDays():Math.min(gmS.seen,gDays()));
+/* saisons : l'aventure suit la vraie date (hiver dès le 15 novembre, comme le ressenti en France) */
+const GM_SSN={hiver:{n:"Hiver",e:"❄️",h:"L'hiver est arrivé",t:"La neige tombe sur l'aventure"},printemps:{n:"Printemps",e:"🌸",h:"Le printemps est là",t:"Les fleurs reviennent, les gains aussi"},
+  ete:{n:"Été",e:"☀️",h:"C'est l'été",t:"Grand soleil sur l'aventure"},automne:{n:"Automne",e:"🍂",h:"L'automne est là",t:"Les feuilles tombent, pas ta motivation"}};
+const GM_SSN_T=["","hiver","printemps","ete","automne"];
+function gmSeason(){ const t=isAdmin()?store.get("hmg-season-test",""):""; if(GM_SSN[t]) return t;
+  const d=new Date(), v=(d.getMonth()+1)*100+d.getDate(); return v>=1115||v<301?"hiver":v<601?"printemps":v<915?"ete":"automne"; }
 const gmBase=eq=>GM_LG[eq.hero]?GM_LG[eq.hero].base:(eq.hero||"homme");
 const gmNone=(c,eq)=>({skin:gmBase(eq)==="robot"?"Châssis nu":gmBase(eq)==="femme"?"Brassière":"Torse nu",legs:"Caleçon",feet:"Pieds nus",hand:"Mains libres"}[c]||"Aucun");
 const GM={on:false,busy:false,pos:0,lay:null,ghosts:null,tm:null};
@@ -3074,11 +3198,14 @@ function gmDeco(w,h){
   const W=gmWorld(w), r=gmRng(gmHash("deco"+w)), R=(a,b)=>a+(b-a)*r(), o=[], c=W.wc;
   const n=Math.round(h/95), side=()=>{ const s=r()<.5?-1:1; return s*(r()<.6?R(70,260):R(260,620)); };
   for(let i=0;i<Math.round(h/30);i++) o.push(`<circle cx="${R(-700,700)|0}" cy="${R(0,h)|0}" r="${R(.5,1.6).toFixed(1)}" fill="#fff" opacity="${R(.15,.6).toFixed(2)}"/>`);
-  if(W.k==="plaine"){
-    for(let i=0;i<4;i++){ const y=h*(i+.8)/4; o.push(`<path d="M-700 ${y} C-420 ${y-120} -260 ${y-30} -60 ${y-90} C160 ${y-150} 360 ${y-20} 700 ${y-110} V${y+300} H-700Z" fill="${["#0f3a2c","#0c3024","#0a281e","#082018"][i]}" opacity=".85"/><path d="M-700 ${y} C-420 ${y-120} -260 ${y-30} -60 ${y-90} C160 ${y-150} 360 ${y-20} 700 ${y-110}" stroke="${c}" stroke-opacity=".25" stroke-width="2" fill="none"/>`); }
-    for(let i=0;i<n*1.6;i++){ const x=side(), y=R(60,h-20), s=R(.7,1.4); o.push(`<g transform="translate(${x|0} ${y|0}) scale(${s.toFixed(2)})"><rect x="-3" y="-22" width="6" height="24" rx="3" fill="#3b2a1e"/><circle cx="0" cy="-36" r="20" fill="#1f8a5c"/><circle cx="-9" cy="-44" r="12" fill="#2bc27a"/><circle cx="-11" cy="-47" r="4" fill="#bfffe0" opacity=".6"/></g>`); }
-    for(let i=0;i<n*4;i++){ const x=R(-700,700), y=R(0,h); o.push(`<path d="M${x|0} ${y|0} q-3 -12 -7 -16 M${x|0} ${y|0} q1 -14 4 -18 M${x|0} ${y|0} q4 -9 9 -11" stroke="${c}" stroke-opacity="${R(.25,.6).toFixed(2)}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`); }
-    for(let i=0;i<n*2;i++) o.push(`<circle cx="${R(-700,700)|0}" cy="${R(0,h)|0}" r="${R(2,3.4).toFixed(1)}" fill="${["#ff7ab8","#ffe066","#9ad7ff"][i%3]}" opacity=".8"/>`);
+  if(W.k==="plaine"){ const ss=gmSeason(), hv=ss==="hiver", au=ss==="automne", pr=ss==="printemps";
+    const hill=hv?["#2b3d52","#243447","#1d2b3b","#172331"]:au?["#3d2a12","#33230f","#2a1c0c","#22170a"]:pr?["#124430","#0e3828","#0b2e21","#09261b"]:["#0f3a2c","#0c3024","#0a281e","#082018"];
+    const fol=hv?["#1d5a46","#2c7a5c"]:au?["#c2551f","#ff9a3d"]:["#1f8a5c","#2bc27a"], gr=hv?"#e6f4ff":au?"#ffb547":c;
+    for(let i=0;i<4;i++){ const y=h*(i+.8)/4; o.push(`<path d="M-700 ${y} C-420 ${y-120} -260 ${y-30} -60 ${y-90} C160 ${y-150} 360 ${y-20} 700 ${y-110} V${y+300} H-700Z" fill="${hill[i]}" opacity=".85"/><path d="M-700 ${y} C-420 ${y-120} -260 ${y-30} -60 ${y-90} C160 ${y-150} 360 ${y-20} 700 ${y-110}" stroke="${hv?"#f4f9ff":c}" stroke-opacity="${hv?.55:.25}" stroke-width="${hv?4:2}" fill="none"/>`); }
+    for(let i=0;i<n*1.6;i++){ const x=side(), y=R(60,h-20), s=R(.7,1.4); o.push(`<g transform="translate(${x|0} ${y|0}) scale(${s.toFixed(2)})"><rect x="-3" y="-22" width="6" height="24" rx="3" fill="#3b2a1e"/><circle cx="0" cy="-36" r="20" fill="${fol[0]}"/><circle cx="-9" cy="-44" r="12" fill="${fol[1]}"/>${hv?`<path d="M-19.6 -40 C-19 -52 -11 -57 -2 -56.6 C9 -56.6 18 -51 19.8 -40 C14 -45 8 -44 4 -46.5 C-1 -43.6 -6 -45.6 -10 -44 C-14 -45 -17 -43 -19.6 -40Z" fill="#f4f9ff"/><circle cx="-10" cy="-52" r="4" fill="#fff"/>`:pr?`<circle cx="7" cy="-30" r="3.4" fill="#ffc2e3"/><circle cx="-6" cy="-28" r="3" fill="#ff9ad5"/><circle cx="10" cy="-42" r="3" fill="#fff0f8"/><circle cx="-13" cy="-36" r="2.6" fill="#ffc2e3"/><circle cx="2" cy="-48" r="2.6" fill="#ff9ad5"/>`:`<circle cx="-11" cy="-47" r="4" fill="${au?"#ffd166":"#bfffe0"}" opacity=".6"/>`}</g>`); }
+    for(let i=0;i<n*4;i++){ const x=R(-700,700), y=R(0,h); o.push(`<path d="M${x|0} ${y|0} q-3 -12 -7 -16 M${x|0} ${y|0} q1 -14 4 -18 M${x|0} ${y|0} q4 -9 9 -11" stroke="${gr}" stroke-opacity="${R(.25,.6).toFixed(2)}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`); }
+    for(let i=0;i<n*(pr?4:2);i++) o.push(hv?`<ellipse cx="${R(-700,700)|0}" cy="${R(0,h)|0}" rx="${R(6,16).toFixed(1)}" ry="${R(2,4).toFixed(1)}" fill="#f4f9ff" opacity="${R(.35,.7).toFixed(2)}"/>`
+      :`<circle cx="${R(-700,700)|0}" cy="${R(0,h)|0}" r="${R(2,3.4).toFixed(1)}" fill="${(au?["#ff9a3d","#e8542a","#ffc24a"]:pr?["#ff9ad5","#ffe066","#ffffff","#c77dff"]:["#ff7ab8","#ffe066","#9ad7ff"])[i%(pr?4:3)]}" opacity=".8"/>`);
   } else if(W.k==="desert"){
     o.push(`<g opacity=".9"><circle cx="0" cy="${h*.12}" r="150" fill="url(#sun${w})"/>${[0,1,2,3,4].map(i=>`<rect x="-160" y="${h*.12+20+i*22}" width="320" height="${4+i*2}" fill="${W.c[0]}"/>`).join("")}</g>`);
     for(let i=0;i<6;i++){ const y=h*(i+.6)/6; o.push(`<path d="M-700 ${y} Q-300 ${y-90} 0 ${y-30} T700 ${y-60} V${y+260} H-700Z" fill="${["#6b3414","#5a2c12","#4a240f","#3d1d0c","#33180a","#2a1408"][i]}" opacity=".8"/>`); }
@@ -3182,7 +3309,7 @@ function gmPathD(L,a,b,tEnd){ if(b<=a&&!tEnd) return ""; const s0=L.P(a); let d=
 function gmBuild(pos){
   const g=$("game"), L=GM.lay=gmLayout(pos,gDays()), d=gDays(), wcur=Math.floor(d/GM_PER), h=[];
   for(let w=L.w0;w<=L.w1;w++){ const W=gmWorld(w), top=w===L.w1?0:L.P((w+1)*GM_PER).y, bot=w===L.w0?L.H:L.P(w*GM_PER).y, bh=bot-top, nx=gmWorld(w+1);
-    h.push(`<div class="gm-band${w>wcur?" lock":""}" style="top:${top}px;height:${bh}px;background:linear-gradient(${W.c[1]},${W.c[0]} 55%,${W.c[1]})">${gmDeco(w,bh)}<div style="position:absolute;left:0;right:0;top:0;height:140px;background:linear-gradient(${nx.c[1]},transparent)"></div>`);
+    h.push(`<div class="gm-band${w>wcur?" lock":""}" style="top:${top}px;height:${bh}px;background:linear-gradient(${W.c[1]},${W.c[0]} 55%,${W.c[1]})">${gmDeco(w,bh)}<div class="gm-tint"></div><div style="position:absolute;left:0;right:0;top:0;height:140px;background:linear-gradient(${nx.c[1]},transparent)"></div>`);
     const rp=gmRng(gmHash("pt"+w)), snow=W.k==="glacier", up=W.k==="volcan"||W.k==="plaine"||W.k==="jungle";
     for(let i=0;i<16;i++){ const s=(2+rp()*3.5).toFixed(1); h.push(`<i class="gm-pt" style="left:${(rp()*100).toFixed(1)}%;top:${(rp()*bh)|0}px;width:${s}px;height:${s}px;background:${snow?"#fff":W.wc};box-shadow:0 0 ${s*3}px ${snow?"#fff":W.wc};--d:${(6+rp()*8).toFixed(1)}s;--dl:-${(rp()*10).toFixed(1)}s;--dx:${((rp()-.5)*60)|0}px;--dy:${snow?(120+rp()*160)|0:up?-(120+rp()*200)|0:((rp()-.5)*120)|0}px;--o:${(.4+rp()*.5).toFixed(2)}"></i>`); }
     h.push(`</div>`); }
@@ -3215,7 +3342,18 @@ function gmPlace(pos,scroll){ const p=gmPoint(pos), hr=$("gmHero"); if(!hr) retu
   if(scroll!==false){ const sc=$("game").querySelector(".gm-scroll"); const target=p.y-sc.clientHeight*.56, tx=(sc.scrollWidth-sc.clientWidth)/2+p.x*.55;
     sc.scrollTop=scroll===0?target:sc.scrollTop+(target-sc.scrollTop)*.14; sc.scrollLeft=scroll===0?tx:sc.scrollLeft+(tx-sc.scrollLeft)*.14; } }
 function gmMood(){ const hh=new Date().getHours(); return score.today?"happy idle":(hh>=23||hh<6)?"sleep":"idle"; }
-function gmPaintHero(cls){ const hr=$("gmHero"); if(hr) hr.innerHTML=gmBot(gmS.eq,{cls:cls||gmMood()}); }
+function gmPaintHero(cls){ const hr=$("gmHero"); if(!hr) return; hr.innerHTML=gmBot(gmS.eq,{cls:cls||gmMood()}); hr.classList.toggle("cold",gmSeason()==="hiver"&&!gmS.eq.skin&&!GM_LG[gmS.eq.hero]); }
+function gmSky(){ const g=$("game"); if(!g) return; const s=gmSeason(); g.dataset.ssn=s; let k=g.querySelector(".gm-sky");
+  if(!k){ k=document.createElement("div"); k.className="gm-sky"; k.setAttribute("aria-hidden","true"); g.querySelector(".gm-scroll").after(k); }
+  if(k.dataset.s===s) return; k.dataset.s=s; const r=gmRng(gmHash("sky"+s)), o=[], N={hiver:48,printemps:26,ete:18,automne:24}[s];
+  if(s==="ete") o.push(`<div class="sun"></div>`);
+  for(let i=0;i<N;i++){ const sz=s==="hiver"?2+r()*4.6:s==="ete"?2+r()*3:9+r()*9, d=(s==="hiver"?7+r()*9:s==="ete"?9+r()*8:9+r()*9).toFixed(1);
+    const col=s==="automne"?["#ff9a3d","#e8542a","#ffc24a","#c2551f"][i%4]:s==="printemps"?["#ffc2e3","#ff9ad5","#fff0f8"][i%3]:s==="ete"?"#fff2b0":"#ffffff";
+    o.push(`<i style="left:${(r()*100).toFixed(1)}%;--s:${sz.toFixed(1)}px;--d:${d}s;--dl:-${(r()*18).toFixed(1)}s;--dx:${((r()-.5)*(s==="hiver"?120:260))|0}px;--r:${((r()-.5)*1440)|0}deg;--c:${col};--o:${(.45+r()*.5).toFixed(2)}"></i>`); }
+  k.innerHTML=o.join(""); }
+function gmSsnBanner(s){ return new Promise(res=>{ const S=GM_SSN[s], b=document.createElement("div"); b.className="gm-banner glass ssn"; b.style.setProperty("--wc",{hiver:"#bfe6ff",printemps:"#ff9ad5",ete:"#ffd166",automne:"#ff9a3d"}[s]);
+  b.innerHTML=`<b>${esc(S.h)}</b><span>${S.e} ${esc(S.n)}</span><small>${esc(S.t)}</small>`; document.body.appendChild(b); gmSnd("magic");
+  setTimeout(()=>{ b.remove(); res(); },3200); }); }
 function gmHeroCls(c){ const s=$("gmHero")&&$("gmHero").querySelector(".gmb"); if(s) s.setAttribute("class","gmb "+c); }
 
 /* ---------- les autres sportifs (classement) en petits fantômes sur le chemin */
@@ -3236,7 +3374,7 @@ function gmHud(){
   const g=$("game"); if(!g) return; const d=gDays(), w=Math.floor(d/GM_PER), W=gmWorld(w), inW=d%GM_PER;
   const nx=gmNextChest(d), left=nx-d, pend=gmPending().length, eye=gmLegOn("l_reine")?(gmLegRoll(nx)?"Légende":GM_RAR[(gmRoll(nx)||{r:"L"}).r].t):"";
   g.style.setProperty("--wc",W.wc);
-  g.querySelector(".gm-hud").innerHTML=`<div><div class="w">Monde ${w+1}${gmLap(w)>1?" · Tour "+gmLap(w):""}</div><h3>${esc(W.n)}</h3></div>
+  g.querySelector(".gm-hud").innerHTML=`<div><div class="w">Monde ${w+1}${gmLap(w)>1?" · Tour "+gmLap(w):""}<span class="ssn"> · ${GM_SSN[gmSeason()].e} ${GM_SSN[gmSeason()].n}</span></div><h3>${esc(W.n)}</h3></div>
     <div class="btns"><button data-gm="coll" aria-label="Ma collection" title="Ma collection"><svg class="i" viewBox="0 0 24 24"><path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="bdg">${gmS.items.length}</span></button>
     <button data-gm="share" aria-label="Partager mon héros" title="Partager mon héros"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
     <div class="bar"><i style="width:${inW*10}%"></i><u style="left:30%"></u>${gmLegOn("l_coach")?`<u style="left:50%"></u>`:""}<u style="left:60%"></u></div>
@@ -3245,7 +3383,7 @@ function gmHud(){
   g.querySelector(".gm-cta").innerHTML=`<p>${today?`Séance validée, <b>${nm}</b>. Ton héros a avancé : reviens demain pour le pas suivant.`:pend?`Un coffre t'attend, <b>${nm}</b>. Touche-le pour l'ouvrir.`:nu?`Ton héros est encore en caleçon, <b>${nm}</b>. Chaque séance le fait avancer, les coffres l'habillent.`:`Ton héros t'attend, <b>${nm}</b>. Chaque séance à la salle le fait avancer d'un pas.`}</p>
     <button class="gm-go${today?" done":""}" data-gm="go">${today?ic("check")+" Séance du jour validée":ic("bolt")+` Je suis à la salle <em>+1 pas</em>`}</button>`;
   let t=g.querySelector(".gm-test"); if(isAdmin()&&!GM.hideTest){ if(!t){ t=document.createElement("div"); t.className="gm-test glass"; g.appendChild(t); }
-    t.innerHTML=`<small>TEST ADMIN</small><button class="mini" data-gm="t1">+1 séance</button><button class="mini" data-gm="t5">+5</button><button class="mini" data-gm="t0">Remise à zéro</button><button class="mini ghost" data-gm="th">Masquer</button>`; } else if(t) t.remove();
+    t.innerHTML=`<small>TEST ADMIN</small><button class="mini" data-gm="t1">+1 séance</button><button class="mini" data-gm="t5">+5</button><button class="mini" data-gm="t0">Remise à zéro</button><button class="mini" data-gm="ts">${(()=>{ const t=store.get("hmg-season-test",""); return GM_SSN[t]?GM_SSN[t].e+" "+GM_SSN[t].n:"Saison : auto"; })()}</button><button class="mini ghost" data-gm="th">Masquer</button>`; } else if(t) t.remove();
 }
 function gmPending(){ const d=gDays(), o=[]; for(let n=0;n<=d;n++) if(gmKind(n)&&!gmS.open.includes(n)) o.push(n); return o; }
 function gmSay(html,ms){ const col=$("gmCol"), hr=$("gmHero"); if(!col||!hr) return; col.querySelectorAll(".gm-say").forEach(x=>x.remove());
@@ -3266,6 +3404,7 @@ async function gmSync(){
   if(!GM.on||GM.busy) return; const d=gDays();
   if(gmS.seen===null||gmS.seen>d){ gmS.seen=Math.max(0,d-1); gmSave(); }
   if(!gmS.eq.hero){ await gmPickHero(true); }
+  if(gmS.ssn!==gmSeason()&&!GM.busy){ gmS.ssn=gmSeason(); gmSave(); GM.busy=true; gmPaintHero("happy cheer"); await gmSsnBanner(gmS.ssn); gmPaintHero(); GM.busy=false; }
   if(d>gmS.seen){ GM.busy=true; const from=Math.max(gmS.seen,d-6); if(!GM.lay||Math.floor(d/GM_PER)+1>GM.lay.w1) gmBuild(from); gmPlace(from,0);
     await gmSleep(500); gmHeroCls("walk");
     for(let i=from;i<d;i++){ const t0=performance.now(), dur=640;
@@ -3398,6 +3537,7 @@ function gmSet(on,silent){
   const sw=$("modeSw"); sw.classList.toggle("game",on); sw.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.mode==="game")===on)));
   if(on){ if(!silent){ SND.want=true; SND.unlock(); } closeSheet(); closeMe();
     if(!$("game")){ const g=document.createElement("div"); g.id="game"; g.innerHTML=`<div class="gm-scroll"><div class="gm-world"></div></div><div class="gm-hud glass"></div><div class="gm-cta"></div>`; document.body.appendChild(g); gmBind(g); }
+    gmSky();
     GM.ghosts=null; gmBuild(gmS.seen==null?Math.max(0,gDays()-1):Math.min(gmS.seen,gDays())); gmHud(); setTimeout(gmSync,silent?900:450); }
   else { SND.want=false; }
 }
@@ -3415,12 +3555,15 @@ function gmBind(g){
       else if(k==="t1"||k==="t5"){ store.set("hmg-game-test",gmTest()+(k==="t1"?1:5)); gmHud(); gmSync(); }
       else if(k==="t0"){ store.set("hmg-game-test",0); Object.assign(gmS,{seen:null,open:[],items:[],stars:0,leg:{}}); gmS.eq={...GM_EQ0}; gmSave(); toast("Test remis à zéro : ton aventure repart du début."); gmSet(true); }
       else if(k==="th"){ GM.hideTest=true; gmHud(); }
+      else if(k==="ts"){ const t=store.get("hmg-season-test",""), nx=GM_SSN_T[(GM_SSN_T.indexOf(GM_SSN[t]?t:"")+1)%GM_SSN_T.length]; store.set("hmg-season-test",nx); gmSky(); gmBuild(GM.pos); gmHud(); toast(nx?"Saison de test : "+GM_SSN[nx].n+" (toi seul).":"Saison automatique, selon la date."); }
       return; }
     const ch=t.closest("[data-chest]"); if(ch&&ch.classList.contains("ready")&&!GM.busy){ GM.busy=true; await gmOpenChest(+ch.dataset.chest); GM.busy=false; gmHud(); return; }
     const gh=t.closest("[data-ghost]"); if(gh){ toast(gh.dataset.ghost); return; }
     if(t.closest("#gmHero")&&!GM.busy){ const hr=$("gmHero"); hr.classList.remove("gm-jump"); void hr.offsetWidth; hr.classList.add("gm-jump"); gmSnd("pop");
       const was=gmMood(); gmHeroCls("happy idle"); setTimeout(()=>gmHeroCls(was),1800);
       const d=gDays(), left=gmNextChest(d)-d;
+      const ss=gmSeason(), nu=!gmS.eq.skin&&!GM_LG[gmS.eq.hero], sl={hiver:nu?"Brrr… il caille ! Vite, un t-shirt.":"Il neige dehors, mais à la salle il fait chaud !",printemps:"Le printemps, la saison des gains !",ete:nu?"En caleçon ? Parfait pour l'été !":"Objectif été : on y est presque !",automne:"Les feuilles tombent, pas ta motivation."}[ss];
+      if(Math.random()<.4){ gmSay(sl); return; }
       gmSay(pickR([`Prêt pour la séance, <b>${esc(myName())}</b> ?`,`Encore <b>${left}</b> séance${left>1?"s":""} et on ouvre un coffre !`,"On forme une sacrée équipe, toi et moi.","Tu es plus fort qu'hier.",gmMood()==="sleep"?"Zzz… on y va demain matin ?":"Allez, on va soulever de la fonte !"])); } });
   addEventListener("resize",()=>{ if(GM.on&&!GM.busy){ clearTimeout(GM.rz); GM.rz=setTimeout(()=>gmBuild(gmS.seen==null?gDays():Math.min(gmS.seen,gDays())),200); } });
 }
