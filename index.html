@@ -1215,7 +1215,10 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 #modeSw .ms-k{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 4px 18px rgba(var(--a-rgb),.45);transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
 #modeSw.game .ms-k{transform:translateX(100%)}
 #modeSw .ms-hd{width:18px;height:18px;margin:-2px 0}
-@media (max-width:760px){ #modeSw button{padding:7px 9px} #modeSw button .ms-t{display:none} }
+@media (max-width:760px){ #modeSw button{padding:7px 9px} #modeSw button .ms-t{display:none}
+  #top:has(#modeSw:not([hidden])) .brand h1 b{display:none}
+  body.gm-on #stats .prog{display:none!important} }
+@media (max-width:370px){ #top:has(#modeSw:not([hidden])) .brand h1{display:none} #top:has(#modeSw:not([hidden])) .brand{padding:7px} }
 body.gm-on #map,body.gm-on #searchBox,body.gm-on #legend,body.gm-on #fab,body.gm-on #legal,body.gm-on #adminBar,body.gm-on #stats .clubs,body.gm-on #stats .revs{visibility:hidden!important}
 body.gm-on #sheet:not(.gm-keep){display:none}
 
@@ -1258,7 +1261,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-hero svg{width:100%;height:100%;overflow:visible}
 .gm-ghost{position:absolute;width:44px;height:52px;margin:-50px 0 0 -22px;opacity:.6;filter:saturate(.35) brightness(.95);z-index:3;cursor:pointer}
 .gm-ghost svg{width:100%;height:100%;overflow:visible}
-.gm-ghost i{position:absolute;left:50%;top:-14px;transform:translateX(-50%);font:600 9.5px var(--f-b);font-style:normal;white-space:nowrap;color:#fff;padding:1px 6px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15)}
+.gm-ghost i{position:absolute;left:50%;top:-14px;transform:translateX(-50%);font:600 9px var(--f-b);font-style:normal;white-space:nowrap;max-width:62px;overflow:hidden;text-overflow:ellipsis;color:#fff;padding:1px 6px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15)}
 .gm-say{position:absolute;z-index:6;transform:translate(-50%,-100%);max-width:230px;width:max-content;padding:9px 13px;border-radius:16px;font:600 13px/1.35 var(--f-b);color:var(--ink);background:rgba(14,20,34,.88);border:1px solid rgba(var(--a-rgb),.4);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:gmSay .35s cubic-bezier(.3,1.5,.5,1);pointer-events:none;text-align:center}
 .gm-say::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);background:inherit;border-right:1px solid rgba(var(--a-rgb),.4);border-bottom:1px solid rgba(var(--a-rgb),.4)}
 .gm-say b{color:var(--a2)}
@@ -3152,7 +3155,6 @@ function gmBuild(pos){
   h.push(`<div class="gm-col" id="gmCol">`);
   for(let w=L.w0;w<=L.w1;w++){ const W=gmWorld(w+1), gp=L.P((w+1)*GM_PER), y=gp.y+59, gx=gp.x>0?-Math.min(80,L.A*.6):Math.min(80,L.A*.6), lock=(w+1)*GM_PER>d;
     h.push(`<div class="gm-gate" style="left:${gx|0}px;top:${y}px;--wc:${W.wc}"><b>Monde ${w+2}${gmLap(w+1)>1?" · Tour "+gmLap(w+1):""}</b><span>${esc(W.n)}</span>${lock?`<small>Se débloque à ${(w+1)*GM_PER} séances</small>`:""}</div>`); }
-  if(L.w0===0){ const p=L.P(0); h.push(`<div class="gm-gate" style="left:0;top:${p.y+92}px;--wc:${GM_W[0].wc}"><b>Monde 1</b><span>${esc(GM_W[0].n)}</span></div>`); }
   for(let i=L.i0;i<=L.i1;i++){ const p=L.P(i), k=gmKind(i);
     h.push(`<div class="gm-node" data-n="${i}" style="left:${p.x}px;top:${p.y}px">${i||ic("loc")}</div>`);
     if(k){ const big=k==="g", side=p.x>0?-1:p.x<0?1:(i===0?1:-1), cx=p.x+side*(big?84:70);
@@ -3181,10 +3183,10 @@ async function gmGhosts(){
   const col=$("gmCol"); if(!col) return; col.querySelectorAll(".gm-ghost").forEach(x=>x.remove());
   const L=GM.lay, per={}; let k=0;
   for(const r of GM.ghosts){ if(r.me) continue; const d=Math.round((r.points||0)/10); if(d<L.i0||d>L.i1||k>=24) continue; const j=per[d]=(per[d]||0)+1; if(j>3) continue; k++;
-    const p=L.P(d), x=p.x+(j===1?-34:j===2?34:0), y=p.y+(j===3?30:4), r2=gmRng(gmHash(String(r.no)))();
+    const p=L.P(d), x=p.x+(j===1?-48:j===2?48:0), y=p.y+(j===3?44:4), r2=gmRng(gmHash(String(r.no)))();
     const eq={hero:GM_HEROES[(r2*3)|0].k,tone:r2>.5?"fonce":"clair",skin:["blanc","volt","braise","ocean"][(r2*4)|0],hand:"haltere"};
     const el=document.createElement("div"); el.className="gm-ghost"; el.style.left=x+"px"; el.style.top=y+"px"; el.dataset.ghost=`${nameOf(r.no)} · ${d} séance${d>1?"s":""}`;
-    el.innerHTML=gmBot(eq,{cls:"idle"})+`<i>${esc(nameOf(r.no))}</i>`; col.appendChild(el); }
+    el.innerHTML=gmBot(eq,{cls:"idle"})+`<i>${esc(String(nameOf(r.no)).replace(/^Machine /,"n°"))}</i>`; col.appendChild(el); }
 }
 
 /* ---------- interface */
