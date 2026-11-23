@@ -1224,9 +1224,11 @@ body.gm-on #sheet:not(.gm-keep){display:none}
 
 #game{position:fixed;inset:0;z-index:900;overflow:hidden;background:#04060b;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
 body.gm-on #game{opacity:1;visibility:visible}
-#game .gm-scroll{position:absolute;inset:0;overflow:hidden auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-y}
+#game .gm-scroll{position:absolute;inset:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+#game .gm-scroll.drag{cursor:grabbing}
 #game .gm-scroll::-webkit-scrollbar{display:none}
-.gm-world{position:relative;width:100%;overflow:hidden}
+.gm-world{position:relative;width:100%;min-width:100%;overflow:hidden}
+@media (max-width:999px){ .gm-world{width:calc(100% + 280px)} }
 .gm-band{position:absolute;left:0;right:0;overflow:hidden}
 .gm-band>svg{position:absolute;left:50%;top:0;margin-left:-700px;width:1400px;height:100%}
 .gm-band.lock::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(4,6,11,.25),rgba(4,6,11,.72) 60%,rgba(4,6,11,.5));backdrop-filter:saturate(40%) blur(2px);-webkit-backdrop-filter:saturate(40%) blur(2px)}
@@ -1262,8 +1264,8 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-ghost{position:absolute;width:44px;height:52px;margin:-50px 0 0 -22px;opacity:.6;filter:saturate(.35) brightness(.95);z-index:3;cursor:pointer}
 .gm-ghost svg{width:100%;height:100%;overflow:visible}
 .gm-ghost i{position:absolute;left:50%;top:-14px;transform:translateX(-50%);font:600 9px var(--f-b);font-style:normal;white-space:nowrap;max-width:62px;overflow:hidden;text-overflow:ellipsis;color:#fff;padding:1px 6px;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15)}
-.gm-say{position:absolute;z-index:6;transform:translate(-50%,-100%);max-width:230px;width:max-content;padding:9px 13px;border-radius:16px;font:600 13px/1.35 var(--f-b);color:var(--ink);background:rgba(14,20,34,.88);border:1px solid rgba(var(--a-rgb),.4);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:gmSay .35s cubic-bezier(.3,1.5,.5,1);pointer-events:none;text-align:center}
-.gm-say::after{content:"";position:absolute;left:50%;bottom:-7px;width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);background:inherit;border-right:1px solid rgba(var(--a-rgb),.4);border-bottom:1px solid rgba(var(--a-rgb),.4)}
+.gm-say{position:absolute;z-index:6;transform:translate(-50%,-100%);max-width:min(230px,calc(100vw - 24px));width:max-content;padding:9px 13px;border-radius:16px;font:600 13px/1.35 var(--f-b);color:var(--ink);background:rgba(14,20,34,.88);border:1px solid rgba(var(--a-rgb),.4);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:gmSay .35s cubic-bezier(.3,1.5,.5,1);pointer-events:none;text-align:center}
+.gm-say::after{content:"";position:absolute;left:clamp(16px,calc(50% - var(--ax,0px)),calc(100% - 16px));bottom:-7px;width:12px;height:12px;margin-left:-6px;transform:rotate(45deg);background:inherit;border-right:1px solid rgba(var(--a-rgb),.4);border-bottom:1px solid rgba(var(--a-rgb),.4)}
 .gm-say b{color:var(--a2)}
 @keyframes gmSay{from{opacity:0;transform:translate(-50%,-80%) scale(.7)}}
 
@@ -1401,14 +1403,14 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-chest .title{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 34px);text-align:center;padding:0 16px}
 .gm-chest .title b{display:block;font:800 11px var(--f-d);letter-spacing:.3em;color:var(--rc);text-transform:uppercase}
 .gm-chest .title span{display:block;margin-top:4px;font:800 24px var(--f-d);color:#fff}
-.gm-chest .loot{position:absolute;left:50%;top:44%;width:min(330px,calc(100% - 32px));transform:translate(-50%,-50%) scale(.2);opacity:0;padding:16px 16px 14px;text-align:center;border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1.5px solid color-mix(in srgb,var(--rc) 70%,transparent);box-shadow:0 0 60px color-mix(in srgb,var(--rc) 40%,transparent),inset 0 1px 0 rgba(255,255,255,.25);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .7s cubic-bezier(.3,1.5,.5,1) .25s,opacity .3s .25s}
+.gm-chest .loot{position:absolute;left:50%;top:44%;width:min(330px,calc(100% - 32px));transform:translate(-50%,-50%) scale(.2);opacity:0;padding:16px 16px 14px;text-align:center;border-radius:26px;background:linear-gradient(160deg,rgba(26,34,54,.86),rgba(8,12,22,.92));border:1.5px solid color-mix(in srgb,var(--rc) 70%,transparent);box-shadow:0 0 60px color-mix(in srgb,var(--rc) 40%,transparent),inset 0 1px 0 rgba(255,255,255,.25);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .7s cubic-bezier(.3,1.5,.5,1) .25s,opacity .3s .25s}
 .gm-chest .loot{pointer-events:none}
 .gm-chest.open .loot{transform:translate(-50%,-58%) scale(1);opacity:1;pointer-events:auto}
 .gm-chest .hint,.gm-chest .title,.gm-chest .glow,.gm-chest .rays{pointer-events:none}
 .gm-chest .loot .rar{display:inline-block;padding:4px 12px;border-radius:999px;font:800 10.5px var(--f-d);letter-spacing:.22em;color:#05070d;background:var(--rc);box-shadow:0 0 18px var(--rc)}
 .gm-chest .loot .pv{width:150px;height:170px;margin:4px auto 0;display:block;overflow:visible}
 .gm-chest .loot h3{margin:4px 0 2px;font:800 23px var(--f-d);color:#fff}
-.gm-chest .loot p{margin:0;color:var(--muted);font-size:13px}
+.gm-chest .loot p{margin:0;color:#d6deec;font-size:13.5px;line-height:1.4}
 .gm-chest .loot p b{color:var(--ink)}
 .gm-chest .loot .row2{display:flex;gap:8px;margin-top:14px}
 .gm-chest .loot .row2 button{flex:1;justify-content:center;padding:12px 10px}
@@ -1431,7 +1433,9 @@ body.gm-on #game{opacity:1;visibility:visible}
 /* collection */
 .gm-coll .card{width:min(560px,100%);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;padding:18px 0 0;text-align:left}
 .gm-coll .top{display:grid;grid-template-columns:120px 1fr;gap:6px 14px;align-items:center;padding:0 18px 12px;border-bottom:1px solid var(--stroke)}
-.gm-coll .top svg{width:120px;height:136px;grid-row:1/4;overflow:visible}
+.gm-coll .top svg{width:120px;height:136px;grid-row:1/5;overflow:visible}
+.gm-coll .top .cnt.mus b{font-size:14px}
+.gm-coll .top .cnt.mus span{white-space:nowrap}
 .gm-coll .top h2{font-size:21px}
 .gm-coll .top .cnt{font-size:13px;color:var(--muted)}
 .gm-coll .top .cnt b{color:var(--a2);font:800 18px var(--f-d)}
@@ -1673,7 +1677,7 @@ const FEATURES = [
   {k:"feat_profile", t:"Profil du sportif", d:"Le profil de la personne : « Toi · Machine 48213 », son niveau (Recrue, Motivé, Régulier, Acharné, Machine de guerre, Légende HMG) et un compliment. On touche le profil : il se déplie avec ses points, son rang, sa série, ses salles et les boutons « Je suis à la salle », « Classement », « Mes salles ». La carte s'ouvre tout de suite : le bonjour s'affiche sous la pastille « Toi · Machine 48213 » en haut à droite, qui déplie le profil.", def:false},
   {k:"feat_pseudo", t:"Pseudos uniques", d:"À sa première visite, le visiteur choisit son pseudo (unique : personne d'autre ne peut le prendre). Il remplace « Machine 48213 » sur ses avis, au classement et dans son profil. Gros mots et noms réservés (HMG, Mino, Admin) refusés.", def:false},
   {k:"feat_angel", t:"Ange de la semaine", d:"Le sportif qui a validé au moins 3 séances (« Je suis à la salle ») la semaine précédente, du lundi au dimanche, voit un petit ange venir le féliciter à sa première visite de la semaine. Tu choisis l'animation ci-dessous et tu peux la tester.", def:false},
-  {k:"feat_game", t:"Aventure HMG (jeu)", d:"Un bouton Carte / Aventure en haut. Chaque sportif choisit son héros (lui, elle ou le robot Mini-Machine, peau claire ou noire) qui avance d'un pas à chaque séance validée (« Je suis à la salle »). Un coffre tous les 3 pas, un grand coffre au bout de chaque monde (7 mondes), 26 objets à collectionner et à porter, les autres sportifs du classement visibles sur le chemin, image à partager en story. Points et classement inchangés.", def:false},
+  {k:"feat_game", t:"Aventure HMG (jeu)", d:"Un bouton Aventure / Carte en haut. Chaque sportif choisit son héros (lui, elle ou le robot Mini-Machine, peau claire ou noire) qui démarre en caleçon et avance d'un pas à chaque séance validée (« Je suis à la salle »). Les coffres l'habillent (hauts, bas, baskets, accessoires : 42 objets), ses muscles grossissent avec les séances (de Crevette à Colosse), 4 légendes à débloquer, 7 mondes, les autres sportifs du classement visibles sur le chemin, image à partager en story. Points et classement inchangés.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -2873,39 +2877,52 @@ const GM_W=[
   {k:"volcan", n:"Volcans d'Auvergne",   d:"Là où l'on forge les légendes",   c:["#3a0c06","#140303"], wc:"#ff5a36", mon:[["puy",.55,100]]},
   {k:"cosmos", n:"Station Orbitale",     d:"Au-delà de tes limites",          c:["#0b0a2a","#020208"], wc:"#c8ff1e", mon:[["ariane",.45,-110]]}];
 const GM_RAR={C:{t:"Commun",c:"#c9d3e6"},R:{t:"Rare",c:"#3fd8ff"},E:{t:"Épique",c:"#c77dff"},L:{t:"Légendaire",c:"#ffd166"}};
-const GM_CATS=[["skin","Tenues"],["hat","Sur la tête"],["neck","Au cou"],["face","Lunettes"],["back","Dans le dos"],["hand","En main"],["aura","Auras"]];
+const GM_CATS=[["skin","Hauts"],["legs","Bas"],["feet","Chaussures"],["hat","Sur la tête"],["neck","Au cou"],["face","Lunettes"],["back","Dans le dos"],["hand","En main"],["aura","Auras"]];
 const GM_ITEMS=[
-  {id:"blanc",cat:"skin",n:"Tenue Blanche",r:"C",def:1},{id:"volt",cat:"skin",n:"Tenue Volt",r:"R"},{id:"braise",cat:"skin",n:"Tenue Braise",r:"R"},{id:"ocean",cat:"skin",n:"Tenue Océan",r:"R"},
-  {id:"chrome",cat:"skin",n:"Tenue Chrome noir",r:"E"},{id:"or",cat:"skin",n:"Tenue Or massif",r:"L"},{id:"galaxie",cat:"skin",n:"Tenue Galaxie",r:"L"},
+  {id:"blanc",cat:"skin",n:"T-shirt blanc",r:"C",say:"Enfin un t-shirt ! Ton héros a déjà moins froid."},{id:"volt",cat:"skin",n:"T-shirt Volt",r:"R"},{id:"braise",cat:"skin",n:"T-shirt Braise",r:"R"},{id:"ocean",cat:"skin",n:"T-shirt Océan",r:"R"},
+  {id:"chrome",cat:"skin",n:"T-shirt Chrome noir",r:"E"},{id:"or",cat:"skin",n:"T-shirt Or massif",r:"L"},{id:"galaxie",cat:"skin",n:"T-shirt Galaxie",r:"L"},
+  {id:"short_noir",cat:"legs",n:"Short noir",r:"C",say:"Adieu le caleçon, bonjour le short !"},{id:"jogging",cat:"legs",n:"Jogging gris",r:"C"},{id:"short_volt",cat:"legs",n:"Short Volt",r:"R"},{id:"legging",cat:"legs",n:"Legging néon",r:"E"},{id:"short_or",cat:"legs",n:"Short doré",r:"L"},
+  {id:"baskets",cat:"feet",n:"Baskets HMG",r:"C",hmg:1,say:"Des baskets ! Fini de marcher pieds nus."},{id:"baskets_bl",cat:"feet",n:"Baskets blanches",r:"C"},{id:"baskets_volt",cat:"feet",n:"Baskets Volt",r:"R"},{id:"montantes",cat:"feet",n:"Baskets montantes",r:"E"},{id:"baskets_or",cat:"feet",n:"Baskets dorées",r:"L"},
   {id:"bandeau",cat:"hat",n:"Bandeau",r:"C"},{id:"casquette",cat:"hat",n:"Casquette",r:"C"},{id:"bonnet",cat:"hat",n:"Bonnet",r:"C"},{id:"casque",cat:"hat",n:"Casque audio",r:"R"},
   {id:"bonnet_hmg",cat:"hat",n:"Bonnet HMG",r:"R",hmg:1},{id:"bonnet_volt",cat:"hat",n:"Bonnet HMG Volt",r:"E",hmg:1},
   {id:"echarpe_hmg",cat:"neck",n:"Écharpe HMG",r:"R",hmg:1},{id:"echarpe_or",cat:"neck",n:"Écharpe HMG dorée",r:"L",hmg:1},
   {id:"crete",cat:"hat",n:"Crête punk",r:"E"},{id:"aureole",cat:"hat",n:"Auréole",r:"E"},{id:"couronne",cat:"hat",n:"Couronne",r:"L"},
   {id:"soleil",cat:"face",n:"Lunettes de soleil",r:"C"},{id:"cyber",cat:"face",n:"Visière cyber",r:"R"},{id:"coeur",cat:"face",n:"Lunettes cœur",r:"E"},
   {id:"sac",cat:"back",n:"Sac de sport",r:"C"},{id:"cape",cat:"back",n:"Cape de héros",r:"R"},{id:"ailes",cat:"back",n:"Ailes d'ange",r:"E"},{id:"jetpack",cat:"back",n:"Jetpack",r:"L"},
-  {id:"haltere",cat:"hand",n:"Haltère",r:"C",def:1},{id:"kettle",cat:"hand",n:"Kettlebell",r:"C"},{id:"shaker",cat:"hand",n:"Shaker protéiné",r:"C"},{id:"haltereor",cat:"hand",n:"Haltère d'or",r:"L"},
+  {id:"haltere",cat:"hand",n:"Haltère",r:"C",say:"Ton tout premier haltère ! Maintenant, il faut l'habiller…"},{id:"kettle",cat:"hand",n:"Kettlebell",r:"C"},{id:"shaker",cat:"hand",n:"Shaker protéiné",r:"C"},{id:"haltereor",cat:"hand",n:"Haltère d'or",r:"L"},
   {id:"etincelles",cat:"aura",n:"Étincelles",r:"R"},{id:"flammes",cat:"aura",n:"Aura de feu",r:"E"},{id:"eclairs",cat:"aura",n:"Éclairs Volt",r:"L"}];
 const GM_IT=Object.fromEntries(GM_ITEMS.map(i=>[i.id,i]));
-const GM_TOTAL=GM_ITEMS.filter(i=>!i.def).length;
+const GM_TOTAL=GM_ITEMS.length;
+/* le héros démarre en caleçon : les premiers coffres l'habillent (haltère, t-shirt, short, baskets), ensuite c'est le hasard */
+const GM_START={0:"haltere",3:"blanc",6:"short_noir",13:"baskets"};
 /* Légendes : débloquées dans les grands coffres à 20, 40, 60 et 80 séances. Chacune a un pouvoir, actif dès qu'on l'a. */
 const GM_LEG=[
-  {k:"l_masse",n:"Le Roi de la Masse",s:"Huit fois couronné, une montagne de muscles",pw:"Force brute",pd:"Tous tes coffres montent d'un cran de rareté.",base:"homme",tone:"fonce",hair:"chauve",beard:1,wide:1.42,skin:"braise"},
-  {k:"l_classique",n:"Le Prince du Classique",s:"Les plus belles poses de la planète",pw:"Pose classique",pd:"Chaque grand coffre te donne 2 objets.",base:"homme",tone:"bronze",hair:"court",beard:1,wide:1.26,skin:"or",aura:"etincelles"},
-  {k:"l_coach",n:"Le Coach du Peuple",s:"Il motive la France entière",pw:"Motivation",pd:"Un coffre bonus au 5e pas de chaque monde.",base:"homme",tone:"clair",hair:"court",beard:1,wide:1.14,skin:"ocean",hat:"bandeau"},
-  {k:"l_reine",n:"La Reine du Fitness",s:"Personne ne lui résiste",pw:"Œil de reine",pd:"Tu vois la rareté du prochain coffre avant de l'ouvrir.",base:"femme",tone:"clair",hair:"blond",wide:1,skin:"galaxie",hat:"couronne",aura:"etincelles"}];
+  {k:"l_masse",n:"Le Roi de la Masse",s:"Huit fois couronné, une montagne de muscles",pw:"Force brute",pd:"Tous tes coffres montent d'un cran de rareté.",base:"homme",tone:"fonce",hair:"chauve",beard:1,wide:1.42,skin:"braise",legs:"short_noir"},
+  {k:"l_classique",n:"Le Prince du Classique",s:"Les plus belles poses de la planète",pw:"Pose classique",pd:"Chaque grand coffre te donne 2 objets.",base:"homme",tone:"bronze",hair:"court",beard:1,wide:1.26,skin:"or",legs:"short_or",aura:"etincelles"},
+  {k:"l_coach",n:"Le Coach du Peuple",s:"Il motive la France entière",pw:"Motivation",pd:"Un coffre bonus au 5e pas de chaque monde.",base:"homme",tone:"clair",hair:"court",beard:1,wide:1.14,skin:"ocean",legs:"short_volt",hat:"bandeau"},
+  {k:"l_reine",n:"La Reine du Fitness",s:"Personne ne lui résiste",pw:"Œil de reine",pd:"Tu vois la rareté du prochain coffre avant de l'ouvrir.",base:"femme",tone:"clair",hair:"blond",wide:1,skin:"galaxie",legs:"legging",hat:"couronne",aura:"etincelles"}];
 const GM_LG=Object.fromEntries(GM_LEG.map(l=>[l.k,l]));
 const GM_HEROES=[{k:"homme",n:"Lui",s:"Le sportif"},{k:"femme",n:"Elle",s:"La sportive"},{k:"robot",n:"Mini-Machine",s:"Le robot HMG"}];
 const GM_SKIN={blanc:["#ffffff","#e2e8f4","#a7b3ca"],volt:["#f2ffbf","#c8ff1e","#7fae00"],braise:["#ffd0b5","#ff7a3d","#c2410c"],ocean:["#d2f6ff","#3fd8ff","#1479a8"],
   chrome:["#646d83","#2a3142","#0e121b"],or:["#fff4b8","#ffd166","#c48a00"],galaxie:["#dcc2ff","#7b5cff","#2a1670"]};
 const GM_TONE={human:{clair:{s:"#ffd8bf",d:"#e9ab84",h:"#4a2e1c"},fonce:{s:"#8d5838",d:"#663a22",h:"#15100d"}},robot:{clair:{s:"#f2f5fc",d:"#b5c0d5",h:"#8792aa"},fonce:{s:"#30374a",d:"#161a26",h:"#0c0f16"}}};
 const gmS=Object.assign({seen:null,open:[],items:[],stars:0,eq:{},leg:{}},store.get("hmg-game",{}));
-gmS.eq=Object.assign({hero:null,tone:"clair",skin:"blanc",hat:null,neck:null,face:null,back:null,hand:"haltere",aura:null},gmS.eq||{});
+const GM_EQ0={hero:null,tone:"clair",skin:null,legs:null,feet:null,hat:null,neck:null,face:null,back:null,hand:null,aura:null};
+gmS.eq=Object.assign({...GM_EQ0},gmS.eq||{});
 if(!gmS.leg||typeof gmS.leg!=="object") gmS.leg={};
 const gmLegOn=(k,n)=>gmS.leg[k]!=null&&(n==null||n>gmS.leg[k]);
 const gmSave=()=>store.set("hmg-game",gmS);
 const gmOwn=id=>!!(GM_IT[id]&&(GM_IT[id].def||gmS.items.includes(id)));
+GM_CATS.forEach(([c])=>{ if(gmS.eq[c]&&!gmOwn(gmS.eq[c])) gmS.eq[c]=null; });
 const gmTest=()=>isAdmin()?(store.get("hmg-game-test",0)|0):0;
 const gDays=()=>Math.max(0,(score.days||0)+gmTest());
+/* physique : les muscles grossissent avec les séances */
+const GM_MUS=[{d:0,n:"Crevette",w:.9,t:"Tout commence ici"},{d:5,n:"Affûté",w:1,t:"Les premiers muscles pointent le bout de leur nez"},{d:15,n:"Costaud",w:1.1,t:"Le t-shirt commence à serrer"},
+  {d:30,n:"Massif",w:1.2,t:"Les portes deviennent étroites"},{d:50,n:"Titan",w:1.3,t:"La salle tremble à ton arrivée"},{d:80,n:"Colosse",w:1.4,t:"Une légende vivante"}];
+const gmMusLv=d=>{ let l=0; GM_MUS.forEach((m,i)=>{ if(d>=m.d) l=i; }); return l; };
+const gmHeroLv=()=>gmMusLv(gmS.seen==null?gDays():Math.min(gmS.seen,gDays()));
+const gmBase=eq=>GM_LG[eq.hero]?GM_LG[eq.hero].base:(eq.hero||"homme");
+const gmNone=(c,eq)=>({skin:gmBase(eq)==="robot"?"Châssis nu":gmBase(eq)==="femme"?"Brassière":"Torse nu",legs:"Caleçon",feet:"Pieds nus",hand:"Mains libres"}[c]||"Aucun");
 const GM={on:false,busy:false,pos:0,lay:null,ghosts:null,tm:null};
 let gmUid=0;
 function gmHash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
@@ -2919,18 +2936,20 @@ const gmWorldOf=d=>Math.min(Math.floor(d/GM_PER),Math.floor(Math.max(0,d-1)/GM_P
 /* ---------- le petit héros (SVG) : homme, femme ou robot, peau claire ou foncée, + objets de la collection */
 function gmBot(eq,o={}){
   const LG=GM_LG[eq.hero];
-  if(LG) eq={...eq,tone:LG.tone,skin:eq.skin&&eq.skin!=="blanc"?eq.skin:LG.skin,hat:eq.hat||LG.hat||null,aura:eq.aura||LG.aura||null};
+  if(LG) eq={...eq,tone:LG.tone,skin:eq.skin||LG.skin,legs:eq.legs||LG.legs||"short_noir",feet:eq.feet||"baskets",hat:eq.hat||LG.hat||null,aura:eq.aura||LG.aura||null};
   const u="gb"+(++gmUid), hero=LG?LG.base:(eq.hero||"homme"), rob=hero==="robot", fem=hero==="femme", tone=eq.tone==="fonce"?"fonce":eq.tone==="bronze"?"bronze":"clair";
-  const wd=LG?LG.wide:1, dx=12*(wd-1), hs=LG?LG.hair:"";
+  const lv=LG?4:(o.mus!=null?o.mus:gmHeroLv()), wd=LG?LG.wide:GM_MUS[lv].w, dx=12*(wd-1), hs=LG?LG.hair:"";
   const T={...(rob?GM_TONE.robot[tone==="bronze"?"clair":tone]:tone==="bronze"?{s:"#dc9a6a",d:"#b47248",h:"#24160d"}:GM_TONE.human[tone]),...(hs==="blond"?{h:"#e8b84f"}:{})}, K=GM_SKIN[eq.skin]||GM_SKIN.blanc, st=!!o.static;
-  const hat=eq.hat, face=eq.face, back=eq.back, hand=eq.hand||"haltere", aura=eq.aura;
+  const hat=eq.hat, face=eq.face, back=eq.back, hand=eq.hand, aura=eq.aura, top=!!GM_SKIN[eq.skin];
   const emb=(eq.skin==="volt"||eq.skin==="or")?"#0a0f02":"#c8ff1e";
   const ey=rob?-53:-48, p=[];
   p.push(`<defs><linearGradient id="${u}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[0]}"/><stop offset=".55" stop-color="${K[1]}"/><stop offset="1" stop-color="${K[2]}"/></linearGradient>
     <radialGradient id="${u}h" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="${T.s}"/><stop offset=".75" stop-color="${T.s}"/><stop offset="1" stop-color="${T.d}"/></radialGradient>
     <linearGradient id="${u}au" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c4"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#c48a00"/></linearGradient>
     <radialGradient id="${u}fl" cx=".5" cy=".62" r=".6"><stop offset="0" stop-color="#ffe08a" stop-opacity=".95"/><stop offset=".45" stop-color="#ff7a3d" stop-opacity=".7"/><stop offset="1" stop-color="#ff3b1f" stop-opacity="0"/></radialGradient>
-    <linearGradient id="${u}sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#2b1460"/></linearGradient></defs>`);
+    <linearGradient id="${u}sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#2b1460"/></linearGradient>
+    <linearGradient id="${u}bd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${T.d}"/><stop offset=".28" stop-color="${T.s}"/><stop offset=".72" stop-color="${T.s}"/><stop offset="1" stop-color="${T.d}"/></linearGradient>
+    <linearGradient id="${u}lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>`);
   p.push(`<ellipse cx="0" cy="0" rx="16" ry="3.6" fill="#000" opacity=".38"/><g class="b-all">`);
   /* dans le dos */
   if(aura==="flammes") p.push(`<g class="b-aura"><path d="M0 -90 C12 -78 30 -66 28 -36 C27 -12 14 2 0 2 C-14 2 -27 -12 -28 -36 C-30 -66 -12 -78 0 -90Z" fill="url(#${u}fl)"/><path d="M-8 -78 C-4 -70 -14 -66 -12 -56 M9 -80 C14 -70 6 -66 10 -58" stroke="#ffd166" stroke-width="1.4" fill="none" opacity=".7"/></g>`);
@@ -2941,21 +2960,43 @@ function gmBot(eq,o={}){
     <rect x="-22" y="-35" width="9" height="21" rx="4.5" fill="#3a4256"/><rect x="13" y="-35" width="9" height="21" rx="4.5" fill="#3a4256"/><rect x="-22" y="-28" width="9" height="3" fill="#c8ff1e"/><rect x="13" y="-28" width="9" height="3" fill="#c8ff1e"/><rect x="-21" y="-16" width="7" height="3" rx="1" fill="#1b2130"/><rect x="14" y="-16" width="7" height="3" rx="1" fill="#1b2130"/>`);
   if(back==="sac") p.push(`<rect x="-16.5" y="-34" width="33" height="21" rx="7" fill="#ff7a3d"/><rect x="-16.5" y="-24" width="33" height="3" fill="#c2410c"/>`);
   /* jambes */
-  const limb=rob?T.d:T.s, leg=x=>`<rect x="${x}" y="-15" width="6.4" height="13" rx="3.2" fill="${limb}"/><ellipse cx="${x+3.2}" cy="-1.9" rx="5.6" ry="3.1" fill="#1b2130"/><path d="M${x-2.2} -0.4 H${x+8.6}" stroke="#c8ff1e" stroke-width="1.3" stroke-linecap="round"/>`;
+  const LEGS={short_noir:{c:"#1b2130",s:"#c8ff1e"},jogging:{c:"#6b7489",s:"#3d4456",long:1},short_volt:{c:"#c8ff1e",s:"#0a0f02"},legging:{c:`url(#${u}lg)`,s:"#ff4fd8",long:1},short_or:{c:`url(#${u}au)`,s:"#fff4b8"}};
+  const SHOES={baskets:{c:"#1b2130",s:"#c8ff1e"},baskets_bl:{c:"#f4f6fb",s:"#c8ff1e",b:"#a7b3ca"},baskets_volt:{c:"#c8ff1e",s:"#0a0f02"},montantes:{c:"#ff3b5c",s:"#fff",hi:1},baskets_or:{c:`url(#${u}au)`,s:"#fff4b8"}};
+  const BAS=LEGS[eq.legs], SH=SHOES[eq.feet], limb=rob?T.d:T.s;
+  const leg=x=>`<rect x="${x}" y="-15" width="6.4" height="13" rx="3.2" fill="${BAS&&BAS.long?BAS.c:limb}"/>`+(BAS&&BAS.long?`<rect x="${x-.2}" y="-5.8" width="6.8" height="2.2" rx="1" fill="${BAS.s}"/>`:"")
+    +(SH?`${SH.hi?`<rect x="${x-.7}" y="-8.2" width="7.8" height="6.6" rx="2.6" fill="${SH.c}"/><path d="M${x+.4} -6.2 H${x+6}" stroke="${SH.s}" stroke-width="1.1"/>`:""}<ellipse cx="${x+3.2}" cy="-1.9" rx="5.6" ry="3.1" fill="${SH.c}"/>${SH.b?`<path d="M${x-2.4} -.5 H${x+8.8}" stroke="${SH.b}" stroke-width="1.8" stroke-linecap="round"/>`:""}<path d="M${x-2.2} -0.4 H${x+8.6}" stroke="${SH.s}" stroke-width="1.3" stroke-linecap="round"/>`
+      :`<ellipse cx="${x+3.2}" cy="-1.8" rx="4.7" ry="2.7" fill="${rob?T.h:T.d}"/>${rob?"":`<ellipse cx="${x+2.4}" cy="-2.6" rx="2.2" ry="1" fill="${T.s}" opacity=".7"/>`}`);
   p.push(`<g class="b-legL">${leg(-8.4)}</g><g class="b-legR">${leg(2)}</g>`);
-  /* corps : t-shirt aux couleurs de la tenue + short */
-  p.push(`<rect x="${-12*wd}" y="-34" width="${24*wd}" height="22" rx="9" fill="url(#${u}k)"/>`);
-  if(LG&&wd>1.2) p.push(`<path d="M${-7*wd} -27 Q0 -23 ${7*wd} -27 M-1 -24 V-14" stroke="#000" stroke-opacity=".18" stroke-width="1.2" fill="none"/>`);
-  if(!rob) p.push(fem?`<path d="M-4.5 -34 Q0 -28.5 4.5 -34Z" fill="${T.s}"/>`:`<path d="M-4 -34 Q0 -30.5 4 -34Z" fill="${T.d}" opacity=".9"/>`);
-  if(eq.skin==="galaxie") p.push(`<circle cx="-6" cy="-27" r=".8" fill="#fff"/><circle cx="5" cy="-22" r=".6" fill="#fff"/><circle cx="7" cy="-29" r=".9" fill="#fff"/><circle cx="-3" cy="-19" r=".6" fill="#fff"/>`);
-  p.push(rob?`<circle cx="0" cy="-25" r="3.6" fill="#0a0f1c"/><circle cx="0" cy="-25" r="2" fill="#c8ff1e"/>`:`<path d="M1 -29 L-2.6 -24.2 H0 L-1 -20.5 L2.8 -25.6 H0.2Z" fill="${emb}"/>`);
-  p.push(`<path d="M${-12*Math.min(wd,1.2)} -18.5 H${12*Math.min(wd,1.2)} V-14.5 Q${12*Math.min(wd,1.2)} -11.5 9 -11.5 H-9 Q${-12*Math.min(wd,1.2)} -11.5 ${-12*Math.min(wd,1.2)} -14.5Z" fill="#1b2130"/>`);
+  /* corps : le t-shirt gagné, sinon torse nu (les muscles se dessinent avec le physique) */
+  const tw=12*wd, sw=12*Math.min(wd,1.2), mc=`stroke="${T.d}" stroke-width="1.1" fill="none" stroke-linecap="round"`;
+  if(top){
+    p.push(`<rect x="${-tw}" y="-34" width="${2*tw}" height="22" rx="9" fill="url(#${u}k)"/>`);
+    if(wd>1.15) p.push(`<path d="M${-7*wd} -27 Q0 -23 ${7*wd} -27 M-1 -24 V-14" stroke="#000" stroke-opacity=".18" stroke-width="1.2" fill="none"/>`);
+    if(!rob) p.push(fem?`<path d="M-4.5 -34 Q0 -28.5 4.5 -34Z" fill="${T.s}"/>`:`<path d="M-4 -34 Q0 -30.5 4 -34Z" fill="${T.d}" opacity=".9"/>`);
+    if(eq.skin==="galaxie") p.push(`<circle cx="-6" cy="-27" r=".8" fill="#fff"/><circle cx="5" cy="-22" r=".6" fill="#fff"/><circle cx="7" cy="-29" r=".9" fill="#fff"/><circle cx="-3" cy="-19" r=".6" fill="#fff"/>`);
+    if(!rob) p.push(`<path d="M1 -29 L-2.6 -24.2 H0 L-1 -20.5 L2.8 -25.6 H0.2Z" fill="${emb}"/>`);
+  } else {
+    p.push(`<rect x="${-tw}" y="-34" width="${2*tw}" height="22" rx="9" fill="url(#${u}bd)"/><ellipse cx="${-tw*.42}" cy="-29.5" rx="${tw*.32}" ry="2" fill="#fff" opacity=".18"/>`);
+    if(rob) p.push(`<path d="M${-tw+3} -29.5 H${tw-3} M${-tw+3} -19.5 H${tw-3}" stroke="${T.h}" stroke-opacity=".55" stroke-width="1"/>${[[-1,-31.6],[1,-31.6],[-1,-17.4],[1,-17.4]].map(([s,y])=>`<circle cx="${s*(tw-3.6)}" cy="${y}" r=".9" fill="${T.h}"/>`).join("")}`);
+    else {
+      if(lv===0) p.push(`<path d="M${-tw+2.6} -28 q1.8 1 3.6 0 M${-tw+2.6} -25.4 q1.8 1 3.6 0 M${tw-2.6} -28 q-1.8 1 -3.6 0 M${tw-2.6} -25.4 q-1.8 1 -3.6 0" ${mc} opacity=".7"/>`);
+      if(lv>=2) p.push(`<path d="M${-7*wd} -27.4 Q${-3.6*wd} -24.4 -.6 -27.4 M.6 -27.4 Q${3.6*wd} -24.4 ${7*wd} -27.4" ${mc}/>`);
+      if(lv>=3) p.push(`<path d="M0 -24 V-19 M-3.2 -22.4 H-1.1 M1.1 -22.4 H3.2 M-3 -19.9 H-1.1 M1.1 -19.9 H3" ${mc} opacity=".85"/>`);
+      if(lv>=4) p.push(`<path d="M${-tw+2.4} -25 Q${-tw+4.2} -21.6 ${-tw+3.2} -18.8 M${tw-2.4} -25 Q${tw-4.2} -21.6 ${tw-3.2} -18.8" ${mc} opacity=".7"/>`);
+      if(lv<3) p.push(`<ellipse cx="0" cy="-20.4" rx=".75" ry="1" fill="${T.d}"/>`);
+      if(fem) p.push(`<path d="M${-tw+.8} -32.2 Q0 -35.8 ${tw-.8} -32.2 L${tw-.8} -26.6 Q0 -24.2 ${-tw+.8} -26.6Z" fill="#6ec6ff"/><path d="M${-tw+.8} -26.8 Q0 -24.4 ${tw-.8} -26.8" stroke="#f4f8ff" stroke-width="1.6" fill="none"/><circle cx="-4" cy="-30.4" r=".85" fill="#fff"/><circle cx="3.6" cy="-29.4" r=".85" fill="#fff"/>`);
+    }
+  }
+  if(rob) p.push(`<circle cx="0" cy="-25" r="3.6" fill="#0a0f1c"/><circle cx="0" cy="-25" r="2" fill="#c8ff1e"/>`);
+  /* bas : caleçon à pois au début, puis shorts, jogging, legging… */
+  if(!BAS) p.push(`<path d="M${-sw} -18.6 H${sw} V-11.4 Q${sw} -9.2 ${sw-2.4} -9.2 H1.5 L0 -11.4 L-1.5 -9.2 H${-sw+2.4} Q${-sw} -9.2 ${-sw} -11.4Z" fill="#6ec6ff"/><rect x="${-sw}" y="-19.4" width="${2*sw}" height="2.9" rx="1.3" fill="#f4f8ff"/>${[[-7,-14.2],[-2.6,-15.4],[3.4,-13.8],[7.8,-15.2],[-8.8,-11.4],[6.4,-11.2],[-4.4,-11.8],[1,-12.6]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".95" fill="#fff"/>`).join("")}`);
+  else p.push(`<path d="M${-sw} -18.5 H${sw} V-14.5 Q${sw} -11.5 9 -11.5 H-9 Q${-sw} -11.5 ${-sw} -14.5Z" fill="${BAS.c}"/>${BAS.long?`<path d="M${-sw} -18.4 H${sw}" stroke="${BAS.s}" stroke-width="1.6"/><path d="M-1.4 -17.6 l-.8 3 M1.4 -17.6 l.8 3" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/>`:`<path d="M${-sw+1.6} -17 V-12.6 M${sw-1.6} -17 V-12.6" stroke="${BAS.s}" stroke-width="1.2" stroke-linecap="round"/>`}`);
   if(eq.neck){ const sc=eq.neck==="echarpe_or"?["#ffd166","#c48a00","#fff4b8"]:["#11151f","#c8ff1e","#c8ff1e"];
     p.push(`<path d="M-13 -37 Q0 -30 13 -37 L13.5 -31.5 Q0 -24.5 -13.5 -31.5Z" fill="${sc[0]}"/><path d="M-11 -35.6 Q0 -29.6 11 -35.6" stroke="${sc[1]}" stroke-width="1.3" fill="none"/>
       <path d="M-9 -31 L-12 -16 L-5.5 -16 L-3.6 -29.6Z" fill="${sc[0]}"/><path d="M-10.6 -22 L-5 -22 M-11.2 -19 L-5.4 -19" stroke="${sc[1]}" stroke-width="1.2"/><path d="M-12 -16 v2.4 M-10 -16 v2.4 M-8 -16 v2.4 M-6 -16 v2.4" stroke="${sc[2]}" stroke-width=".9"/>`); }
   if(back==="sac") p.push(`<path d="M-7.5 -34 L-6.5 -19 M7.5 -34 L6.5 -19" stroke="#ff7a3d" stroke-width="2.6" stroke-linecap="round"/>`);
   /* bras */
-  const aw=6*Math.min(wd,1.35), arm=(x,hx)=>`<rect x="${x-(aw-6)/2}" y="-32" width="${aw}" height="15" rx="${aw/2}" fill="${limb}"/>${rob?"":`<rect x="${x-.4}" y="-33" width="6.8" height="6.5" rx="3" fill="${K[1]}"/>`}<circle cx="${hx}" cy="-16.5" r="3.3" fill="${T.s}"/>`;
+  const aw=6*Math.min(wd,1.35), arm=(x,hx)=>`<rect x="${x-(aw-6)/2}" y="-32" width="${aw}" height="15" rx="${aw/2}" fill="${limb}"/>${!rob&&lv>=3?`<ellipse cx="${x+3}" cy="-26.2" rx="${(aw/2+.5+.45*(lv-3)).toFixed(2)}" ry="4.6" fill="${limb}"/>`:""}${rob||!top?"":`<rect x="${(x-(aw-6)/2-.4).toFixed(2)}" y="-33" width="${(aw+.8).toFixed(2)}" height="6.5" rx="3" fill="${K[1]}"/>`}<circle cx="${hx}" cy="-16.5" r="3.3" fill="${T.s}"/>`;
   p.push(`<g transform="translate(${-dx} 0)"><g class="b-armL"><g transform="rotate(10 -12 -29)">${arm(-16.5,-13.5)}</g></g></g>`);
   /* tête */
   p.push(`<g class="b-head">`);
@@ -3171,7 +3212,8 @@ function gmMark(pos){ const L=GM.lay; if(!L) return; const d=Math.floor(pos);
   const done=gmPathD(L,L.i0,Math.max(L.i0,Math.floor(pos)),pos%1||0); $("gmDone").setAttribute("d",done); $("gmDoneG").setAttribute("d",done); }
 function gmPoint(pos){ const L=GM.lay, i=Math.floor(pos), t=pos-i; if(t<.001||i>=L.i1) return L.P(Math.min(i,L.i1)); return gmBez(gmSeg(L,i),t); }
 function gmPlace(pos,scroll){ const p=gmPoint(pos), hr=$("gmHero"); if(!hr) return; hr.style.left=p.x+"px"; hr.style.top=p.y+"px"; GM.pos=pos;
-  if(scroll!==false){ const sc=$("game").querySelector(".gm-scroll"); const target=p.y-sc.clientHeight*.56; sc.scrollTop=scroll===0?target:sc.scrollTop+(target-sc.scrollTop)*.14; } }
+  if(scroll!==false){ const sc=$("game").querySelector(".gm-scroll"); const target=p.y-sc.clientHeight*.56, tx=(sc.scrollWidth-sc.clientWidth)/2+p.x*.55;
+    sc.scrollTop=scroll===0?target:sc.scrollTop+(target-sc.scrollTop)*.14; sc.scrollLeft=scroll===0?tx:sc.scrollLeft+(tx-sc.scrollLeft)*.14; } }
 function gmMood(){ const hh=new Date().getHours(); return score.today?"happy idle":(hh>=23||hh<6)?"sleep":"idle"; }
 function gmPaintHero(cls){ const hr=$("gmHero"); if(hr) hr.innerHTML=gmBot(gmS.eq,{cls:cls||gmMood()}); }
 function gmHeroCls(c){ const s=$("gmHero")&&$("gmHero").querySelector(".gmb"); if(s) s.setAttribute("class","gmb "+c); }
@@ -3184,9 +3226,9 @@ async function gmGhosts(){
   const L=GM.lay, per={}; let k=0;
   for(const r of GM.ghosts){ if(r.me) continue; const d=Math.round((r.points||0)/10); if(d<L.i0||d>L.i1||k>=24) continue; const j=per[d]=(per[d]||0)+1; if(j>3) continue; k++;
     const p=L.P(d), x=p.x+(j===1?-48:j===2?48:0), y=p.y+(j===3?44:4), r2=gmRng(gmHash(String(r.no)))();
-    const eq={hero:GM_HEROES[(r2*3)|0].k,tone:r2>.5?"fonce":"clair",skin:["blanc","volt","braise","ocean"][(r2*4)|0],hand:"haltere"};
-    const el=document.createElement("div"); el.className="gm-ghost"; el.style.left=x+"px"; el.style.top=y+"px"; el.dataset.ghost=`${nameOf(r.no)} · ${d} séance${d>1?"s":""}`;
-    el.innerHTML=gmBot(eq,{cls:"idle"})+`<i>${esc(String(nameOf(r.no)).replace(/^Machine /,"n°"))}</i>`; col.appendChild(el); }
+    const eq={hero:GM_HEROES[(r2*3)|0].k,tone:r2>.5?"fonce":"clair",skin:d>=3?["blanc","volt","braise","ocean"][(r2*4)|0]:null,legs:d>=6?(r2>.7?"jogging":"short_noir"):null,feet:d>=13?"baskets":null,hand:"haltere"}, ml=gmMusLv(d);
+    const el=document.createElement("div"); el.className="gm-ghost"; el.style.left=x+"px"; el.style.top=y+"px"; el.dataset.ghost=`${nameOf(r.no)} · ${d} séance${d>1?"s":""} · ${GM_MUS[ml].n}`;
+    el.innerHTML=gmBot(eq,{cls:"idle",mus:ml})+`<i>${esc(String(nameOf(r.no)).replace(/^Machine /,"n°"))}</i>`; col.appendChild(el); }
 }
 
 /* ---------- interface */
@@ -3198,16 +3240,22 @@ function gmHud(){
     <div class="btns"><button data-gm="coll" aria-label="Ma collection" title="Ma collection"><svg class="i" viewBox="0 0 24 24"><path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="bdg">${gmS.items.length}</span></button>
     <button data-gm="share" aria-label="Partager mon héros" title="Partager mon héros"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
     <div class="bar"><i style="width:${inW*10}%"></i><u style="left:30%"></u>${gmLegOn("l_coach")?`<u style="left:50%"></u>`:""}<u style="left:60%"></u></div>
-    <div class="sub"><span><b>${d}</b> séance${d>1?"s":""} · ${gmS.items.length}/${GM_TOTAL} objets</span><span>${pend?`<b style="color:var(--a2)">Coffre à ouvrir !</b>`:`${left>1?"Coffre dans":"Coffre à la"} <b>${left>1?left+" séances":"prochaine séance"}</b>${eye?` · <b style="color:var(--gold)">${eye}</b>`:""}`}</span></div>`;
-  const today=!!score.today, nm=esc(myName());
-  g.querySelector(".gm-cta").innerHTML=`<p>${today?`Séance validée, <b>${nm}</b>. Ton héros a avancé : reviens demain pour le pas suivant.`:pend?`Un coffre t'attend, <b>${nm}</b>. Touche-le pour l'ouvrir.`:`Ton héros t'attend, <b>${nm}</b>. Chaque séance à la salle le fait avancer d'un pas.`}</p>
+    <div class="sub"><span><b>${d}</b> séance${d>1?"s":""} · 💪 <b>${GM_MUS[gmHeroLv()].n}</b></span><span>${pend?`<b style="color:var(--a2)">Coffre à ouvrir !</b>`:`${left>1?"Coffre dans":"Coffre à la"} <b>${left>1?left+" séances":"prochaine séance"}</b>${eye?` · <b style="color:var(--gold)">${eye}</b>`:""}`}</span></div>`;
+  const today=!!score.today, nm=esc(myName()), nu=!GM_LG[gmS.eq.hero]&&!gmS.eq.skin&&!gmS.eq.legs;
+  g.querySelector(".gm-cta").innerHTML=`<p>${today?`Séance validée, <b>${nm}</b>. Ton héros a avancé : reviens demain pour le pas suivant.`:pend?`Un coffre t'attend, <b>${nm}</b>. Touche-le pour l'ouvrir.`:nu?`Ton héros est encore en caleçon, <b>${nm}</b>. Chaque séance le fait avancer, les coffres l'habillent.`:`Ton héros t'attend, <b>${nm}</b>. Chaque séance à la salle le fait avancer d'un pas.`}</p>
     <button class="gm-go${today?" done":""}" data-gm="go">${today?ic("check")+" Séance du jour validée":ic("bolt")+` Je suis à la salle <em>+1 pas</em>`}</button>`;
   let t=g.querySelector(".gm-test"); if(isAdmin()&&!GM.hideTest){ if(!t){ t=document.createElement("div"); t.className="gm-test glass"; g.appendChild(t); }
     t.innerHTML=`<small>TEST ADMIN</small><button class="mini" data-gm="t1">+1 séance</button><button class="mini" data-gm="t5">+5</button><button class="mini" data-gm="t0">Remise à zéro</button><button class="mini ghost" data-gm="th">Masquer</button>`; } else if(t) t.remove();
 }
 function gmPending(){ const d=gDays(), o=[]; for(let n=0;n<=d;n++) if(gmKind(n)&&!gmS.open.includes(n)) o.push(n); return o; }
 function gmSay(html,ms){ const col=$("gmCol"), hr=$("gmHero"); if(!col||!hr) return; col.querySelectorAll(".gm-say").forEach(x=>x.remove());
-  const s=document.createElement("div"); s.className="gm-say"; s.innerHTML=html; s.style.left=hr.style.left; s.style.top=(parseFloat(hr.style.top)-112)+"px"; col.appendChild(s);
+  const s=document.createElement("div"); s.className="gm-say"; s.innerHTML=html; s.style.left=hr.style.left; s.style.top=(parseFloat(hr.style.top)+(parseFloat(getComputedStyle(hr).marginTop)||-108)-4)+"px"; col.appendChild(s);
+  const g=$("game"), vw=g.clientWidth, cx=col.getBoundingClientRect().left-g.getBoundingClientRect().left+parseFloat(hr.style.left), bw=s.offsetWidth, m=10;
+  let sx=0; if(cx+bw/2>vw-m) sx=vw-m-(cx+bw/2); if(cx-bw/2+sx<m) sx=m-(cx-bw/2);
+  if(sx){ s.style.marginLeft=sx.toFixed(1)+"px"; s.style.setProperty("--ax",sx.toFixed(1)+"px"); }
+  s._fit=()=>{ const r=s.getBoundingClientRect(), gr=g.getBoundingClientRect(); if(r.right<gr.right-4&&r.left>gr.left+4) return; s.style.marginLeft=""; s.style.removeProperty("--ax");
+    const c2=col.getBoundingClientRect().left-gr.left+parseFloat(hr.style.left), w2=s.offsetWidth; let z=0; if(c2+w2/2>vw-m) z=vw-m-(c2+w2/2); if(c2-w2/2+z<m) z=m-(c2-w2/2);
+    if(Math.abs(z)>w2/2-14){ s.remove(); return; } if(z){ s.style.marginLeft=z.toFixed(1)+"px"; s.style.setProperty("--ax",z.toFixed(1)+"px"); } };
   clearTimeout(GM.sayT); GM.sayT=setTimeout(()=>s.remove(),ms||3200); }
 function gmSnd(nm,a){ if(SND.ready()&&SND.on()) try{ SND.play(nm,a); }catch(e){} }
 function gmStepSnd(i){ if(!SND.ready()||!SND.on()) return; try{ const t=SND.ctx.currentTime+.01; SND.pluck(SND.note(7+(i%5),60),t,.08,.7); SND.noise(t,.08,{f1:900,f2:300,type:"lowpass",g:.05,a:.2,rev:.05}); }catch(e){} }
@@ -3224,6 +3272,7 @@ async function gmSync(){
       await new Promise(res=>{ (function f(t){ const k=Math.min(1,(t-t0)/dur), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2; gmPlace(i+e,true); gmMark(i+e); if(k<1) requestAnimationFrame(f); else res(); })(t0); });
       gmStepSnd(i); const p=GM.lay.P(i+1), pl=document.createElement("div"); pl.className="gm-plus"; pl.textContent="+1"; pl.style.left=p.x+"px"; pl.style.top=(p.y-100)+"px"; $("gmCol").appendChild(pl); setTimeout(()=>pl.remove(),1700);
       gmS.seen=i+1; gmSave();
+      if(gmMusLv(i+1)>gmMusLv(i)){ gmPaintHero("happy cheer"); await gmLvBanner(gmMusLv(i+1)); gmPaintHero("walk"); }
       if(gmKind(i+1)){ gmHeroCls("happy cheer"); await gmSleep(380); await gmOpenChest(i+1); gmHeroCls("walk"); }
       if((i+1)%GM_PER===0){ gmHeroCls("happy cheer"); await gmBanner(Math.floor((i+1)/GM_PER)); gmHeroCls("walk"); } }
     gmPaintHero("happy cheer"); const hr=$("gmHero"); hr.classList.remove("gm-jump"); void hr.offsetWidth; hr.classList.add("gm-jump"); gmSnd("pop");
@@ -3231,13 +3280,17 @@ async function gmSync(){
     setTimeout(()=>gmPaintHero(),1600); GM.busy=false; gmHud(); }
   const pend=gmPending(); if(pend.length&&!GM.busy&&!document.querySelector(".gm-chest")){ GM.busy=true; for(const n of pend){ await gmOpenChest(n); } GM.busy=false; gmMark(GM.pos); gmHud(); }
 }
+function gmLvBanner(lv){ return new Promise(res=>{ const M=GM_MUS[lv], b=document.createElement("div"); b.className="gm-banner glass"; b.style.setProperty("--wc",ACC);
+  b.innerHTML=`<b>Physique · niveau ${lv+1}</b><span>💪 ${esc(M.n)}</span><small>${esc(M.t)}</small>`; document.body.appendChild(b); gmSnd("fanfare");
+  if(navigator.vibrate) try{ navigator.vibrate([20,40,60]); }catch(e){}
+  setTimeout(()=>{ b.remove(); res(); },3200); }); }
 function gmBanner(wi){ return new Promise(res=>{ const W=gmWorld(wi), b=document.createElement("div"); b.className="gm-banner glass"; b.style.setProperty("--wc",W.wc);
   b.innerHTML=`<b>Monde ${wi+1} débloqué</b><span>${esc(W.n)}</span><small>${esc(W.d)}</small>`; document.body.appendChild(b); gmSnd("crown");
   setTimeout(()=>{ b.remove(); res(); },3500); }); }
 
 /* ---------- coffre : on le touche 3 fois, il s'ouvre et révèle un objet */
 function gmLegRoll(n){ if(!(n>0&&n%20===0)) return null; const ord=GM_LEG.slice().sort((a,b)=>gmHash(voterId+a.k)-gmHash(voterId+b.k)); return ord.find(l=>gmS.leg[l.k]==null)||null; }
-function gmRoll(n,salt){ const k=gmKind(n), r=gmRng(gmHash(voterId+":"+n+(salt||"")))(), w=Math.floor(n/GM_PER);
+function gmRoll(n,salt){ const st=GM_START[n]; if(!salt&&st&&!gmOwn(st)) return GM_IT[st]; const k=gmKind(n), r=gmRng(gmHash(voterId+":"+n+(salt||"")))(), w=Math.floor(n/GM_PER);
   let rar=k==="w"?"C":k==="c"&&n%GM_PER===3?(r<.7?"C":"R"):k==="c"?(r<.6?"R":"E"):(w>=2||r<.35)?"L":"E";
   if(gmLegOn("l_masse",n)) rar={C:"R",R:"E",E:"L",L:"L"}[rar];
   const order={C:["C","R","E","L"],R:["R","C","E","L"],E:["E","R","L","C"],L:["L","E","R","C"]}[rar];
@@ -3266,16 +3319,16 @@ function gmOpenChest(n){ return new Promise(res=>{
     const cols=[rc,"#ffffff",ACC,rc,ACC1]; for(let j=0;j<46;j++){ const a=Math.PI*2*j/46+Math.random()*.3, dd=160+Math.random()*260, c=document.createElement("i"); c.className="cf";
       c.style.cssText=`background:${cols[j%cols.length]};--x:${Math.round(Math.cos(a)*dd)}px;--y:${Math.round(Math.sin(a)*dd-60)}px;--r:${Math.round(Math.random()*900-450)}deg;animation-delay:${Math.round(Math.random()*150)}ms`; ov.appendChild(c); setTimeout(()=>c.remove(),2000); }
     const pv=item?{...gmS.eq,[item.cat]:item.id}:gmS.eq, worn=item&&gmS.eq[item.cat]===item.id;
-    ov.querySelector(".loot").innerHTML=leg?`<span class="rar">Légende débloquée</span>${gmBot({...gmS.eq,hero:leg.k,hat:null,aura:null,skin:"blanc"},{cls:"happy cheer"}).replace('class="gmb','class="pv gmb')}<h3>${esc(leg.n)}</h3>
+    ov.querySelector(".loot").innerHTML=leg?`<span class="rar">Légende débloquée</span>${gmBot({...gmS.eq,hero:leg.k,hat:null,aura:null,skin:null,legs:null,feet:null},{cls:"happy cheer"}).replace('class="gmb','class="pv gmb')}<h3>${esc(leg.n)}</h3>
       <p>${esc(leg.s)}.</p><div class="pwr"><b>Pouvoir · ${esc(leg.pw)}</b>${esc(leg.pd)} Actif dès maintenant.</div>
       <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="leg">Jouer avec</button></div>`
       :item?`<span class="rar">${GM_RAR[item.r].t}</span>${gmBot(pv,{cls:"happy idle"}).replace('class="gmb','class="pv gmb')}<h3>${esc(item.n)}</h3>
-      <p>${pickR(["Il te va à merveille.","Avec ça, la salle va trembler.","Style de champion, ","Les autres vont être jaloux."]).replace(/, $/,`, <b>${esc(myName())}</b>.`)}</p>
+      <p>${item.say?esc(item.say):pickR(["Il te va à merveille.","Avec ça, la salle va trembler.","Style de champion, ","Les autres vont être jaloux."]).replace(/, $/,`, <b>${esc(myName())}</b>.`)}</p>
       ${item2?`<div class="pwr"><b>Pose classique · 2e objet</b>${esc(item2.n)} (${GM_RAR[item2.r].t.toLowerCase()}) rejoint ta collection.</div>`:""}
       <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="wear">${worn?"Super !":"Le porter"}</button></div>`
       :`<span class="rar">Étoile HMG</span><div style="font-size:84px;line-height:1.4">⭐</div><h3>Collection complète !</h3><p>Tu as déjà tous les objets : <b>+1 étoile</b>. Respect, ${esc(myName())}.</p><div class="row2"><button class="cy" data-k="later">Continuer</button></div>`;
     ov.querySelector(".loot").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(!b) return; e.stopPropagation();
-      if(b.dataset.k==="leg"&&leg){ gmS.eq.hero=leg.k; gmS.eq.hat=null; gmS.eq.aura=null; gmS.eq.skin="blanc"; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
+      if(b.dataset.k==="leg"&&leg){ gmS.eq.hero=leg.k; gmS.eq.hat=null; gmS.eq.aura=null; gmS.eq.skin=null; gmS.eq.legs=null; gmS.eq.feet=null; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
       if(b.dataset.k==="wear"&&item){ gmS.eq[item.cat]=item.id; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
       ov.style.transition="opacity .3s"; ov.style.opacity=0; setTimeout(()=>{ ov.remove(); gmMark(GM.pos); gmHud(); res(); },300); }); }
 }); }
@@ -3287,7 +3340,7 @@ function gmPickHero(first){ return new Promise(res=>{
   const draw=()=>{ const tc=GM_TONE[hero==="robot"?"robot":"human"];
     ov.innerHTML=`<div class="card glass" role="dialog" aria-label="Choisis ton héros">${first?"":`<button class="x" data-k="x" aria-label="Fermer">${ic("x")}</button>`}
       <div class="kick">L'Aventure HMG</div><h2>${first?"Choisis ton héros":"Change de héros"}</h2>
-      <p>${first?`Il avance d'un pas à <b>chaque séance</b> validée à la salle. Tous les 3 pas, un <b>coffre</b>. Au bout de chaque monde, un <b>grand coffre</b>. À ton rythme.`:"Ta collection et ta progression restent les mêmes."}</p>
+      <p>${first?`Il démarre en <b>caleçon</b>. Chaque séance validée à la salle le fait avancer d'un pas et grossir ses muscles. Les <b>coffres</b> l'habillent, à ton rythme.`:"Ta collection et ta progression restent les mêmes."}</p>
       <div class="gm-pick">${GM_HEROES.map(h=>`<button data-hero="${h.k}" aria-pressed="${h.k===hero}">${gmBot({...gmS.eq,hero:h.k,tone},{cls:h.k===hero?"happy idle":"idle"})}<b>${h.n}</b><small>${h.s}</small></button>`).join("")}</div>
       <div class="gm-tone">${["clair","fonce"].map(t=>`<button data-tone="${t}" aria-pressed="${t===tone}"><i style="background:${tc[t].s}"></i>${hero==="robot"?(t==="clair"?"Blanc":"Noir"):(t==="clair"?"Peau claire":"Peau noire")}</button>`).join("")}</div>
       <button class="cy gm-go" style="width:100%" data-k="ok">${hero==="femme"?"C'est elle !":hero==="robot"?"C'est mon robot !":"C'est lui !"}</button></div>`; };
@@ -3303,10 +3356,11 @@ function gmColl(){
   const ov=document.createElement("div"); ov.className="gm-ov gm-coll";
   const draw=()=>{ ov.innerHTML=`<div class="card glass" role="dialog" aria-label="Ma collection"><button class="x" data-k="x" aria-label="Fermer">${ic("x")}</button>
     <div class="top">${gmBot(gmS.eq,{cls:"happy idle"})}<h2>Ma collection</h2><div class="cnt"><b>${gmS.items.length}</b> / ${GM_TOTAL} objets${gmS.stars?` · ⭐ ${gmS.stars}`:""} · ${gDays()} séance${gDays()>1?"s":""}</div>
+      <div class="cnt mus">💪 Physique <b>${GM_MUS[gmHeroLv()].n}</b>${GM_MUS[gmHeroLv()+1]?` · <span>${GM_MUS[gmHeroLv()+1].n} à ${GM_MUS[gmHeroLv()+1].d} séances</span>`:" · niveau max"}</div>
       <div class="row"><button class="mini" data-k="hero">Changer de héros</button><button class="mini" data-k="share">Partager</button></div></div>
     <div class="body"><h4>Légendes · ${Object.keys(gmS.leg).length}/${GM_LEG.length}</h4><div class="gm-grid leg">${GM_LEG.map((l,i)=>{ const own=gmS.leg[l.k]!=null, on=gmS.eq.hero===l.k;
-      return `<button class="gm-it leg${own?" own":" lock"}${on?" on":""}" style="--rc:#ffd166" ${own?`data-hero="${l.k}"`:"disabled"}>${gmBot({...gmS.eq,hero:l.k,hat:null,aura:null,skin:"blanc"},{cls:""})}<b>${own?esc(l.n):"Légende mystère"}</b><small>${esc(l.pw).toUpperCase()}</small><em>${own?esc(l.pd):`Grand coffre à ${20*(i+1)} séances`}</em></button>`; }).join("")}</div>
-      ${GM_CATS.map(([c,t])=>`<h4>${t}</h4><div class="gm-grid">${(c==="skin"||c==="hand"?[]:[{id:"",cat:c,n:"Aucun",r:"C",def:1}]).concat(GM_ITEMS.filter(i=>i.cat===c)).map(i=>{ const own=i.def||gmOwn(i.id), on=(gmS.eq[c]||"")===i.id;
+      return `<button class="gm-it leg${own?" own":" lock"}${on?" on":""}" style="--rc:#ffd166" ${own?`data-hero="${l.k}"`:"disabled"}>${gmBot({...gmS.eq,hero:l.k,hat:null,aura:null,skin:null,legs:null,feet:null},{cls:""})}<b>${own?esc(l.n):"Légende mystère"}</b><small>${esc(l.pw).toUpperCase()}</small><em>${own?esc(l.pd):`Grand coffre à ${20*(i+1)} séances`}</em></button>`; }).join("")}</div>
+      ${GM_CATS.map(([c,t])=>`<h4>${t}</h4><div class="gm-grid">${[{id:"",cat:c,n:gmNone(c,gmS.eq),r:"C",def:1}].concat(GM_ITEMS.filter(i=>i.cat===c)).map(i=>{ const own=i.def||gmOwn(i.id), on=(gmS.eq[c]||"")===i.id;
       return `<button class="gm-it${own?" own":" lock"}${on?" on":""}" style="--rc:${GM_RAR[i.r].c}" ${own?`data-eq="${c}:${i.id}"`:"disabled"} aria-label="${esc(i.n)}">${gmBot({...gmS.eq,[c]:i.id||null},{cls:""})}<b>${own?esc(i.n):"???"}</b><small>${i.id?GM_RAR[i.r].t.toUpperCase():""}${i.hmg?" · HMG":""}</small></button>`; }).join("")}</div>`).join("")}
       <p style="color:var(--muted);font-size:12px;margin:16px 0 0">Les objets sortent des coffres au hasard. Ta collection est gardée sur cet appareil, comme tes points.</p></div></div>`; };
   draw(); document.body.appendChild(ov);
@@ -3329,7 +3383,7 @@ async function gmShare(){
     x.textAlign="center"; x.fillStyle=W.wc; x.font="700 34px 'Space Grotesk',sans-serif"; x.fillText(("MONDE "+(w+1)+" · "+W.n).toUpperCase(),540,250);
     x.fillStyle="#fff"; x.font="700 84px 'Space Grotesk',sans-serif"; x.fillText(myName(),540,350);
     x.font="700 60px 'Space Grotesk',sans-serif"; x.fillText(d+" séance"+(d>1?"s":"")+" à la salle",540,1470);
-    x.fillStyle="#c9d3e6"; x.font="500 40px Inter,sans-serif"; x.fillText(gmS.items.length+" / "+GM_TOTAL+" objets · série "+(score.streak||0)+" jour"+((score.streak||0)>1?"s":""),540,1540);
+    x.fillStyle="#c9d3e6"; x.font="500 40px Inter,sans-serif"; x.fillText("💪 "+GM_MUS[gmHeroLv()].n+" · "+gmS.items.length+" / "+GM_TOTAL+" objets",540,1540);
     x.fillStyle=ACC; x.font="700 54px 'Space Grotesk',sans-serif"; x.fillText("hmgfitness.fr",540,1760); x.fillStyle="#93a0b8"; x.font="500 34px Inter,sans-serif"; x.fillText("Explore. Note. Conquiers.",540,1815);
     const blob=await new Promise(r=>cv.toBlob(r,"image/png")), f=new File([blob],"mon-heros-hmg.png",{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:"Mon héros HMG",text:"Mon héros avance à chaque séance 💪 hmgfitness.fr"}); }
@@ -3348,12 +3402,18 @@ function gmSet(on,silent){
   else { SND.want=false; }
 }
 function gmBind(g){
-  g.addEventListener("click",async e=>{ const t=e.target, b=t.closest("[data-gm]");
+  const sc=g.querySelector(".gm-scroll"); let dr=null, raf=0;
+  sc.addEventListener("scroll",()=>{ if(raf) return; raf=requestAnimationFrame(()=>{ raf=0; const b=g.querySelector(".gm-say"); if(b&&b._fit) b._fit(); }); },{passive:true});
+  sc.addEventListener("pointerdown",e=>{ if(e.pointerType!=="mouse"||e.button!==0) return; dr={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop,m:false}; });
+  addEventListener("pointermove",e=>{ if(!dr) return; const ddx=e.clientX-dr.x, ddy=e.clientY-dr.y;
+    if(!dr.m&&Math.abs(ddx)+Math.abs(ddy)>6){ dr.m=true; sc.classList.add("drag"); } if(dr.m){ sc.scrollLeft=dr.l-ddx; sc.scrollTop=dr.t-ddy; } });
+  addEventListener("pointerup",()=>{ if(dr&&dr.m){ GM.drag=Date.now(); sc.classList.remove("drag"); } dr=null; });
+  g.addEventListener("click",async e=>{ if(Date.now()-(GM.drag||0)<300) return; const t=e.target, b=t.closest("[data-gm]");
     if(b){ const k=b.dataset.gm;
       if(k==="go"){ if(score.today){ gmSay(pickR(["Repos mérité. À demain, champion.","Ton héros récupère. Toi aussi.","Demain, on avance encore !"])); return; } if(!ptsOn()){ toast("Bientôt disponible !"); return; } doCheckin(); }
       else if(k==="coll") gmColl(); else if(k==="share") gmShare();
       else if(k==="t1"||k==="t5"){ store.set("hmg-game-test",gmTest()+(k==="t1"?1:5)); gmHud(); gmSync(); }
-      else if(k==="t0"){ store.set("hmg-game-test",0); Object.assign(gmS,{seen:null,open:[],items:[],stars:0,leg:{}}); gmS.eq={hero:null,tone:"clair",skin:"blanc",hat:null,neck:null,face:null,back:null,hand:"haltere",aura:null}; gmSave(); toast("Test remis à zéro : ton aventure repart du début."); gmSet(true); }
+      else if(k==="t0"){ store.set("hmg-game-test",0); Object.assign(gmS,{seen:null,open:[],items:[],stars:0,leg:{}}); gmS.eq={...GM_EQ0}; gmSave(); toast("Test remis à zéro : ton aventure repart du début."); gmSet(true); }
       else if(k==="th"){ GM.hideTest=true; gmHud(); }
       return; }
     const ch=t.closest("[data-chest]"); if(ch&&ch.classList.contains("ready")&&!GM.busy){ GM.busy=true; await gmOpenChest(+ch.dataset.chest); GM.busy=false; gmHud(); return; }
