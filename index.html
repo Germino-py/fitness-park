@@ -834,7 +834,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .lbl.city.t2{font-weight:600;font-size:12.5px}
 .lbl.city::before{content:"";display:block;width:4px;height:4px;border-radius:50%;background:rgba(238,243,255,.7);margin:0 auto 3px}
 /* plan des rues : tuiles OpenStreetMap (sans clé) passées en sombre pour rester dans le thème */
-.leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.55)}
+.leaflet-tile-pane{filter:saturate(1.12) contrast(1.03)}
 .leaflet-container .leaflet-tile{background:#e8e8e8}
 /* marqueurs des salles */
 .ps-ico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 10px 30px rgba(var(--a-rgb),.35);animation:spin .6s cubic-bezier(.2,1.4,.4,1)}
@@ -1231,9 +1231,9 @@ body.gm-on #game{opacity:1;visibility:visible}
 @keyframes gmFloat{0%{transform:translate(0,0);opacity:0}15%{opacity:var(--o,.8)}85%{opacity:var(--o,.8)}100%{transform:translate(var(--dx,20px),var(--dy,-160px));opacity:0}}
 .gm-path{position:absolute;left:50%;top:0;margin-left:-700px;width:1400px;pointer-events:none;overflow:visible}
 .gm-col{position:absolute;left:50%;top:0;width:0;height:100%}
-.gm-gate{position:absolute;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:280px}
+.gm-gate{position:absolute;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:230px}
 .gm-gate b{display:block;font:800 11px var(--f-d);letter-spacing:.32em;color:var(--wc,#c8ff1e);text-shadow:0 0 14px var(--wc,#c8ff1e)}
-.gm-gate span{display:block;font:700 24px/1.1 var(--f-d);letter-spacing:.02em;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.8),0 0 30px color-mix(in srgb,var(--wc,#c8ff1e) 45%,transparent)}
+.gm-gate span{display:block;font:700 20px/1.1 var(--f-d);letter-spacing:.02em;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.8),0 0 30px color-mix(in srgb,var(--wc,#c8ff1e) 45%,transparent)}
 .gm-gate small{display:inline-block;margin-top:7px;padding:4px 10px;border-radius:999px;font:600 11px var(--f-b);color:#fff;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14)}
 .gm-node{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--f-d);color:rgba(255,255,255,.55);background:rgba(10,14,24,.55);border:1.5px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.45);transition:transform .3s}
 .gm-node::before{content:"";position:absolute;inset:5px;border-radius:50%;border:1px dashed rgba(255,255,255,.12)}
@@ -1419,6 +1419,12 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-plus{position:absolute;z-index:7;transform:translate(-50%,-100%);font:800 26px var(--f-d);color:var(--a2);text-shadow:0 0 18px rgba(var(--a-rgb),.9);pointer-events:none;animation:gmPlus 1.6s ease-out forwards}
 @keyframes gmPlus{0%{opacity:0;transform:translate(-50%,-60%) scale(.5)}20%{opacity:1;transform:translate(-50%,-110%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-260%)}}
 
+/* légendes */
+.gm-chest .loot .pwr{margin:10px 0 0;padding:9px 12px;border-radius:14px;text-align:left;font-size:12.5px;color:var(--ink);background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.35)}
+.gm-chest .loot .pwr b{display:block;font:800 10.5px var(--f-d);letter-spacing:.14em;color:var(--gold);text-transform:uppercase;margin-bottom:2px}
+.gm-grid.leg{grid-template-columns:repeat(auto-fill,minmax(122px,1fr))}
+.gm-it.leg em{font-style:normal;font-size:10.5px;line-height:1.3;color:var(--muted)}
+.gm-it.leg.own{background:linear-gradient(170deg,rgba(255,209,102,.18),rgba(255,255,255,.02))}
 /* collection */
 .gm-coll .card{width:min(560px,100%);max-height:calc(100dvh - 32px);display:flex;flex-direction:column;padding:18px 0 0;text-align:left}
 .gm-coll .top{display:grid;grid-template-columns:120px 1fr;gap:6px 14px;align-items:center;padding:0 18px 12px;border-bottom:1px solid var(--stroke)}
@@ -1754,6 +1760,7 @@ if(TOUCH_DEV){ let mvT=0; const root=document.documentElement;
 map.on("zoomend",()=>$("map").classList.toggle("far",map.getZoom()<7.5));
 function setTiles(on){ tilesOn=on; if(on){ tiles.addTo(map); frLayer.setStyle({fillOpacity:0}); nbLayer.setStyle({fillOpacity:0}); } else { map.removeLayer(tiles); frLayer.setStyle({fillOpacity:.92}); nbLayer.setStyle({fillOpacity:.9}); }
   $("bTiles").classList.toggle("on",on); $("legal").classList.toggle("osm-on",on); $("bTiles").setAttribute("aria-pressed",on); updateLabels(); }
+if(store.get("hmg-tiles",true)) setTiles(true);
 
 /* marqueurs : dessinés sur un seul canvas (et non 375 éléments de page) pour une carte fluide sur téléphone.
    Chaque style de pastille est dessiné une fois dans une petite image, puis recopiée : très rapide. */
@@ -1804,13 +1811,16 @@ const Pin=L.CircleMarker.extend({
     if(TAGZ){ const a=avgOf(c.id); if(a!=null){ ctx.font=TAGFONT; ctx.textAlign="center"; ctx.textBaseline="bottom"; ctx.lineWidth=3; ctx.strokeStyle="#05070d"; ctx.fillStyle=pinCol("gold");
       const t=fmt1(a), y=p.y-(sel?16:10); ctx.strokeText(t,p.x,y); ctx.fillText(t,p.x,y); } } }
 });
+function crowdZoom(m){ if(map.getZoom()>=11) return false; const p=map.latLngToContainerPoint(m.getLatLng()); let n=0;
+  for(const id in markers){ const q=map.latLngToContainerPoint(markers[id].getLatLng()); if(Math.abs(q.x-p.x)<20&&Math.abs(q.y-p.y)<20) n++; }
+  if(n<3) return false; map.flyTo(m.getLatLng(),Math.min(13,map.getZoom()+2.5),{duration:.6}); return true; }
 function drawMarker(c){
   const p=pos(c); if(!p||isDom(c)) return;
   let m=markers[c.id];
   if(m){ m.setLatLng([p.lat,p.lon]); if(selected===c.id) m.bringToFront(); m.redraw(); return; }
   m=new Pin([p.lat,p.lon],{renderer:pinRenderer,radius:9,stroke:false,fill:true,fillOpacity:0,bubblingMouseEvents:false}); m.club=c;
   if(!TOUCH) m.bindTooltip(()=>{ const a=avgOf(c.id); return esc(c.n)+(a!=null?` · ${fmt1(a)}/10`:""); },{className:"tip",direction:"top",offset:[0,-8]});
-  m.on("click",()=>openClub(c.id));
+  m.on("click",()=>{ if(crowdZoom(m)) return; openClub(c.id); });
   clubLayer.addLayer(m); markers[c.id]=m;
 }
 function refreshMarkers(){ CLUBS.forEach(c=>drawMarker(c)); }
@@ -2841,7 +2851,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ const m=document.
 $("bZin").addEventListener("click",()=>map.zoomIn());
 $("bZout").addEventListener("click",()=>map.zoomOut());
 $("bHome").addEventListener("click",()=>fitFrance(true));
-$("bTiles").addEventListener("click",()=>setTiles(!tilesOn));
+$("bTiles").addEventListener("click",()=>{ setTiles(!tilesOn); store.set("hmg-tiles",tilesOn); });
 $("bList").addEventListener("click",()=>sheetMode==="list"?closeSheet():openList());
 map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
 
@@ -2852,19 +2862,21 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
    La collection (coffres ouverts, objets, tenue portée) reste sur l'appareil, comme les points. */
 const GM_PER=10, GM_STEP=118, GM_PADT=330, GM_PADB=250;
 const GM_W=[
-  {k:"plaine", n:"Plaine Néon",          d:"Là où tout commence",            c:["#0b2b2a","#04120e"], wc:"#2bffa0"},
-  {k:"desert", n:"Désert des Haltères",  d:"Le sable ne fait pas peur aux machines", c:["#3a1a0c","#1a0b06"], wc:"#ffb547"},
-  {k:"glacier",n:"Glacier Cryo",         d:"La récup' à -30 °C",              c:["#0a2238","#050e1c"], wc:"#7fe3ff"},
+  {k:"plaine", n:"Plaine Néon",          d:"Là où tout commence",            c:["#0b2b2a","#04120e"], wc:"#2bffa0", mon:[["msm",.42,-100]]},
+  {k:"cite",   n:"Paris Néon",           d:"La ville lumière, version muscle", c:["#2a0a2c","#0b0414"], wc:"#ff4fd8", mon:[["sacre",.1,110],["eiffel",.36,-95],["louvre",.62,95],["arc",.88,-100]]},
+  {k:"desert", n:"Désert des Haltères",  d:"Le sable ne fait pas peur aux machines", c:["#3a1a0c","#1a0b06"], wc:"#ffb547", mon:[["gard",.55,110]]},
+  {k:"glacier",n:"Glacier du Mont-Blanc", d:"La récup' à -30 °C",             c:["#0a2238","#050e1c"], wc:"#7fe3ff", mon:[["blanc",.32,-60]]},
   {k:"jungle", n:"Jungle Protéine",      d:"Ça pousse, comme tes muscles",    c:["#1d0f33","#0a0718"], wc:"#c77dff"},
-  {k:"cite",   n:"Cité Néon",            d:"La ville qui ne dort jamais",     c:["#2a0a2c","#0b0414"], wc:"#ff4fd8"},
-  {k:"volcan", n:"Volcan de Fonte",      d:"Là où l'on forge les légendes",   c:["#3a0c06","#140303"], wc:"#ff5a36"},
-  {k:"cosmos", n:"Station Orbitale",     d:"Au-delà de tes limites",          c:["#0b0a2a","#020208"], wc:"#c8ff1e"}];
+  {k:"volcan", n:"Volcans d'Auvergne",   d:"Là où l'on forge les légendes",   c:["#3a0c06","#140303"], wc:"#ff5a36", mon:[["puy",.55,100]]},
+  {k:"cosmos", n:"Station Orbitale",     d:"Au-delà de tes limites",          c:["#0b0a2a","#020208"], wc:"#c8ff1e", mon:[["ariane",.45,-110]]}];
 const GM_RAR={C:{t:"Commun",c:"#c9d3e6"},R:{t:"Rare",c:"#3fd8ff"},E:{t:"Épique",c:"#c77dff"},L:{t:"Légendaire",c:"#ffd166"}};
-const GM_CATS=[["skin","Tenues"],["hat","Sur la tête"],["face","Lunettes"],["back","Dans le dos"],["hand","En main"],["aura","Auras"]];
+const GM_CATS=[["skin","Tenues"],["hat","Sur la tête"],["neck","Au cou"],["face","Lunettes"],["back","Dans le dos"],["hand","En main"],["aura","Auras"]];
 const GM_ITEMS=[
   {id:"blanc",cat:"skin",n:"Tenue Blanche",r:"C",def:1},{id:"volt",cat:"skin",n:"Tenue Volt",r:"R"},{id:"braise",cat:"skin",n:"Tenue Braise",r:"R"},{id:"ocean",cat:"skin",n:"Tenue Océan",r:"R"},
   {id:"chrome",cat:"skin",n:"Tenue Chrome noir",r:"E"},{id:"or",cat:"skin",n:"Tenue Or massif",r:"L"},{id:"galaxie",cat:"skin",n:"Tenue Galaxie",r:"L"},
   {id:"bandeau",cat:"hat",n:"Bandeau",r:"C"},{id:"casquette",cat:"hat",n:"Casquette",r:"C"},{id:"bonnet",cat:"hat",n:"Bonnet",r:"C"},{id:"casque",cat:"hat",n:"Casque audio",r:"R"},
+  {id:"bonnet_hmg",cat:"hat",n:"Bonnet HMG",r:"R",hmg:1},{id:"bonnet_volt",cat:"hat",n:"Bonnet HMG Volt",r:"E",hmg:1},
+  {id:"echarpe_hmg",cat:"neck",n:"Écharpe HMG",r:"R",hmg:1},{id:"echarpe_or",cat:"neck",n:"Écharpe HMG dorée",r:"L",hmg:1},
   {id:"crete",cat:"hat",n:"Crête punk",r:"E"},{id:"aureole",cat:"hat",n:"Auréole",r:"E"},{id:"couronne",cat:"hat",n:"Couronne",r:"L"},
   {id:"soleil",cat:"face",n:"Lunettes de soleil",r:"C"},{id:"cyber",cat:"face",n:"Visière cyber",r:"R"},{id:"coeur",cat:"face",n:"Lunettes cœur",r:"E"},
   {id:"sac",cat:"back",n:"Sac de sport",r:"C"},{id:"cape",cat:"back",n:"Cape de héros",r:"R"},{id:"ailes",cat:"back",n:"Ailes d'ange",r:"E"},{id:"jetpack",cat:"back",n:"Jetpack",r:"L"},
@@ -2872,12 +2884,21 @@ const GM_ITEMS=[
   {id:"etincelles",cat:"aura",n:"Étincelles",r:"R"},{id:"flammes",cat:"aura",n:"Aura de feu",r:"E"},{id:"eclairs",cat:"aura",n:"Éclairs Volt",r:"L"}];
 const GM_IT=Object.fromEntries(GM_ITEMS.map(i=>[i.id,i]));
 const GM_TOTAL=GM_ITEMS.filter(i=>!i.def).length;
+/* Légendes : débloquées dans les grands coffres à 20, 40, 60 et 80 séances. Chacune a un pouvoir, actif dès qu'on l'a. */
+const GM_LEG=[
+  {k:"l_masse",n:"Le Roi de la Masse",s:"Huit fois couronné, une montagne de muscles",pw:"Force brute",pd:"Tous tes coffres montent d'un cran de rareté.",base:"homme",tone:"fonce",hair:"chauve",beard:1,wide:1.42,skin:"braise"},
+  {k:"l_classique",n:"Le Prince du Classique",s:"Les plus belles poses de la planète",pw:"Pose classique",pd:"Chaque grand coffre te donne 2 objets.",base:"homme",tone:"bronze",hair:"court",beard:1,wide:1.26,skin:"or",aura:"etincelles"},
+  {k:"l_coach",n:"Le Coach du Peuple",s:"Il motive la France entière",pw:"Motivation",pd:"Un coffre bonus au 5e pas de chaque monde.",base:"homme",tone:"clair",hair:"court",beard:1,wide:1.14,skin:"ocean",hat:"bandeau"},
+  {k:"l_reine",n:"La Reine du Fitness",s:"Personne ne lui résiste",pw:"Œil de reine",pd:"Tu vois la rareté du prochain coffre avant de l'ouvrir.",base:"femme",tone:"clair",hair:"blond",wide:1,skin:"galaxie",hat:"couronne",aura:"etincelles"}];
+const GM_LG=Object.fromEntries(GM_LEG.map(l=>[l.k,l]));
 const GM_HEROES=[{k:"homme",n:"Lui",s:"Le sportif"},{k:"femme",n:"Elle",s:"La sportive"},{k:"robot",n:"Mini-Machine",s:"Le robot HMG"}];
 const GM_SKIN={blanc:["#ffffff","#e2e8f4","#a7b3ca"],volt:["#f2ffbf","#c8ff1e","#7fae00"],braise:["#ffd0b5","#ff7a3d","#c2410c"],ocean:["#d2f6ff","#3fd8ff","#1479a8"],
   chrome:["#646d83","#2a3142","#0e121b"],or:["#fff4b8","#ffd166","#c48a00"],galaxie:["#dcc2ff","#7b5cff","#2a1670"]};
 const GM_TONE={human:{clair:{s:"#ffd8bf",d:"#e9ab84",h:"#4a2e1c"},fonce:{s:"#8d5838",d:"#663a22",h:"#15100d"}},robot:{clair:{s:"#f2f5fc",d:"#b5c0d5",h:"#8792aa"},fonce:{s:"#30374a",d:"#161a26",h:"#0c0f16"}}};
-const gmS=Object.assign({seen:null,open:[],items:[],stars:0,eq:{}},store.get("hmg-game",{}));
-gmS.eq=Object.assign({hero:null,tone:"clair",skin:"blanc",hat:null,face:null,back:null,hand:"haltere",aura:null},gmS.eq||{});
+const gmS=Object.assign({seen:null,open:[],items:[],stars:0,eq:{},leg:{}},store.get("hmg-game",{}));
+gmS.eq=Object.assign({hero:null,tone:"clair",skin:"blanc",hat:null,neck:null,face:null,back:null,hand:"haltere",aura:null},gmS.eq||{});
+if(!gmS.leg||typeof gmS.leg!=="object") gmS.leg={};
+const gmLegOn=(k,n)=>gmS.leg[k]!=null&&(n==null||n>gmS.leg[k]);
 const gmSave=()=>store.set("hmg-game",gmS);
 const gmOwn=id=>!!(GM_IT[id]&&(GM_IT[id].def||gmS.items.includes(id)));
 const gmTest=()=>isAdmin()?(store.get("hmg-game-test",0)|0):0;
@@ -2886,15 +2907,19 @@ const GM={on:false,busy:false,pos:0,lay:null,ghosts:null,tm:null};
 let gmUid=0;
 function gmHash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function gmRng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-const gmKind=n=>n===0?"w":n%GM_PER===0?"g":(n%GM_PER===3||n%GM_PER===6)?"c":null;
+const gmKind=n=>n===0?"w":n%GM_PER===0?"g":(n%GM_PER===3||n%GM_PER===6||(n%GM_PER===5&&gmLegOn("l_coach",n)))?"c":null;
+const gmNextChest=d=>{ let n=d+1; while(!gmKind(n)) n++; return n; };
 const gmWorld=w=>GM_W[((w%GM_W.length)+GM_W.length)%GM_W.length];
 const gmLap=w=>Math.floor(w/GM_W.length)+1;
 const gmWorldOf=d=>Math.min(Math.floor(d/GM_PER),Math.floor(Math.max(0,d-1)/GM_PER)+(d%GM_PER===0&&d>0?1:0));
 
 /* ---------- le petit héros (SVG) : homme, femme ou robot, peau claire ou foncée, + objets de la collection */
 function gmBot(eq,o={}){
-  const u="gb"+(++gmUid), hero=eq.hero||"homme", rob=hero==="robot", fem=hero==="femme", tone=eq.tone==="fonce"?"fonce":"clair";
-  const T=GM_TONE[rob?"robot":"human"][tone], K=GM_SKIN[eq.skin]||GM_SKIN.blanc, st=!!o.static;
+  const LG=GM_LG[eq.hero];
+  if(LG) eq={...eq,tone:LG.tone,skin:eq.skin&&eq.skin!=="blanc"?eq.skin:LG.skin,hat:eq.hat||LG.hat||null,aura:eq.aura||LG.aura||null};
+  const u="gb"+(++gmUid), hero=LG?LG.base:(eq.hero||"homme"), rob=hero==="robot", fem=hero==="femme", tone=eq.tone==="fonce"?"fonce":eq.tone==="bronze"?"bronze":"clair";
+  const wd=LG?LG.wide:1, dx=12*(wd-1), hs=LG?LG.hair:"";
+  const T={...(rob?GM_TONE.robot[tone==="bronze"?"clair":tone]:tone==="bronze"?{s:"#dc9a6a",d:"#b47248",h:"#24160d"}:GM_TONE.human[tone]),...(hs==="blond"?{h:"#e8b84f"}:{})}, K=GM_SKIN[eq.skin]||GM_SKIN.blanc, st=!!o.static;
   const hat=eq.hat, face=eq.face, back=eq.back, hand=eq.hand||"haltere", aura=eq.aura;
   const emb=(eq.skin==="volt"||eq.skin==="or")?"#0a0f02":"#c8ff1e";
   const ey=rob?-53:-48, p=[];
@@ -2916,15 +2941,19 @@ function gmBot(eq,o={}){
   const limb=rob?T.d:T.s, leg=x=>`<rect x="${x}" y="-15" width="6.4" height="13" rx="3.2" fill="${limb}"/><ellipse cx="${x+3.2}" cy="-1.9" rx="5.6" ry="3.1" fill="#1b2130"/><path d="M${x-2.2} -0.4 H${x+8.6}" stroke="#c8ff1e" stroke-width="1.3" stroke-linecap="round"/>`;
   p.push(`<g class="b-legL">${leg(-8.4)}</g><g class="b-legR">${leg(2)}</g>`);
   /* corps : t-shirt aux couleurs de la tenue + short */
-  p.push(`<rect x="-12" y="-34" width="24" height="22" rx="9" fill="url(#${u}k)"/>`);
+  p.push(`<rect x="${-12*wd}" y="-34" width="${24*wd}" height="22" rx="9" fill="url(#${u}k)"/>`);
+  if(LG&&wd>1.2) p.push(`<path d="M${-7*wd} -27 Q0 -23 ${7*wd} -27 M-1 -24 V-14" stroke="#000" stroke-opacity=".18" stroke-width="1.2" fill="none"/>`);
   if(!rob) p.push(fem?`<path d="M-4.5 -34 Q0 -28.5 4.5 -34Z" fill="${T.s}"/>`:`<path d="M-4 -34 Q0 -30.5 4 -34Z" fill="${T.d}" opacity=".9"/>`);
   if(eq.skin==="galaxie") p.push(`<circle cx="-6" cy="-27" r=".8" fill="#fff"/><circle cx="5" cy="-22" r=".6" fill="#fff"/><circle cx="7" cy="-29" r=".9" fill="#fff"/><circle cx="-3" cy="-19" r=".6" fill="#fff"/>`);
   p.push(rob?`<circle cx="0" cy="-25" r="3.6" fill="#0a0f1c"/><circle cx="0" cy="-25" r="2" fill="#c8ff1e"/>`:`<path d="M1 -29 L-2.6 -24.2 H0 L-1 -20.5 L2.8 -25.6 H0.2Z" fill="${emb}"/>`);
-  p.push(`<path d="M-12 -18.5 H12 V-14.5 Q12 -11.5 9 -11.5 H-9 Q-12 -11.5 -12 -14.5Z" fill="#1b2130"/>`);
+  p.push(`<path d="M${-12*Math.min(wd,1.2)} -18.5 H${12*Math.min(wd,1.2)} V-14.5 Q${12*Math.min(wd,1.2)} -11.5 9 -11.5 H-9 Q${-12*Math.min(wd,1.2)} -11.5 ${-12*Math.min(wd,1.2)} -14.5Z" fill="#1b2130"/>`);
+  if(eq.neck){ const sc=eq.neck==="echarpe_or"?["#ffd166","#c48a00","#fff4b8"]:["#11151f","#c8ff1e","#c8ff1e"];
+    p.push(`<path d="M-13 -37 Q0 -30 13 -37 L13.5 -31.5 Q0 -24.5 -13.5 -31.5Z" fill="${sc[0]}"/><path d="M-11 -35.6 Q0 -29.6 11 -35.6" stroke="${sc[1]}" stroke-width="1.3" fill="none"/>
+      <path d="M-9 -31 L-12 -16 L-5.5 -16 L-3.6 -29.6Z" fill="${sc[0]}"/><path d="M-10.6 -22 L-5 -22 M-11.2 -19 L-5.4 -19" stroke="${sc[1]}" stroke-width="1.2"/><path d="M-12 -16 v2.4 M-10 -16 v2.4 M-8 -16 v2.4 M-6 -16 v2.4" stroke="${sc[2]}" stroke-width=".9"/>`); }
   if(back==="sac") p.push(`<path d="M-7.5 -34 L-6.5 -19 M7.5 -34 L6.5 -19" stroke="#ff7a3d" stroke-width="2.6" stroke-linecap="round"/>`);
   /* bras */
-  const arm=(x,hx)=>`<rect x="${x}" y="-32" width="6" height="15" rx="3" fill="${limb}"/>${rob?"":`<rect x="${x-.4}" y="-33" width="6.8" height="6.5" rx="3" fill="${K[1]}"/>`}<circle cx="${hx}" cy="-16.5" r="3.3" fill="${T.s}"/>`;
-  p.push(`<g class="b-armL"><g transform="rotate(10 -12 -29)">${arm(-16.5,-13.5)}</g></g>`);
+  const aw=6*Math.min(wd,1.35), arm=(x,hx)=>`<rect x="${x-(aw-6)/2}" y="-32" width="${aw}" height="15" rx="${aw/2}" fill="${limb}"/>${rob?"":`<rect x="${x-.4}" y="-33" width="6.8" height="6.5" rx="3" fill="${K[1]}"/>`}<circle cx="${hx}" cy="-16.5" r="3.3" fill="${T.s}"/>`;
+  p.push(`<g transform="translate(${-dx} 0)"><g class="b-armL"><g transform="rotate(10 -12 -29)">${arm(-16.5,-13.5)}</g></g></g>`);
   /* tête */
   p.push(`<g class="b-head">`);
   if(fem) p.push(`<g class="b-ponytail"><path d="M9 -67 C24 -74 34 -61 31 -45 C30 -37 26 -32 22 -30 C25 -40 23 -52 9 -58Z" fill="${T.h}"/><path d="M14 -64 C24 -66 29 -56 28 -46" stroke="#fff" stroke-opacity=".18" stroke-width="1.6" fill="none"/><ellipse cx="12" cy="-64" rx="3.4" ry="2.6" fill="#c8ff1e"/></g>`);
@@ -2945,11 +2974,13 @@ function gmBot(eq,o={}){
       <g class="b-sleep" stroke="#1a1322" stroke-width="1.4" fill="none" stroke-linecap="round"><path d="M-8.6 -48 Q-6.2 -46 -3.8 -48"/><path d="M3.8 -48 Q6.2 -46 8.6 -48"/></g>`);
     p.push(`<path d="M-8.8 -54.6 Q-6.2 -56.2 -3.6 -55 M3.6 -55 Q6.2 -56.2 8.8 -54.6" stroke="${T.h}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
       <ellipse cx="-10.6" cy="-43" rx="2.8" ry="1.6" fill="#ff7aa0" opacity="${tone==="fonce"?.3:.45}"/><ellipse cx="10.6" cy="-43" rx="2.8" ry="1.6" fill="#ff7aa0" opacity="${tone==="fonce"?.3:.45}"/>`);
-    if(hat!=="casquette"&&hat!=="bonnet") p.push(fem
+    if(hs==="chauve") p.push(`<ellipse cx="-6" cy="-62" rx="5" ry="2.6" fill="#fff" opacity=".3" transform="rotate(-25 -6 -62)"/>`);
+    else if(!/^(casquette|bonnet)/.test(hat||"")) p.push(fem
       ?`<path d="M-17.6 -47 C-19.6 -65 -8 -71.5 1 -71 C13 -71 20 -63 17.8 -47 C16 -55 12 -60 5 -60.5 C0 -57.5 -7 -57.5 -11 -59.5 C-14 -56.5 -16 -52 -17.6 -47Z" fill="${T.h}"/><path d="M-17.4 -51 C-19 -43 -17.5 -37 -14 -34.5 C-15.2 -40 -15.2 -46 -14 -52Z" fill="${T.h}"/>`
       :`<path d="M-17 -53 C-18.6 -66 -8 -71.6 1 -71 C12 -70.6 18.6 -64.5 17 -53 C16 -58 13.5 -61.5 8.5 -62 C4 -65.5 -4 -65 -8.5 -62.5 C-12.5 -62 -15.6 -58.5 -17 -53Z" fill="${T.h}"/><path d="M-6 -70 C0 -79 12 -76 10.5 -67.5 C6 -71.5 0 -71.5 -6 -70Z" fill="${T.h}"/><path d="M-16.8 -53 V-47 M16.8 -53 V-47" stroke="${T.h}" stroke-width="2" stroke-linecap="round"/>`);
-    else p.push(fem?`<path d="M-17.4 -51 C-19 -43 -17.5 -37 -14 -34.5 C-15.2 -40 -15.2 -46 -14 -52Z" fill="${T.h}"/>`:"");
+    else if(hs!=="chauve") p.push(fem?`<path d="M-17.4 -51 C-19 -43 -17.5 -37 -14 -34.5 C-15.2 -40 -15.2 -46 -14 -52Z" fill="${T.h}"/>`:"");
   }
+  if(LG&&LG.beard&&!rob) p.push(`<path d="M-15.6 -46 Q-15 -34 0 -32.6 Q15 -34 15.6 -46 Q12 -38.4 6 -38.6 Q3 -41.4 0 -40.6 Q-3 -41.4 -6 -38.6 Q-12 -38.4 -15.6 -46Z" fill="${T.h}"/><path d="M-3.2 -39.6 Q0 -37.8 3.2 -39.6" stroke="#7a2b2b" stroke-width="1.3" fill="none" stroke-linecap="round"/>`);
   /* lunettes */
   if(face==="soleil") p.push(`<path d="M-17 ${ey-2} H-12 M12 ${ey-2} H17" stroke="#111" stroke-width="1.4"/><rect x="-12.5" y="${ey-4.5}" width="10.5" height="8" rx="3.4" fill="url(#${u}sg)" stroke="#111" stroke-width="1"/><rect x="2" y="${ey-4.5}" width="10.5" height="8" rx="3.4" fill="url(#${u}sg)" stroke="#111" stroke-width="1"/><path d="M-2 ${ey-2} H2" stroke="#111" stroke-width="1.4"/><path d="M-10 ${ey-2.6} l3 -1 M4.4 ${ey-2.6} l3 -1" stroke="#fff" stroke-width="1" opacity=".8" stroke-linecap="round"/>`);
   if(face==="cyber") p.push(`<rect x="-16.5" y="${ey-4.6}" width="33" height="8.4" rx="4.2" fill="rgba(63,216,255,.42)" stroke="#3fd8ff" stroke-width="1"/><path d="M-13 ${ey-2.6} H6" stroke="#e6fbff" stroke-width="1" opacity=".75" stroke-linecap="round"/>`);
@@ -2958,6 +2989,8 @@ function gmBot(eq,o={}){
   if(hat==="bandeau") p.push(`<path d="M-17.6 -56 Q0 -64.5 17.6 -56 L17.8 -51.6 Q0 -60 -17.8 -51.6Z" fill="#ff3b5c"/><path d="M16.5 -55 L25 -53.5 L22.5 -49.5Z M16.5 -53.5 L23.5 -48 L19.5 -46.5Z" fill="#e8264a"/>`);
   if(hat==="casquette") p.push(`<path d="M-18 -52.5 C-18.5 -66 -9 -72.5 0 -72.5 C9 -72.5 18.5 -66 18 -52.5 Q0 -57.5 -18 -52.5Z" fill="#1b2130"/><path d="M3 -55 Q20 -59.5 31 -53 Q19.5 -50 3 -52Z" fill="#0e121b"/><path d="M1 -68 L-2.4 -63.4 H0 L-1 -59.8 L2.6 -64.6 H0.2Z" fill="#c8ff1e"/><circle cx="0" cy="-72.4" r="1.6" fill="#c8ff1e"/>`);
   if(hat==="bonnet") p.push(`<path d="M-18 -52 C-18 -68 -9 -74 0 -74 C9 -74 18 -68 18 -52Z" fill="#3fd8ff"/><path d="M-9 -72 V-56 M0 -74 V-56 M9 -72 V-56" stroke="#2aa9d6" stroke-width="1.4"/><rect x="-19" y="-57.5" width="38" height="7" rx="3.5" fill="#1f9fd0"/><circle cx="0" cy="-75.5" r="4.4" fill="#fff"/>`);
+  if(hat==="bonnet_hmg"||hat==="bonnet_volt"){ const v=hat==="bonnet_volt", a=v?"#c8ff1e":"#11151f", b=v?"#0a0f02":"#c8ff1e";
+    p.push(`<path d="M-18 -52 C-18 -68 -9 -74 0 -74 C9 -74 18 -68 18 -52Z" fill="${a}"/><path d="M-9 -72 V-58 M0 -74 V-58 M9 -72 V-58" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><rect x="-19" y="-58" width="38" height="8" rx="3.5" fill="${b}"/><text x="0" y="-51.9" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-weight="700" font-size="6.4" letter-spacing=".6" fill="${a}">HMG</text><circle cx="0" cy="-75.5" r="4.6" fill="${b}"/>`); }
   if(hat==="casque") p.push(`<path d="M-19 -50 C-21 -76 21 -76 19 -50" stroke="#1b2130" stroke-width="3.6" fill="none"/><rect x="-23" y="-57" width="7.4" height="14" rx="3.4" fill="#1b2130" stroke="#c8ff1e" stroke-width="1.1"/><rect x="15.6" y="-57" width="7.4" height="14" rx="3.4" fill="#1b2130" stroke="#c8ff1e" stroke-width="1.1"/>`);
   if(hat==="crete") p.push(`<path d="M-7 -64.5 L-6.5 -78 L-2.2 -68 L0 -84 L3.2 -68 L7.6 -77.5 L8 -63.5 Q0 -67.5 -7 -64.5Z" fill="#ff4fd8" stroke="#b0129a" stroke-width=".8"/>`);
   if(hat==="aureole") p.push(`<g class="b-halo"><ellipse cx="0" cy="-81" rx="12.5" ry="3.6" fill="none" stroke="#ffd166" stroke-opacity=".35" stroke-width="5"/><ellipse cx="0" cy="-81" rx="12.5" ry="3.6" fill="none" stroke="#ffe9a3" stroke-width="2.2"/></g>`);
@@ -2968,7 +3001,7 @@ function gmBot(eq,o={}){
     haltereor:`<rect x="5" y="-17.8" width="17" height="2.6" rx="1" fill="#fff2b0"/><rect x="2.8" y="-23" width="4.6" height="13" rx="1.6" fill="url(#${u}au)"/><rect x="19.6" y="-23" width="4.6" height="13" rx="1.6" fill="url(#${u}au)"/><circle cx="4" cy="-22" r=".9" fill="#fff"/><circle cx="21" cy="-21" r=".9" fill="#fff"/>`,
     kettle:`<path d="M9.6 -18.5 Q13.5 -25 17.4 -18.5" stroke="#2a3142" stroke-width="2.2" fill="none"/><circle cx="13.5" cy="-11.5" r="6" fill="#2a3142"/><circle cx="11.6" cy="-13.2" r="1.6" fill="#fff" opacity=".35"/><path d="M10 -10 H17" stroke="#c8ff1e" stroke-width="1.2"/>`,
     shaker:`<rect x="10" y="-25.5" width="7" height="14" rx="2.2" fill="#c8ff1e" opacity=".9"/><rect x="9.6" y="-28" width="7.8" height="3.6" rx="1.2" fill="#1b2130"/><rect x="11" y="-21" width="5" height="1.4" fill="#0a0f02" opacity=".5"/>`}[hand]||"";
-  p.push(`<g class="b-armR"><g transform="rotate(-10 12 -29)">${hand==="shaker"?it+arm(10.5,13.5):arm(10.5,13.5)+it}</g></g>`);
+  p.push(`<g transform="translate(${dx} 0)"><g class="b-armR"><g transform="rotate(-10 12 -29)">${hand==="shaker"?it+arm(10.5,13.5):arm(10.5,13.5)+it}</g></g></g>`);
   /* devant */
   if(aura==="etincelles") p.push(`<g class="b-spk" fill="#fff6b0">${[[-25,-62],[24,-46],[-21,-22],[23,-74]].map(([x,y])=>`<path d="M${x} ${y-5} L${x+1.3} ${y-1.3} L${x+5} ${y} L${x+1.3} ${y+1.3} L${x} ${y+5} L${x-1.3} ${y+1.3} L${x-5} ${y} L${x-1.3} ${y-1.3}Z"/>`).join("")}</g>`);
   if(aura==="eclairs") p.push(`<path class="b-bolt" d="M-27 -66 L-21 -54 L-26 -52 L-19 -38" stroke="#c8ff1e" stroke-width="2.2" fill="none" stroke-linejoin="round"/><path class="b-bolt" d="M27 -60 L21 -48 L26 -46 L19 -31" stroke="#c8ff1e" stroke-width="2.2" fill="none" stroke-linejoin="round"/>`);
@@ -3019,7 +3052,7 @@ function gmDeco(w,h){
     for(let i=0;i<9;i++){ const y=h*(i+1)/9; for(const s of [-1,1]){ let x=150; while(x<700){ const bw=R(40,90), bh=R(80,220), X=s<0?-x-bw:x; o.push(`<rect x="${X|0}" y="${(y-bh)|0}" width="${bw|0}" height="${bh|0}" fill="#14081f" stroke="${c}" stroke-opacity=".25"/>`);
       for(let wy=y-bh+10;wy<y-8;wy+=14) for(let wx=X+7;wx<X+bw-8;wx+=12) if(r()<.45) o.push(`<rect x="${wx|0}" y="${wy|0}" width="5" height="7" fill="${r()<.5?c:"#3fd8ff"}" opacity="${R(.35,.9).toFixed(2)}"/>`);
       x+=bw+R(4,20); } } }
-    for(let i=0;i<n*.8;i++){ const x=side(), y=R(60,h), t=["GYM","HMG","24/7","PR","NO PAIN"][i%5], cc=i%2?c:"#3fd8ff"; o.push(`<g transform="translate(${x|0} ${y|0})"><text x="0" y="0" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="26" fill="none" stroke="${cc}" stroke-opacity=".5" stroke-width="5" filter="url(#bl${w})">${t}</text><text x="0" y="0" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="26" fill="#fff" stroke="${cc}" stroke-width="1.2">${t}</text></g>`); }
+    for(let i=0;i<n*.8;i++){ const x=side(), y=R(60,h), t=["GYM","HMG","PARIS","24/7","CAFÉ"][i%5], cc=i%2?c:"#3fd8ff"; o.push(`<g transform="translate(${x|0} ${y|0})"><text x="0" y="0" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="26" fill="none" stroke="${cc}" stroke-opacity=".5" stroke-width="5" filter="url(#bl${w})">${t}</text><text x="0" y="0" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="26" fill="#fff" stroke="${cc}" stroke-width="1.2">${t}</text></g>`); }
   } else if(W.k==="volcan"){
     o.push(`<path d="M-520 ${h*.32} L-140 ${h*.05} H140 L520 ${h*.32}Z" fill="#2a0c08"/><path d="M-140 ${h*.05} H140 L110 ${h*.09} Q0 ${h*.06} -110 ${h*.09}Z" fill="#ff5a36"/><ellipse cx="0" cy="${h*.05}" rx="160" ry="40" fill="#ff7a3d" opacity=".55" filter="url(#bl${w})"/>
       <path d="M-20 ${h*.07} C-60 ${h*.15} 30 ${h*.2} -40 ${h*.31}" stroke="#ff7a3d" stroke-width="10" fill="none" opacity=".8"/>`);
@@ -3036,7 +3069,54 @@ function gmDeco(w,h){
   const defs=`<defs><filter id="bl${w}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
     <radialGradient id="sun${w}"><stop offset="0" stop-color="#ffe08a"/><stop offset=".7" stop-color="#ff7a3d"/><stop offset="1" stop-color="#ff3b5c" stop-opacity="0"/></radialGradient>
     <linearGradient id="ice${w}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6fbff"/><stop offset=".5" stop-color="#7fe3ff"/><stop offset="1" stop-color="#1f6f9a"/></linearGradient></defs>`;
+  for(const [mk,yy,mx] of (W.mon||[])) o.push(`<g transform="translate(${mx} ${(h*yy)|0})">${gmMon(mk,w)}</g>`);
   return `<svg viewBox="-700 0 1400 ${h}" preserveAspectRatio="none" aria-hidden="true">${defs}${o.join("")}</svg>`;
+}
+
+
+/* ---------- monuments de France (décor des mondes) */
+function gmMon(k,w){
+  const id=k+w, lbl=(t,y)=>`<text x="0" y="${y||26}" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="13" letter-spacing="3" fill="#fff" opacity=".72">${t}</text>`;
+  const tw=(x,y,c,d)=>`<circle cx="${x}" cy="${y}" r="1.8" fill="${c||"#ffe9a3"}"><animate attributeName="opacity" values="1;.15;1" dur="${d||1.4}s" begin="-${(Math.abs(x*7+y*3)%14)/10}s" repeatCount="indefinite"/></circle>`;
+  if(k==="eiffel"){ const legs="M-72 0 C-44 -50 -26 -110 -16 -168 H16 C26 -110 44 -50 72 0 H50 C40 -28 22 -52 0 -54 C-22 -52 -40 -28 -50 0Z", top="M-14 -160 C-8 -210 -5 -250 -3 -282 H3 C5 -250 8 -210 14 -160Z";
+    let L=""; for(let i=0;i<26;i++){ const y=-8-i*10.6, hw=y>-168?16+(72-16)*Math.pow((y+168)/168,2.2):3+11*((y+282)/122); L+=tw(((i%2?1:-1)*hw*.7)|0,y|0,"#ffe9a3",1+(i%4)*.3); }
+    return `<defs><linearGradient id="e${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a8"/><stop offset=".5" stop-color="#d79a45"/><stop offset="1" stop-color="#7a4f1c"/></linearGradient>
+      <pattern id="lt${id}" width="7" height="7" patternUnits="userSpaceOnUse"><path d="M0 0 L7 7 M7 0 L0 7" stroke="#2a1606" stroke-width=".9" opacity=".55"/></pattern>
+      <linearGradient id="bm${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff6c4" stop-opacity=".55"/><stop offset="1" stop-color="#fff6c4" stop-opacity="0"/></linearGradient></defs>
+      <ellipse cx="0" cy="-140" rx="110" ry="170" fill="#ffb547" opacity=".16" filter="url(#bl${w})"/>
+      <g><path d="M0 -296 L-320 -350 L-320 -318Z" fill="url(#bm${id})" transform="scale(-1,1)"/><animateTransform attributeName="transform" type="rotate" values="-30 0 -296;35 0 -296;-30 0 -296" dur="7s" repeatCount="indefinite"/></g>
+      <path d="${legs}" fill="url(#e${id})"/><path d="${legs}" fill="url(#lt${id})"/><path d="${top}" fill="url(#e${id})"/><path d="${top}" fill="url(#lt${id})"/>
+      <rect x="-46" y="-74" width="92" height="7" rx="1.5" fill="#ffd98a"/><rect x="-22" y="-162" width="44" height="6" rx="1.5" fill="#ffd98a"/><rect x="-6" y="-291" width="12" height="10" rx="2" fill="#ffd98a"/><path d="M0 -291 V-318" stroke="#ffd98a" stroke-width="2"/>${L}${tw(0,-320,"#ff4d6d",1)}${lbl("TOUR EIFFEL")}`; }
+  if(k==="louvre"){ let g=""; for(let y=-14;y>-88;y-=14){ const hw=95*(1+y/88); g+=`<path d="M${-hw|0} ${y} H${hw|0}" />`; } for(let i=1;i<10;i++){ const x0=-95+i*19; g+=`<path d="M${x0} 0 L${((x0+95)/2)|0} ${(-(95-x0)*88/190)|0}"/><path d="M${x0} 0 L${((x0-95)/2)|0} ${(-(95+x0)*88/190)|0}"/>`; }
+    let pal=""; for(const s0 of [-1,1]) for(let i=0;i<9;i++){ const x=s0*(110+i*20); pal+=`<rect x="${x-7}" y="-38" width="10" height="14" fill="#ffd98a" opacity="${.3+((i*7)%5)/10}"/>`; }
+    return `<defs><linearGradient id="lv${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6fbff" stop-opacity=".75"/><stop offset="1" stop-color="#3fa9d8" stop-opacity=".3"/></linearGradient></defs>
+      <rect x="-300" y="-58" width="600" height="58" fill="#2a2030"/><rect x="-300" y="-64" width="600" height="8" fill="#3a2e44"/>${pal}
+      <ellipse cx="0" cy="-30" rx="120" ry="60" fill="#7fe3ff" opacity=".25" filter="url(#bl${w})"/>
+      <path d="M-95 0 L0 -88 L95 0Z" fill="url(#lv${id})" stroke="#d8f6ff" stroke-width="1.6"/><g stroke="#d8f6ff" stroke-width=".7" opacity=".55">${g}</g>
+      <path d="M-150 0 L-128 -22 L-106 0Z M106 0 L128 -22 L150 0Z" fill="url(#lv${id})" stroke="#d8f6ff"/><rect x="-200" y="0" width="400" height="5" fill="#7fe3ff" opacity=".6"/>${lbl("LE LOUVRE")}`; }
+  if(k==="arc") return `<ellipse cx="0" cy="-40" rx="80" ry="60" fill="#ffd98a" opacity=".18" filter="url(#bl${w})"/><path fill-rule="evenodd" d="M-50 0 V-112 H50 V0Z M-18 0 V-54 A18 18 0 0 1 18 -54 V0Z M-44 -64 V-40 A6 6 0 0 1 -32 -40 V-64Z M32 -64 V-40 A6 6 0 0 1 44 -40 V-64Z" fill="#cdbd94"/>
+      <rect x="-54" y="-118" width="108" height="10" fill="#b5a47a"/><rect x="-50" y="-100" width="100" height="4" fill="#a8966c"/><path d="M-50 -76 H50" stroke="#a8966c" stroke-width="2"/><ellipse cx="0" cy="-4" rx="14" ry="4" fill="#ffb547" opacity=".9"/>${tw(0,-30,"#ffb547",2)}${lbl("ARC DE TRIOMPHE")}`;
+  if(k==="sacre") return `<ellipse cx="0" cy="-60" rx="90" ry="70" fill="#fff" opacity=".1" filter="url(#bl${w})"/><rect x="-62" y="-58" width="124" height="58" fill="#efeadf"/><rect x="52" y="-112" width="13" height="56" fill="#e2dccf"/><path d="M52 -112 Q58.5 -128 65 -112Z" fill="#e2dccf"/>
+      <rect x="-18" y="-74" width="36" height="16" fill="#e8e2d6"/><path d="M-24 -72 C-24 -110 24 -110 24 -72Z" fill="#f6f2ea"/><rect x="-4" y="-116" width="8" height="12" fill="#efeadf"/><path d="M-4 -116 Q0 -126 4 -116Z" fill="#efeadf"/>
+      <path d="M-54 -58 C-54 -76 -30 -76 -30 -58Z M30 -58 C30 -76 54 -76 54 -58Z" fill="#f6f2ea"/><g fill="#ffd98a" opacity=".75">${[-48,-34,-20,20,34,48].map(x=>`<rect x="${x-3}" y="-40" width="6" height="14" rx="3"/>`).join("")}</g><path d="M-12 0 V-22 A12 12 0 0 1 12 -22 V0Z" fill="#ffb547" opacity=".8"/>${lbl("SACRÉ-CŒUR")}`;
+  if(k==="msm"){ let hs=""; for(let i=0;i<14;i++){ const x=-80+i*12, y=-18-Math.max(0,60-Math.abs(x+5)*.75); hs+=`<rect x="${x}" y="${y|0}" width="10" height="12" fill="#5a5448"/><rect x="${x+3}" y="${(y+3)|0}" width="3" height="4" fill="#ffd98a" opacity="${.4+(i%3)*.2}"/>`; }
+    return `<ellipse cx="0" cy="2" rx="230" ry="16" fill="#1f6f8a" opacity=".5"/><path d="M-115 0 C-85 -30 -62 -70 -32 -90 C-12 -108 22 -104 42 -80 C72 -50 96 -24 118 0Z" fill="#33403a"/>${hs}
+      <rect x="-30" y="-126" width="60" height="38" fill="#7a7468"/><path d="M-34 -126 L0 -146 L34 -126Z" fill="#5f5a50"/><path d="M-5 -140 L0 -210 L5 -140Z" fill="#8a8478"/><circle cx="0" cy="-213" r="3.6" fill="#ffd166"/><circle cx="0" cy="-213" r="10" fill="#ffd166" opacity=".3" filter="url(#bl${w})"/>
+      <path d="M-115 4 C-85 30 -62 50 -32 58 C-12 64 22 62 42 50 C72 34 96 18 118 4Z" fill="#33403a" opacity=".25"/>${lbl("MONT-SAINT-MICHEL",44)}`; }
+  if(k==="gard"){ const row=(y0,h,aw,sp,n)=>{ let d=`M${-n*sp/2} ${y0} V${y0-h} H${n*sp/2} V${y0}Z`; for(let i=0;i<n;i++){ const x=-n*sp/2+i*sp+(sp-aw)/2; d+=` M${x} ${y0} V${y0-h+aw/2+4} A${aw/2} ${aw/2} 0 0 1 ${x+aw} ${y0-h+aw/2+4} V${y0}Z`; } return `<path fill-rule="evenodd" d="${d}" fill="#d9b77a"/><rect x="${-n*sp/2}" y="${y0-h}" width="${n*sp}" height="3" fill="#b8955a"/>`; };
+    return `<rect x="-240" y="-6" width="480" height="10" fill="#2e8fb0" opacity=".6"/>${row(0,62,40,52,7)}${row(-62,44,30,40,9)}${row(-106,22,10,14,26)}${lbl("PONT DU GARD")}`; }
+  if(k==="blanc") return `<defs><linearGradient id="mb${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#bfe6f7"/><stop offset="1" stop-color="#1d4a6a"/></linearGradient></defs>
+      <path d="M-280 0 L-130 -150 L-70 -108 L10 -240 L82 -132 L132 -164 L280 0Z" fill="url(#mb${id})"/><path d="M10 -240 L82 -132 L132 -164 L280 0 L60 0 L40 -120Z" fill="#0d2a44" opacity=".35"/>
+      <path d="M-20 -196 L10 -240 L36 -200 L22 -206 L10 -192 L-4 -204Z" fill="#fff"/>${lbl("MONT BLANC · 4 806 M")}`;
+  if(k==="puy") return `<path d="M-210 0 C-150 -34 -92 -124 0 -128 C92 -124 150 -34 210 0Z" fill="#3b1612"/><path d="M-150 -20 C-110 -60 -70 -100 0 -110" stroke="#ff5a36" stroke-opacity=".3" stroke-width="3" fill="none"/>
+      <rect x="-14" y="-140" width="28" height="14" fill="#5a4a48"/><path d="M0 -140 V-206" stroke="#cfd6e6" stroke-width="5"/><path d="M-6 -170 H6 M-5 -186 H5" stroke="#cfd6e6" stroke-width="2"/>${tw(0,-208,"#ff3b3b",1.1)}${lbl("PUY DE DÔME")}`;
+  if(k==="ariane") return `<defs><linearGradient id="fl${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c4"/><stop offset=".4" stop-color="#ffb547"/><stop offset="1" stop-color="#ff3b1f" stop-opacity="0"/></linearGradient></defs>
+      <rect x="-86" y="-250" width="16" height="250" fill="none" stroke="#5a6378" stroke-width="2"/><path d="M-86 -250 L-70 -230 M-70 -250 L-86 -230 M-86 -200 L-70 -180 M-70 -200 L-86 -180 M-86 -150 L-70 -130 M-70 -150 L-86 -130 M-86 -100 L-70 -80 M-70 -100 L-86 -80" stroke="#5a6378" stroke-width="1.4"/>
+      <g><animateTransform attributeName="transform" type="translate" values="0 0;0 -4;0 0" dur="2.6s" repeatCount="indefinite"/>
+      <path d="M-30 -30 Q-20 40 -20 70 Q-14 40 -8 -30Z M8 -30 Q14 40 20 70 Q20 40 30 -30Z M-10 -20 Q0 70 0 100 Q0 70 10 -20Z" fill="url(#fl${id})"><animate attributeName="opacity" values="1;.7;1" dur=".2s" repeatCount="indefinite"/></path>
+      <rect x="-13" y="-230" width="26" height="206" rx="10" fill="#f2f5fc"/><path d="M-13 -228 Q0 -268 13 -228Z" fill="#f2f5fc"/><rect x="-13" y="-150" width="26" height="6" fill="#c8ff1e"/>
+      <rect x="-30" y="-120" width="14" height="96" rx="6" fill="#dfe6f3"/><path d="M-30 -118 Q-23 -138 -16 -118Z" fill="#dfe6f3"/><rect x="16" y="-120" width="14" height="96" rx="6" fill="#dfe6f3"/><path d="M16 -118 Q23 -138 30 -118Z" fill="#dfe6f3"/></g>${lbl("ARIANE 6",30)}`;
+  return "";
 }
 
 /* ---------- mise en page : chemin, mondes, cases, coffres */
@@ -3070,8 +3150,8 @@ function gmBuild(pos){
     <path id="gmDoneG" stroke="${ACC}" stroke-opacity=".55" stroke-width="16" fill="none" stroke-linecap="round" filter="url(#gmGlow)"/>
     <path id="gmDone" stroke="${ACC}" stroke-width="7" fill="none" stroke-linecap="round"/></svg>`);
   h.push(`<div class="gm-col" id="gmCol">`);
-  for(let w=L.w0;w<=L.w1;w++){ const W=gmWorld(w+1), y=L.P((w+1)*GM_PER).y-118, lock=(w+1)*GM_PER>d;
-    h.push(`<div class="gm-gate" style="left:0;top:${y}px;--wc:${W.wc}"><b>Monde ${w+2}${gmLap(w+1)>1?" · Tour "+gmLap(w+1):""}</b><span>${esc(W.n)}</span>${lock?`<small>Se débloque à ${(w+1)*GM_PER} séances</small>`:""}</div>`); }
+  for(let w=L.w0;w<=L.w1;w++){ const W=gmWorld(w+1), gp=L.P((w+1)*GM_PER), y=gp.y+59, gx=gp.x>0?-Math.min(80,L.A*.6):Math.min(80,L.A*.6), lock=(w+1)*GM_PER>d;
+    h.push(`<div class="gm-gate" style="left:${gx|0}px;top:${y}px;--wc:${W.wc}"><b>Monde ${w+2}${gmLap(w+1)>1?" · Tour "+gmLap(w+1):""}</b><span>${esc(W.n)}</span>${lock?`<small>Se débloque à ${(w+1)*GM_PER} séances</small>`:""}</div>`); }
   if(L.w0===0){ const p=L.P(0); h.push(`<div class="gm-gate" style="left:0;top:${p.y+92}px;--wc:${GM_W[0].wc}"><b>Monde 1</b><span>${esc(GM_W[0].n)}</span></div>`); }
   for(let i=L.i0;i<=L.i1;i++){ const p=L.P(i), k=gmKind(i);
     h.push(`<div class="gm-node" data-n="${i}" style="left:${p.x}px;top:${p.y}px">${i||ic("loc")}</div>`);
@@ -3110,13 +3190,13 @@ async function gmGhosts(){
 /* ---------- interface */
 function gmHud(){
   const g=$("game"); if(!g) return; const d=gDays(), w=Math.floor(d/GM_PER), W=gmWorld(w), inW=d%GM_PER;
-  const next=[3,6,10].find(x=>x>inW), left=next-inW, pend=gmPending().length;
+  const nx=gmNextChest(d), left=nx-d, pend=gmPending().length, eye=gmLegOn("l_reine")?(gmLegRoll(nx)?"Légende":GM_RAR[(gmRoll(nx)||{r:"L"}).r].t):"";
   g.style.setProperty("--wc",W.wc);
   g.querySelector(".gm-hud").innerHTML=`<div><div class="w">Monde ${w+1}${gmLap(w)>1?" · Tour "+gmLap(w):""}</div><h3>${esc(W.n)}</h3></div>
     <div class="btns"><button data-gm="coll" aria-label="Ma collection" title="Ma collection"><svg class="i" viewBox="0 0 24 24"><path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="bdg">${gmS.items.length}</span></button>
     <button data-gm="share" aria-label="Partager mon héros" title="Partager mon héros"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
-    <div class="bar"><i style="width:${inW*10}%"></i><u style="left:30%"></u><u style="left:60%"></u></div>
-    <div class="sub"><span><b>${d}</b> séance${d>1?"s":""} · ${gmS.items.length}/${GM_TOTAL} objets</span><span>${pend?`<b style="color:var(--a2)">Coffre à ouvrir !</b>`:`${left>1?"Coffre dans":"Coffre à la"} <b>${left>1?left+" séances":"prochaine séance"}</b>`}</span></div>`;
+    <div class="bar"><i style="width:${inW*10}%"></i><u style="left:30%"></u>${gmLegOn("l_coach")?`<u style="left:50%"></u>`:""}<u style="left:60%"></u></div>
+    <div class="sub"><span><b>${d}</b> séance${d>1?"s":""} · ${gmS.items.length}/${GM_TOTAL} objets</span><span>${pend?`<b style="color:var(--a2)">Coffre à ouvrir !</b>`:`${left>1?"Coffre dans":"Coffre à la"} <b>${left>1?left+" séances":"prochaine séance"}</b>${eye?` · <b style="color:var(--gold)">${eye}</b>`:""}`}</span></div>`;
   const today=!!score.today, nm=esc(myName());
   g.querySelector(".gm-cta").innerHTML=`<p>${today?`Séance validée, <b>${nm}</b>. Ton héros a avancé : reviens demain pour le pas suivant.`:pend?`Un coffre t'attend, <b>${nm}</b>. Touche-le pour l'ouvrir.`:`Ton héros t'attend, <b>${nm}</b>. Chaque séance à la salle le fait avancer d'un pas.`}</p>
     <button class="gm-go${today?" done":""}" data-gm="go">${today?ic("check")+" Séance du jour validée":ic("bolt")+` Je suis à la salle <em>+1 pas</em>`}</button>`;
@@ -3154,17 +3234,19 @@ function gmBanner(wi){ return new Promise(res=>{ const W=gmWorld(wi), b=document
   setTimeout(()=>{ b.remove(); res(); },3500); }); }
 
 /* ---------- coffre : on le touche 3 fois, il s'ouvre et révèle un objet */
-function gmRoll(n){ const k=gmKind(n), r=gmRng(gmHash(voterId+":"+n))(), w=Math.floor(n/GM_PER);
-  const rar=k==="w"?"C":k==="c"&&n%GM_PER===3?(r<.7?"C":"R"):k==="c"?(r<.6?"R":"E"):(w>=2||r<.35)?"L":"E";
+function gmLegRoll(n){ if(!(n>0&&n%20===0)) return null; const ord=GM_LEG.slice().sort((a,b)=>gmHash(voterId+a.k)-gmHash(voterId+b.k)); return ord.find(l=>gmS.leg[l.k]==null)||null; }
+function gmRoll(n,salt){ const k=gmKind(n), r=gmRng(gmHash(voterId+":"+n+(salt||"")))(), w=Math.floor(n/GM_PER);
+  let rar=k==="w"?"C":k==="c"&&n%GM_PER===3?(r<.7?"C":"R"):k==="c"?(r<.6?"R":"E"):(w>=2||r<.35)?"L":"E";
+  if(gmLegOn("l_masse",n)) rar={C:"R",R:"E",E:"L",L:"L"}[rar];
   const order={C:["C","R","E","L"],R:["R","C","E","L"],E:["E","R","L","C"],L:["L","E","R","C"]}[rar];
-  for(const q of order){ const pool=GM_ITEMS.filter(i=>i.r===q&&!gmOwn(i.id)); if(pool.length){ const rr=gmRng(gmHash(voterId+"#"+n+q)); return pool[Math.floor(rr()*pool.length)]; } }
+  for(const q of order){ const pool=GM_ITEMS.filter(i=>i.r===q&&!gmOwn(i.id)); if(pool.length){ const rr=gmRng(gmHash(voterId+"#"+n+q)); return pool[Math.floor(gmRng(gmHash(voterId+"#"+n+q+(salt||"")))()*pool.length)]; } }
   return null; }
 function gmOpenChest(n){ return new Promise(res=>{
   if(gmS.open.includes(n)){ res(); return; }
-  const k=gmKind(n), item=gmRoll(n), col=gmChestCol(k), rc=item?GM_RAR[item.r].c:"#ffd166";
+  const k=gmKind(n), leg=gmLegRoll(n), item=leg?null:gmRoll(n), col=gmChestCol(k), rc=leg?"#ffd166":item?GM_RAR[item.r].c:"#ffd166";
   const ttl=k==="w"?"Coffre de bienvenue":k==="g"?`Grand coffre · Monde ${n/GM_PER}`:`Coffre de la séance ${n}`;
   const ov=document.createElement("div"); ov.className="gm-chest"; ov.style.setProperty("--rc",col);
-  ov.innerHTML=`<div class="rays"></div><div class="glow"></div><div class="title"><b>${k==="g"?"Épique ou légendaire":"Récompense"}</b><span>${ttl}</span></div>
+  ov.innerHTML=`<div class="rays"></div><div class="glow"></div><div class="title"><b>${leg?"Légende à l'intérieur":k==="g"?"Épique ou légendaire":"Récompense"}</b><span>${ttl}</span></div>
     <div class="box in" role="button" aria-label="Ouvrir le coffre">${gmChestSvg(col,false,k==="g")}</div>
     <div class="hint">Touche 3 fois pour l'ouvrir<div class="dots"><i></i><i></i><i></i></div></div><div class="loot"></div>`;
   document.body.appendChild(ov); gmSnd("drop");
@@ -3176,16 +3258,22 @@ function gmOpenChest(n){ return new Promise(res=>{
   box.addEventListener("click",tap);
   const auto=setTimeout(()=>{ if(!taps){ const h=ov.querySelector(".hint"); if(h) h.innerHTML=`Touche le coffre !<small>3 petits coups et il s'ouvre</small><div class="dots"><i></i><i></i><i></i></div>`; } },4000);
   function reveal(){ clearTimeout(auto);
-    gmS.open.push(n); if(item) gmS.items.push(item.id); else gmS.stars=(gmS.stars||0)+1; gmSave();
-    ov.style.setProperty("--rc",rc); ov.classList.add("open"); gmSnd("magic"); setTimeout(()=>gmSnd(item&&item.r==="L"?"crown":"fanfare"),650);
+    gmS.open.push(n); if(leg) gmS.leg[leg.k]=n; else if(item) gmS.items.push(item.id); else gmS.stars=(gmS.stars||0)+1;
+    const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id); gmSave();
+    ov.style.setProperty("--rc",rc); ov.classList.add("open"); gmSnd("magic"); setTimeout(()=>gmSnd(leg||(item&&item.r==="L")?"crown":"fanfare"),650);
     const cols=[rc,"#ffffff",ACC,rc,ACC1]; for(let j=0;j<46;j++){ const a=Math.PI*2*j/46+Math.random()*.3, dd=160+Math.random()*260, c=document.createElement("i"); c.className="cf";
       c.style.cssText=`background:${cols[j%cols.length]};--x:${Math.round(Math.cos(a)*dd)}px;--y:${Math.round(Math.sin(a)*dd-60)}px;--r:${Math.round(Math.random()*900-450)}deg;animation-delay:${Math.round(Math.random()*150)}ms`; ov.appendChild(c); setTimeout(()=>c.remove(),2000); }
     const pv=item?{...gmS.eq,[item.cat]:item.id}:gmS.eq, worn=item&&gmS.eq[item.cat]===item.id;
-    ov.querySelector(".loot").innerHTML=item?`<span class="rar">${GM_RAR[item.r].t}</span>${gmBot(pv,{cls:"happy idle"}).replace('class="gmb','class="pv gmb')}<h3>${esc(item.n)}</h3>
+    ov.querySelector(".loot").innerHTML=leg?`<span class="rar">Légende débloquée</span>${gmBot({...gmS.eq,hero:leg.k,hat:null,aura:null,skin:"blanc"},{cls:"happy cheer"}).replace('class="gmb','class="pv gmb')}<h3>${esc(leg.n)}</h3>
+      <p>${esc(leg.s)}.</p><div class="pwr"><b>Pouvoir · ${esc(leg.pw)}</b>${esc(leg.pd)} Actif dès maintenant.</div>
+      <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="leg">Jouer avec</button></div>`
+      :item?`<span class="rar">${GM_RAR[item.r].t}</span>${gmBot(pv,{cls:"happy idle"}).replace('class="gmb','class="pv gmb')}<h3>${esc(item.n)}</h3>
       <p>${pickR(["Il te va à merveille.","Avec ça, la salle va trembler.","Style de champion, ","Les autres vont être jaloux."]).replace(/, $/,`, <b>${esc(myName())}</b>.`)}</p>
+      ${item2?`<div class="pwr"><b>Pose classique · 2e objet</b>${esc(item2.n)} (${GM_RAR[item2.r].t.toLowerCase()}) rejoint ta collection.</div>`:""}
       <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="wear">${worn?"Super !":"Le porter"}</button></div>`
       :`<span class="rar">Étoile HMG</span><div style="font-size:84px;line-height:1.4">⭐</div><h3>Collection complète !</h3><p>Tu as déjà tous les objets : <b>+1 étoile</b>. Respect, ${esc(myName())}.</p><div class="row2"><button class="cy" data-k="later">Continuer</button></div>`;
     ov.querySelector(".loot").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(!b) return; e.stopPropagation();
+      if(b.dataset.k==="leg"&&leg){ gmS.eq.hero=leg.k; gmS.eq.hat=null; gmS.eq.aura=null; gmS.eq.skin="blanc"; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
       if(b.dataset.k==="wear"&&item){ gmS.eq[item.cat]=item.id; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
       ov.style.transition="opacity .3s"; ov.style.opacity=0; setTimeout(()=>{ ov.remove(); gmMark(GM.pos); gmHud(); res(); },300); }); }
 }); }
@@ -3214,11 +3302,14 @@ function gmColl(){
   const draw=()=>{ ov.innerHTML=`<div class="card glass" role="dialog" aria-label="Ma collection"><button class="x" data-k="x" aria-label="Fermer">${ic("x")}</button>
     <div class="top">${gmBot(gmS.eq,{cls:"happy idle"})}<h2>Ma collection</h2><div class="cnt"><b>${gmS.items.length}</b> / ${GM_TOTAL} objets${gmS.stars?` · ⭐ ${gmS.stars}`:""} · ${gDays()} séance${gDays()>1?"s":""}</div>
       <div class="row"><button class="mini" data-k="hero">Changer de héros</button><button class="mini" data-k="share">Partager</button></div></div>
-    <div class="body">${GM_CATS.map(([c,t])=>`<h4>${t}</h4><div class="gm-grid">${(c==="skin"||c==="hand"?[]:[{id:"",cat:c,n:"Aucun",r:"C",def:1}]).concat(GM_ITEMS.filter(i=>i.cat===c)).map(i=>{ const own=i.def||gmOwn(i.id), on=(gmS.eq[c]||"")===i.id;
-      return `<button class="gm-it${own?" own":" lock"}${on?" on":""}" style="--rc:${GM_RAR[i.r].c}" ${own?`data-eq="${c}:${i.id}"`:"disabled"} aria-label="${esc(i.n)}">${gmBot({...gmS.eq,[c]:i.id||null},{cls:""})}<b>${own?esc(i.n):"???"}</b><small>${i.id?GM_RAR[i.r].t.toUpperCase():""}</small></button>`; }).join("")}</div>`).join("")}
+    <div class="body"><h4>Légendes · ${Object.keys(gmS.leg).length}/${GM_LEG.length}</h4><div class="gm-grid leg">${GM_LEG.map((l,i)=>{ const own=gmS.leg[l.k]!=null, on=gmS.eq.hero===l.k;
+      return `<button class="gm-it leg${own?" own":" lock"}${on?" on":""}" style="--rc:#ffd166" ${own?`data-hero="${l.k}"`:"disabled"}>${gmBot({...gmS.eq,hero:l.k,hat:null,aura:null,skin:"blanc"},{cls:""})}<b>${own?esc(l.n):"Légende mystère"}</b><small>${esc(l.pw).toUpperCase()}</small><em>${own?esc(l.pd):`Grand coffre à ${20*(i+1)} séances`}</em></button>`; }).join("")}</div>
+      ${GM_CATS.map(([c,t])=>`<h4>${t}</h4><div class="gm-grid">${(c==="skin"||c==="hand"?[]:[{id:"",cat:c,n:"Aucun",r:"C",def:1}]).concat(GM_ITEMS.filter(i=>i.cat===c)).map(i=>{ const own=i.def||gmOwn(i.id), on=(gmS.eq[c]||"")===i.id;
+      return `<button class="gm-it${own?" own":" lock"}${on?" on":""}" style="--rc:${GM_RAR[i.r].c}" ${own?`data-eq="${c}:${i.id}"`:"disabled"} aria-label="${esc(i.n)}">${gmBot({...gmS.eq,[c]:i.id||null},{cls:""})}<b>${own?esc(i.n):"???"}</b><small>${i.id?GM_RAR[i.r].t.toUpperCase():""}${i.hmg?" · HMG":""}</small></button>`; }).join("")}</div>`).join("")}
       <p style="color:var(--muted);font-size:12px;margin:16px 0 0">Les objets sortent des coffres au hasard. Ta collection est gardée sur cet appareil, comme tes points.</p></div></div>`; };
   draw(); document.body.appendChild(ov);
   ov.addEventListener("click",async e=>{ const t=e.target, q=t.closest("[data-eq]"), k=t.closest("[data-k]");
+    const lh=t.closest("[data-hero]"); if(lh){ gmS.eq.hero=lh.dataset.hero; gmSave(); const sc=ov.querySelector(".body").scrollTop; draw(); ov.querySelector(".body").scrollTop=sc; gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1400); gmSnd("crown"); return; }
     if(q){ const [c,id]=q.dataset.eq.split(":"); gmS.eq[c]=id||null; gmSave(); const sc=ov.querySelector(".body").scrollTop; draw(); ov.querySelector(".body").scrollTop=sc; gmPaintHero(); gmSnd("pop"); return; }
     if(k||t===ov){ const v=k&&k.dataset.k; ov.remove(); if(v==="hero"){ await gmPickHero(false); } else if(v==="share") gmShare(); } });
 }
@@ -3260,14 +3351,14 @@ function gmBind(g){
       if(k==="go"){ if(score.today){ gmSay(pickR(["Repos mérité. À demain, champion.","Ton héros récupère. Toi aussi.","Demain, on avance encore !"])); return; } if(!ptsOn()){ toast("Bientôt disponible !"); return; } doCheckin(); }
       else if(k==="coll") gmColl(); else if(k==="share") gmShare();
       else if(k==="t1"||k==="t5"){ store.set("hmg-game-test",gmTest()+(k==="t1"?1:5)); gmHud(); gmSync(); }
-      else if(k==="t0"){ store.set("hmg-game-test",0); Object.assign(gmS,{seen:null,open:[],items:[],stars:0}); gmS.eq={hero:null,tone:"clair",skin:"blanc",hat:null,face:null,back:null,hand:"haltere",aura:null}; gmSave(); toast("Test remis à zéro : ton aventure repart du début."); gmSet(true); }
+      else if(k==="t0"){ store.set("hmg-game-test",0); Object.assign(gmS,{seen:null,open:[],items:[],stars:0,leg:{}}); gmS.eq={hero:null,tone:"clair",skin:"blanc",hat:null,neck:null,face:null,back:null,hand:"haltere",aura:null}; gmSave(); toast("Test remis à zéro : ton aventure repart du début."); gmSet(true); }
       else if(k==="th"){ GM.hideTest=true; gmHud(); }
       return; }
     const ch=t.closest("[data-chest]"); if(ch&&ch.classList.contains("ready")&&!GM.busy){ GM.busy=true; await gmOpenChest(+ch.dataset.chest); GM.busy=false; gmHud(); return; }
     const gh=t.closest("[data-ghost]"); if(gh){ toast(gh.dataset.ghost); return; }
     if(t.closest("#gmHero")&&!GM.busy){ const hr=$("gmHero"); hr.classList.remove("gm-jump"); void hr.offsetWidth; hr.classList.add("gm-jump"); gmSnd("pop");
       const was=gmMood(); gmHeroCls("happy idle"); setTimeout(()=>gmHeroCls(was),1800);
-      const d=gDays(), inW=d%GM_PER, left=[3,6,10].find(x=>x>inW)-inW;
+      const d=gDays(), left=gmNextChest(d)-d;
       gmSay(pickR([`Prêt pour la séance, <b>${esc(myName())}</b> ?`,`Encore <b>${left}</b> séance${left>1?"s":""} et on ouvre un coffre !`,"On forme une sacrée équipe, toi et moi.","Tu es plus fort qu'hier.",gmMood()==="sleep"?"Zzz… on y va demain matin ?":"Allez, on va soulever de la fonte !"])); } });
   addEventListener("resize",()=>{ if(GM.on&&!GM.busy){ clearTimeout(GM.rz); GM.rz=setTimeout(()=>gmBuild(gmS.seen==null?gDays():Math.min(gmS.seen,gDays())),200); } });
 }
