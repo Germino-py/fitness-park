@@ -1213,7 +1213,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 #modeSw button:hover{background:transparent;color:var(--ink)}
 #modeSw button[aria-pressed="true"]{color:var(--a-ink)}
 #modeSw .ms-k{position:absolute;z-index:0;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 4px 18px rgba(var(--a-rgb),.45);transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
-#modeSw.game .ms-k{transform:translateX(100%)}
+#modeSw:not(.game) .ms-k{transform:translateX(100%)}
 #modeSw .ms-hd{width:18px;height:18px;margin:-2px 0}
 @media (max-width:760px){ #modeSw button{padding:7px 9px} #modeSw button .ms-t{display:none}
   #top:has(#modeSw:not([hidden])) .brand h1 b{display:none}
@@ -1494,7 +1494,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 
 <header id="top">
   <div class="brand glass"><div class="logo" aria-hidden="true"></div><div><h1>HMG <b>Fitness</b></h1><small>Explore. Note. Conquiers.</small></div></div>
-  <div id="modeSw" class="glass" hidden role="group" aria-label="Carte ou aventure"><i class="ms-k"></i><button data-mode="map" aria-pressed="true" title="La carte des salles"><svg class="i"><use href="#i-map"/></svg><span class="ms-t">Carte</span></button><button data-mode="game" aria-pressed="false" title="L'Aventure HMG"><svg class="i"><use href="#i-hero"/></svg><span class="ms-t">Aventure</span></button></div>
+  <div id="modeSw" class="glass" hidden role="group" aria-label="Carte ou aventure"><i class="ms-k"></i><button data-mode="game" aria-pressed="false" title="L'Aventure HMG"><svg class="i"><use href="#i-hero"/></svg><span class="ms-t">Aventure</span></button><button data-mode="map" aria-pressed="true" title="La carte des salles"><svg class="i"><use href="#i-map"/></svg><span class="ms-t">Carte</span></button></div>
   <div id="searchBox"><svg class="i"><use href="#i-search"/></svg>
     <input id="search" type="search" placeholder="Rechercher une salle, une ville, un département…" autocomplete="off" aria-label="Rechercher une salle">
     <div id="sugg" class="glass" hidden role="listbox"></div></div>
@@ -3378,7 +3378,7 @@ $("modeSw").addEventListener("click",e=>{ const b=e.target.closest("[data-mode]"
   order.forEach(x=>drawMarker(x.c)); pinWave();
   updateHeader();
   clearTimeout(introSafety); welcome(); refreshScore();
-  if(feat("feat_game")&&(location.hash==="#aventure"||store.get("hmg-mode","map")==="game")) gmSet(true,true);
+  if(feat("feat_game")&&(location.hash==="#aventure"||store.get("hmg-mode","game")==="game")) gmSet(true,true);
   setTimeout(angelCheck,1600);
   if(needPseudo()) setTimeout(()=>{ if(needPseudo()&&!document.querySelector(".modal")) pseudoModal(true); }, feat("feat_profile")?650:(store.get("hmg-last-visit",null)?1700:2100));
   const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900); else if(h==="admin"&&!isAdmin()) setTimeout(loginModal,900);
