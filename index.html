@@ -8,6 +8,10 @@
 <meta name="theme-color" content="#05070d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HMG">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="HMG Fitness">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="canonical" href="https://hmgfitness.fr/">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
@@ -724,7 +728,7 @@ select option{background:#101828}
 svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---------- barre du haut */
-#top{position:absolute;z-index:1000;top:calc(14px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:10px;align-items:flex-start;pointer-events:none}
+#top{position:absolute;z-index:1000;top:calc(14px + var(--sa-top,env(safe-area-inset-top,0px)));left:max(16px,var(--sa-left,env(safe-area-inset-left,0px)));right:max(16px,var(--sa-right,env(safe-area-inset-right,0px)));display:flex;gap:10px;align-items:flex-start;pointer-events:none}
 #top>*{pointer-events:auto}
 .brand{padding:10px 16px 10px 12px;display:flex;align-items:center;gap:11px}
 .logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--a1),var(--a3));display:grid;place-items:center;box-shadow:0 0 22px rgba(var(--a-rgb),.35)}
@@ -805,14 +809,14 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 #introC{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px;animation-delay:.25s}
 #introC>span{font:600 12.5px var(--f-b);padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--stroke);color:var(--ink)}
 #introC>span b{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
-#intro .skip{position:absolute;left:0;right:0;text-align:center;bottom:calc(28px + env(safe-area-inset-bottom,0px));font-size:11.5px;color:var(--dim);letter-spacing:.06em;animation:fade 1s 1s both}
+#intro .skip{position:absolute;left:0;right:0;text-align:center;bottom:calc(28px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));font-size:11.5px;color:var(--dim);letter-spacing:.06em;animation:fade 1s 1s both}
 @keyframes hi{from{opacity:0;transform:translateY(14px)}}
 
 /* ---------- boutons flottants */
-#fab{position:absolute;z-index:1000;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+#fab{position:absolute;z-index:1000;right:max(16px,var(--sa-right,env(safe-area-inset-right,0px)));bottom:calc(18px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 #fab .grp{display:flex;flex-direction:column;padding:5px;gap:4px}
 #fab .grp button{width:42px;height:42px;padding:0;justify-content:center;border-radius:12px}
-#legend{position:absolute;z-index:1000;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));padding:12px 14px;display:grid;gap:6px;font-size:12px;max-width:calc(100% - 100px)}
+#legend{position:absolute;z-index:1000;left:max(16px,var(--sa-left,env(safe-area-inset-left,0px)));bottom:calc(18px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));padding:12px 14px;display:grid;gap:6px;font-size:12px;max-width:calc(100% - 100px)}
 .lg{display:flex;align-items:center;gap:8px;color:var(--muted)}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .dot.todo{background:var(--todo);box-shadow:0 0 10px var(--todo)}.dot.done{background:var(--done);box-shadow:0 0 10px var(--done)}.dot.soon{background:repeating-linear-gradient(-45deg,var(--soon) 0 2.4px,#1a1030 2.4px 4px);border-radius:2px;transform:rotate(45deg) scale(.86);box-shadow:0 0 0 1px rgba(255,255,255,.75)}
@@ -821,7 +825,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .bar{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#2bffa0,#3fd8ff);box-shadow:0 0 12px rgba(43,255,160,.6);transition:width 1s cubic-bezier(.2,.8,.2,1)}
 #demo{color:var(--gold);font-size:11px}
-#legal{position:absolute;z-index:999;left:50%;transform:translateX(-50%);bottom:calc(4px + env(safe-area-inset-bottom,0px));font-size:10.5px;color:var(--dim);white-space:nowrap}
+#legal{position:absolute;z-index:999;left:50%;transform:translateX(-50%);bottom:calc(4px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));font-size:10.5px;color:var(--dim);white-space:nowrap}
 #legal .osm{display:none}#legal.osm-on .osm{display:inline}
 #legal a,#legal button{color:var(--muted);background:none;border:0;padding:2px 4px;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;display:inline}
 
@@ -879,7 +883,7 @@ html.moving .glass,html.moving #search{backdrop-filter:none!important;-webkit-ba
 .leaflet-control-attribution a{color:var(--dim)!important}
 
 /* ---------- panneau d'une salle / listes (droite sur ordinateur, en bas sur téléphone) */
-.sheet{position:absolute;z-index:1100;top:calc(14px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(430px,calc(100% - 32px));display:flex;flex-direction:column;min-height:0;overflow:hidden;animation:slide .35s cubic-bezier(.2,.9,.2,1)}
+.sheet{position:absolute;z-index:1100;top:calc(14px + var(--sa-top,env(safe-area-inset-top,0px)));right:max(16px,var(--sa-right,env(safe-area-inset-right,0px)));bottom:calc(18px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));width:min(430px,calc(100% - 32px));display:flex;flex-direction:column;min-height:0;overflow:hidden;animation:slide .35s cubic-bezier(.2,.9,.2,1)}
 @keyframes slide{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
 .sh-head{display:flex;align-items:flex-start;gap:10px;padding:16px 16px 12px}
 .sh-head h2{margin:0;font:700 20px/1.15 var(--f-d);letter-spacing:.01em;flex:1}
@@ -972,6 +976,23 @@ textarea{resize:none;min-height:62px;width:100%}
 /* lightbox / modale */
 .modal{position:fixed;inset:0;z-index:2000;background:rgba(3,5,10,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px;animation:fade .25s}
 @keyframes fade{from{opacity:0}}
+/* ===== Appli (écran d'accueil / Capacitor) ===== */
+html.is-app,html.is-app body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior:none}
+html.is-app body :not(input):not(textarea):not([contenteditable]){-webkit-user-select:none;user-select:none}
+#appInv{position:fixed;z-index:1900;left:50%;bottom:calc(18px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));transform:translate(-50%,140%);width:min(400px,calc(100% - 24px));display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border-radius:20px;transition:transform .5s cubic-bezier(.2,.9,.25,1.15)}
+#appInv.on{transform:translate(-50%,0)}
+#appInv .ai-ic{width:46px;height:46px;border-radius:12px;flex:none;box-shadow:0 6px 22px rgba(200,255,30,.28)}
+#appInv .ai-t{flex:1;min-width:0;line-height:1.25}
+#appInv .ai-t b{display:block;font:700 14px var(--f-d)}
+#appInv .ai-t span{font-size:12px;color:var(--muted)}
+#appInv .ai-x{background:none;border:0;color:var(--muted);padding:6px;cursor:pointer}
+.ai-steps{display:grid;gap:10px;margin:4px 0 2px;padding:0;list-style:none;counter-reset:s}
+.ai-steps li{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink)}
+.ai-steps li::before{counter-increment:s;content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--f-d);color:#0b0d08;background:linear-gradient(135deg,var(--a1),var(--a2))}
+.ai-share{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.1);vertical-align:middle}
+.ai-arrow{position:fixed;z-index:2001;left:50%;bottom:calc(6px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));transform:translateX(-50%);color:var(--a2);filter:drop-shadow(0 0 10px rgba(200,255,30,.6));animation:aiB 1s ease-in-out infinite}
+@keyframes aiB{50%{transform:translate(-50%,8px)}}
+
 .modal img{max-width:100%;max-height:88vh;border-radius:16px;box-shadow:0 20px 80px rgba(0,0,0,.6)}
 .card{width:min(380px,100%);padding:22px;display:grid;gap:12px}
 .card h2{margin:0;font:700 20px var(--f-d)}
@@ -981,10 +1002,10 @@ textarea{resize:none;min-height:62px;width:100%}
 .toggle input::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
 .toggle input:checked{background:linear-gradient(135deg,var(--a1),var(--a2))}
 .toggle input:checked::after{transform:translateX(18px)}
-#adminBar{position:absolute;z-index:1001;left:max(16px,env(safe-area-inset-left,0px));top:calc(86px + env(safe-area-inset-top,0px));display:flex;flex-wrap:wrap;gap:6px;padding:6px;align-items:center;max-width:min(620px,calc(100% - 32px))}
+#adminBar{position:absolute;z-index:1001;left:max(16px,var(--sa-left,env(safe-area-inset-left,0px)));top:calc(86px + var(--sa-top,env(safe-area-inset-top,0px)));display:flex;flex-wrap:wrap;gap:6px;padding:6px;align-items:center;max-width:min(620px,calc(100% - 32px))}
 #adminBar .who{font:600 11px var(--f-d);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:0 8px}
 .badge{min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font:700 10.5px/18px var(--f-b);text-align:center;padding:0 5px}
-#toast{position:fixed;z-index:3000;left:50%;bottom:calc(80px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);padding:11px 16px;font-size:13px;animation:fade .2s;width:max-content;max-width:calc(100% - 32px);text-align:center}
+#toast{position:fixed;z-index:3000;left:50%;bottom:calc(80px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));transform:translateX(-50%);padding:11px 16px;font-size:13px;animation:fade .2s;width:max-content;max-width:calc(100% - 32px);text-align:center}
 #intro{position:fixed;inset:0;z-index:4000;background:var(--bg);display:grid;place-items:center;transition:opacity .45s,visibility .45s}
 #intro.out{opacity:0;visibility:hidden}
 #intro .in{text-align:center}
@@ -995,7 +1016,7 @@ textarea{resize:none;min-height:62px;width:100%}
 
 @media (max-width:760px){
   input,select,textarea{font-size:16px}
-  #top{flex-wrap:wrap;gap:8px;left:max(8px,env(safe-area-inset-left,0px));right:max(8px,env(safe-area-inset-right,0px));top:calc(8px + env(safe-area-inset-top,0px))}
+  #top{flex-wrap:wrap;gap:8px;left:max(8px,var(--sa-left,env(safe-area-inset-left,0px)));right:max(8px,var(--sa-right,env(safe-area-inset-right,0px)));top:calc(8px + var(--sa-top,env(safe-area-inset-top,0px)))}
   .brand{min-width:0}.brand small{display:none}
   .brand{padding:8px 12px 8px 9px}.logo{width:30px;height:30px}.logo::after{width:20px;height:20px}
   .brand h1{font-size:15px}
@@ -1005,25 +1026,25 @@ textarea{resize:none;min-height:62px;width:100%}
   .stat.revs{display:none}
   #stats.has-pts .stat.clubs{display:none}
   #bCheck{padding:11px 16px;font-size:13px}
-  .sheet{top:auto;left:8px;right:8px;width:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));max-height:78vh;max-height:78dvh;border-radius:22px;animation:up .35s cubic-bezier(.2,.9,.2,1)}
-  .sheet.big{top:calc(8px + env(safe-area-inset-top,0px));max-height:none}
+  .sheet{top:auto;left:8px;right:8px;width:auto;bottom:calc(8px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));max-height:78vh;max-height:78dvh;border-radius:22px;animation:up .35s cubic-bezier(.2,.9,.2,1)}
+  .sheet.big{top:calc(8px + var(--sa-top,env(safe-area-inset-top,0px)));max-height:none}
   .sh-head{padding:14px 14px 10px}.sh-head h2{font-size:18px}.sh-body{padding:0 14px 16px}
   .rev{grid-template-columns:auto 1fr}.rev .adm{grid-row:auto;grid-column:1/3;justify-content:flex-end}
   .lst-tools select{max-width:46%}
   @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
-  #legend{padding:9px 11px;font-size:11px;gap:4px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  #legend{padding:9px 11px;font-size:11px;gap:4px;bottom:calc(14px + var(--sa-bottom,env(safe-area-inset-bottom,0px)))}
   #legend .ttl,#demo{display:none!important}
   #fab .grp:first-child{display:none}
   #fab .grp button{width:40px;height:40px}
   #map.far .pin i{inset:5.5px}
   #map.far .pin.done i{inset:4px}
-  #adminBar{top:calc(112px + env(safe-area-inset-top,0px));left:8px;right:8px;max-width:none;justify-content:center;gap:4px;padding:5px;border-radius:14px}
+  #adminBar{top:calc(112px + var(--sa-top,env(safe-area-inset-top,0px)));left:8px;right:8px;max-width:none;justify-content:center;gap:4px;padding:5px;border-radius:14px}
   #adminBar .who{display:none}
   #adminBar .toggle{font-size:11.5px;gap:6px}
-  #legend{left:max(8px,env(safe-area-inset-left,0px));max-width:calc(100% - 76px)}
-  #fab{right:max(8px,env(safe-area-inset-right,0px))}
-  #toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-  #legal{font-size:10px;bottom:1px}
+  #legend{left:max(8px,var(--sa-left,env(safe-area-inset-left,0px)));max-width:calc(100% - 76px)}
+  #fab{right:max(8px,var(--sa-right,env(safe-area-inset-right,0px)))}
+  #toast{bottom:calc(96px + var(--sa-bottom,env(safe-area-inset-bottom,0px)))}
+  #legal{font-size:10px;bottom:calc(1px + var(--sa-bottom,env(safe-area-inset-bottom,0px)))}
   #legal .wide{display:none}
   #legal.osm-on .ind{display:none}
 }
@@ -1180,7 +1201,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 .spk{width:var(--s,10px);height:var(--s,10px);margin:calc(var(--s,10px)/-2) 0 0 calc(var(--s,10px)/-2);background:var(--c,#ffd166);pointer-events:none;z-index:5;
   clip-path:polygon(50% 0,61% 38%,100% 50%,61% 62%,50% 100%,39% 62%,0 50%,39% 38%)}
 .spk.hrt{clip-path:path("M5 9 C1.5 6.5 0 4.6 0 3 C0 1.3 1.3 0 2.8 0 C3.8 0 4.6 .5 5 1.3 C5.4 .5 6.2 0 7.2 0 C8.7 0 10 1.3 10 3 C10 4.6 8.5 6.5 5 9Z");width:10px;height:10px;margin:-5px 0 0 -5px;scale:calc(var(--s,10px)/10px)}
-.ang-card{left:50%!important;top:auto!important;bottom:calc(26px + env(safe-area-inset-bottom,0px));width:min(370px,calc(100% - 32px));padding:20px 18px 16px;text-align:center;border-radius:24px;transform:translateX(-50%);
+.ang-card{left:50%!important;top:auto!important;bottom:calc(26px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));width:min(370px,calc(100% - 32px));padding:20px 18px 16px;text-align:center;border-radius:24px;transform:translateX(-50%);
   background:linear-gradient(160deg,rgba(26,30,52,.94),rgba(12,16,28,.94));border:1px solid rgba(255,209,102,.35);box-shadow:0 24px 60px rgba(0,0,0,.55),0 0 50px rgba(255,209,102,.14);opacity:0;z-index:6;cursor:default}
 .ang-card.in{animation:angCard .65s cubic-bezier(.2,1.35,.4,1) forwards}
 @keyframes angCard{from{opacity:0;transform:translate(-50%,40px) scale(.92)}to{opacity:1;transform:translate(-50%,0)}}
@@ -1190,7 +1211,7 @@ html.t-glace .logo{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w
 .ang-card button{width:100%;justify-content:center;padding:13px;font-size:14.5px}
 .ang-card .ang-test{display:block;margin-top:8px;font:600 11px var(--f-b);color:var(--dim);font-style:normal}
 /* bouton du son de l'ange */
-#angel>.ang-snd{left:auto;right:calc(14px + env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px));z-index:7;display:flex;align-items:center;gap:8px;height:40px;min-width:40px;padding:0 11px;border-radius:999px;
+#angel>.ang-snd{left:auto;right:calc(14px + var(--sa-right,env(safe-area-inset-right,0px)));top:calc(14px + var(--sa-top,env(safe-area-inset-top,0px)));z-index:7;display:flex;align-items:center;gap:8px;height:40px;min-width:40px;padding:0 11px;border-radius:999px;
   border:1px solid rgba(255,255,255,.18);background:rgba(20,24,40,.62);color:#fff;font:600 12.5px var(--f-b);cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 #angel>.ang-snd svg{width:18px;height:18px;flex:none}
 #angel>.ang-snd.off{color:var(--dim)}
@@ -1328,7 +1349,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 @keyframes gmAnt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 
 /* tête haute : interface du jeu */
-.gm-hud{position:absolute;z-index:20;left:50%;transform:translateX(-50%);top:calc(78px + env(safe-area-inset-top,0px));width:min(520px,calc(100% - 24px));padding:12px 14px 12px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.gm-hud{position:absolute;z-index:20;left:50%;transform:translateX(-50%);top:calc(78px + var(--sa-top,env(safe-area-inset-top,0px)));width:min(520px,calc(100% - 24px));padding:12px 14px 12px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
 .gm-hud .w{font:800 10.5px var(--f-d);letter-spacing:.24em;color:var(--wc,var(--a2));text-transform:uppercase}
 .gm-hud h3{margin:1px 0 0;font:700 18px/1.15 var(--f-d);color:#fff}
 .gm-hud .bar{grid-column:1/-1;height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;position:relative;margin-top:4px}
@@ -1340,7 +1361,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-hud .btns button{width:42px;height:42px;padding:0;justify-content:center;border-radius:14px;position:relative}
 .gm-hud .btns button svg{width:20px;height:20px}
 .gm-hud .btns .bdg{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font:800 10px/18px var(--f-d);color:#0a0f02;background:var(--a2)}
-.gm-cta{position:absolute;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(440px,calc(100% - 24px));display:grid;gap:8px;justify-items:stretch;text-align:center}
+.gm-cta{position:absolute;z-index:20;left:50%;transform:translateX(-50%);bottom:calc(18px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));width:min(440px,calc(100% - 24px));display:grid;gap:8px;justify-items:stretch;text-align:center}
 .gm-cta p{margin:0;padding:8px 14px;border-radius:14px;font-size:12.5px;color:var(--ink);background:rgba(8,12,20,.7);border:1px solid var(--stroke);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
 .gm-cta p b{color:var(--a2)}
 .gm-go{position:relative;justify-content:center;padding:16px 20px;border-radius:20px;border:0;font:800 15.5px var(--f-d);letter-spacing:.02em;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 55%,var(--a3));box-shadow:0 14px 40px rgba(var(--a-rgb),.45),inset 0 1px 0 rgba(255,255,255,.6)}
@@ -1350,7 +1371,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-go em{font-style:normal;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,.82);color:var(--a2);font-size:12px}
 .gm-go.done{color:var(--ink);background:rgba(14,20,34,.78);border:1px solid var(--stroke2);box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
 .gm-go.done::before{display:none}.gm-go.done svg{color:var(--a2)}
-.gm-test{position:absolute;z-index:21;left:12px;bottom:calc(150px + env(safe-area-inset-bottom,0px));display:grid;gap:6px;padding:8px;border-radius:14px}
+.gm-test{position:absolute;z-index:21;left:12px;bottom:calc(150px + var(--sa-bottom,env(safe-area-inset-bottom,0px)));display:grid;gap:6px;padding:8px;border-radius:14px}
 .gm-test small{font:700 9.5px var(--f-d);letter-spacing:.14em;color:var(--gold);text-align:center}
 .gm-test button{padding:7px 9px;font-size:12px;justify-content:center}
 
@@ -1400,7 +1421,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 .gm-chest .dots i.on{background:var(--rc);box-shadow:0 0 10px var(--rc)}
 @keyframes gmPulse{50%{opacity:.55}}
 .gm-chest.open .hint{display:none}
-.gm-chest .title{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 34px);text-align:center;padding:0 16px}
+.gm-chest .title{position:absolute;left:0;right:0;top:calc(var(--sa-top,env(safe-area-inset-top,0px)) + 34px);text-align:center;padding:0 16px}
 .gm-chest .title b{display:block;font:800 11px var(--f-d);letter-spacing:.3em;color:var(--rc);text-transform:uppercase}
 .gm-chest .title span{display:block;margin-top:4px;font:800 24px var(--f-d);color:#fff}
 .gm-chest .loot{position:absolute;left:50%;top:44%;width:min(330px,calc(100% - 32px));transform:translate(-50%,-50%) scale(.2);opacity:0;padding:16px 16px 14px;text-align:center;border-radius:26px;background:linear-gradient(160deg,rgba(26,34,54,.86),rgba(8,12,22,.92));border:1.5px solid color-mix(in srgb,var(--rc) 70%,transparent);box-shadow:0 0 60px color-mix(in srgb,var(--rc) 40%,transparent),inset 0 1px 0 rgba(255,255,255,.25);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .7s cubic-bezier(.3,1.5,.5,1) .25s,opacity .3s .25s}
@@ -1456,7 +1477,7 @@ body.gm-on #game{opacity:1;visibility:visible}
 @media (min-width:1000px){ .gm-hero{width:132px;height:158px;margin:-151px 0 0 -66px} .gm-node{transform:scale(1.15)} }
 @media (prefers-reduced-motion:reduce){ .gm-pt{display:none} .gmb *,.gm-node{animation:none!important} }
 @media (max-width:760px){
-  .gm-hud{top:calc(70px + env(safe-area-inset-top,0px));padding:10px 10px 10px 13px}
+  .gm-hud{top:calc(70px + var(--sa-top,env(safe-area-inset-top,0px)));padding:10px 10px 10px 13px}
   .gm-hud h3{font-size:16px}
   .gm-hud .btns button{width:38px;height:38px}
   .gm-coll .top{grid-template-columns:92px 1fr}.gm-coll .top svg{width:92px;height:106px}
@@ -1676,6 +1697,54 @@ const frDate = s => { if(!s) return ""; const d=new Date(s.length<=10?s+"T12:00:
 const frDateTime = s => new Date(s).toLocaleString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"});
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)));
 const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
+/* ================= APPLI (installation sur le téléphone) =================
+   Le site s'installe comme une appli (manifest + service worker) et tourne aussi dans l'appli native (Capacitor). */
+const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const IS_APP = IS_NATIVE || matchMedia("(display-mode: standalone)").matches || navigator.standalone === true || /[?&]app=1\b/.test(location.search);
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+if(IS_APP) document.documentElement.classList.add("is-app");
+{ const q=new URLSearchParams(location.search); if(q.has("sim")){ // simulateur : marges d'écran (encoche, barre du bas) du téléphone imité
+  [["sat","top"],["sab","bottom"]].forEach(([k,n])=>{ if(q.has(k)) document.documentElement.style.setProperty("--sa-"+n, (+q.get(k)||0)+"px"); }); } }
+if(IS_NATIVE) document.documentElement.classList.add("is-native");
+if("serviceWorker" in navigator && !IS_NATIVE && (location.protocol === "https:" || location.hostname === "localhost")) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+let installEvt = null;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; });
+addEventListener("appinstalled", () => { store.set("hmg-app-installed", 1); const b=$("appInv"); if(b) b.remove(); toast("HMG est sur ton écran d'accueil 💪"); });
+addEventListener("offline", () => toast("Hors connexion : la carte reste là, les avis reviendront avec le réseau.", 1));
+addEventListener("online", () => toast("De retour en ligne ✅"));
+if(IS_APP) document.addEventListener("pointerdown", e => { if(navigator.vibrate && e.target.closest && e.target.closest("button")) try{ navigator.vibrate(8); }catch(_){} }, {passive:true});
+const APP_ICON = "icons/icon-192.png";
+function appInvite(force){
+  if(!force){
+    if(IS_APP || !feat("feat_app") || store.get("hmg-app-installed", 0)) return;
+    if(Date.now() - (+store.get("hmg-app-ask", 0)) < 7*864e5) return;
+    if(!IS_IOS && !installEvt) return; // ordinateur ou navigateur qui ne sait pas installer
+    if(document.querySelector(".modal")) { setTimeout(()=>appInvite(), 8000); return; }
+  }
+  if($("appInv")) return;
+  store.set("hmg-app-ask", Date.now());
+  const b = document.createElement("div"); b.id = "appInv"; b.className = "glass";
+  b.innerHTML = `<img class="ai-ic" src="${APP_ICON}" alt=""><div class="ai-t"><b>Installe l'appli HMG</b><span>Sur ton écran d'accueil, en plein écran, même sans réseau.</span></div><button class="cy" data-ai>Installer</button><button class="ai-x" data-aix aria-label="Plus tard">${ic("x")}</button>`;
+  document.body.appendChild(b); requestAnimationFrame(()=>requestAnimationFrame(()=>b.classList.add("on")));
+  const close = () => { b.classList.remove("on"); setTimeout(()=>b.remove(), 500); };
+  b.querySelector("[data-aix]").onclick = close;
+  b.querySelector("[data-ai]").onclick = async () => {
+    if(installEvt){ installEvt.prompt(); try{ const r = await installEvt.userChoice; if(r && r.outcome === "accepted") store.set("hmg-app-installed", 1); }catch(_){} installEvt = null; close(); return; }
+    close(); appHowTo();
+  };
+}
+function appHowTo(){
+  const m = document.createElement("div"); m.className = "modal";
+  const share = `<span class="ai-share"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>`;
+  const notSafari = IS_IOS && /CriOS|FxiOS|EdgiOS|Instagram|FBAN|FBAV|TikTok|musical_ly/i.test(navigator.userAgent);
+  m.innerHTML = `<div class="card glass"><div style="display:flex;align-items:center;gap:12px"><img src="${APP_ICON}" alt="" style="width:52px;height:52px;border-radius:13px"><div><h2>HMG sur ton iPhone</h2><p>2 gestes, 5 secondes.</p></div></div>
+    ${notSafari ? `<p style="color:var(--a2)">Ouvre d'abord hmgfitness.fr dans <b>Safari</b> (l'installation ne marche que là).</p>` : ""}
+    <ol class="ai-steps"><li><span>Touche ${share} <b>Partager</b> en bas de Safari</span></li><li><span>Choisis <b>« Sur l'écran d'accueil »</b> puis <b>Ajouter</b></span></li></ol>
+    <div style="display:flex;justify-content:flex-end"><button class="cy" data-x>J'ai compris</button></div></div>${notSafari ? "" : `<div class="ai-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M5 12l7 7 7-7"/></svg></div>`}`;
+  document.body.appendChild(m);
+  m.addEventListener("click", e => { if(e.target === m || e.target.closest("[data-x]")) m.remove(); });
+}
+
 const fmt1 = x => x.toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFractionDigits:1});
 function toast(t,err){ const el=document.createElement("div"); el.id="toast"; el.className="glass"; el.style.color=err?"var(--danger)":""; el.textContent=t; document.querySelectorAll("#toast").forEach(x=>x.remove()); document.body.appendChild(el); setTimeout(()=>el.remove(),3200); }
 
@@ -1770,6 +1839,7 @@ const FEATURES = [
   {k:"feat_pseudo", t:"Pseudos uniques", d:"À sa première visite, le visiteur choisit son pseudo (unique : personne d'autre ne peut le prendre). Il remplace « Machine 48213 » sur ses avis, au classement et dans son profil. Gros mots et noms réservés (HMG, Mino, Admin) refusés.", def:false},
   {k:"feat_angel", t:"Ange de la semaine", d:"Le sportif qui a validé au moins 3 séances (« Je suis à la salle ») la semaine précédente, du lundi au dimanche, voit un petit ange venir le féliciter à sa première visite de la semaine. Tu choisis l'animation ci-dessous et tu peux la tester.", def:false},
   {k:"feat_game", t:"Aventure HMG (jeu)", d:"Un bouton Aventure / Carte en haut. Chaque sportif choisit son héros (lui, elle ou le robot Mini-Machine, peau claire ou noire) qui démarre en caleçon et avance d'un pas à chaque séance validée (« Je suis à la salle »). Les coffres l'habillent (hauts, bas, baskets, accessoires : 42 objets), ses muscles grossissent avec les séances (de Crevette à Colosse), 4 légendes à débloquer, 7 mondes, les autres sportifs du classement visibles sur le chemin, image à partager en story. Points et classement inchangés.", def:false},
+  {k:"feat_app", t:"Appli sur le téléphone", d:"Une bulle « Installe l'appli HMG » propose d'ajouter HMG sur l'écran d'accueil, comme une vraie appli (icône HMG, plein écran, s'ouvre même sans réseau). Sur Android : installation en un appui. Sur iPhone : les 2 gestes expliqués avec une petite animation. Montrée une fois par semaine maximum.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
 const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
@@ -2229,7 +2299,8 @@ const CC_F={
   feat_profile:{t:"Profil du sportif",s:"La pastille « Toi » : niveau, points et série.",i:"db"},
   feat_pseudo:{t:"Pseudos uniques",s:"Chacun choisit son nom, gros mots refusés.",i:"pen"},
   feat_angel:{t:"Ange de la semaine",s:"Félicite ceux qui ont fait 3 séances la semaine passée.",i:"trophy"},
-  feat_game:{t:"Aventure HMG",s:"Le héros en caleçon qui s'habille et se muscle à chaque séance, au fil des saisons.",i:"hero"}};
+  feat_game:{t:"Aventure HMG",s:"Le héros en caleçon qui s'habille et se muscle à chaque séance, au fil des saisons.",i:"hero"},
+  feat_app:{t:"Appli sur le téléphone",s:"Propose d'installer HMG sur l'écran d'accueil (iPhone et Android).",i:"down"}};
 let ccStats=null, ccAngOpen=false;
 async function ccLoad(){
   try{ const rows=LIVE?(await rpc("leaderboard",{p_period:"all",p_voter:voterId}))||[]:[]; ccStats={n:rows.length,s:rows.reduce((a,r)=>a+Math.round((r.points||0)/10),0)}; }
@@ -3581,7 +3652,8 @@ $("modeSw").addEventListener("click",e=>{ const b=e.target.closest("[data-mode]"
   order.forEach(x=>drawMarker(x.c)); pinWave();
   updateHeader();
   clearTimeout(introSafety); welcome(); refreshScore();
-  if(feat("feat_game")&&(location.hash==="#aventure"||store.get("hmg-mode","game")==="game")) gmSet(true,true);
+  if(feat("feat_game")&&location.hash!=="#carte"&&(location.hash==="#aventure"||store.get("hmg-mode","game")==="game")) gmSet(true,true);
+  setTimeout(appInvite,feat("feat_game")?9000:6500);
   setTimeout(angelCheck,1600);
   if(needPseudo()) setTimeout(()=>{ if(needPseudo()&&!document.querySelector(".modal")) pseudoModal(true); }, feat("feat_profile")?650:(store.get("hmg-last-visit",null)?1700:2100));
   const h=decodeURIComponent(location.hash.slice(1)); if(byId[h]) setTimeout(()=>openClub(h,true),900); else if(h==="admin"&&!isAdmin()) setTimeout(loginModal,900);

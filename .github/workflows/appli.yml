@@ -1,0 +1,91 @@
+# Fabrique l'appli HMG Fitness pour Android et iPhone (gratuit, sur les serveurs GitHub).
+# Résultat : https://github.com/Germino-py/fitness-park/releases/tag/appli
+name: Appli Android + iPhone
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "claude/**"]
+    paths: ["app/**", ".github/workflows/appli.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: appli-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - name: Préparer le projet Android
+        working-directory: app
+        run: npm ci && npm run android
+      - name: Construire l'APK
+        working-directory: app/android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon --stacktrace
+      - run: cp app/android/app/build/outputs/apk/debug/app-debug.apk HMG-Fitness.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: HMG-Fitness-android, path: HMG-Fitness.apk }
+
+  ios:
+    name: iPhone (IPA + simulateur)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with: { xcode-version: latest-stable }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
+      - name: Préparer le projet iPhone
+        working-directory: app
+        run: npm ci && npm run ios
+      - name: Construire pour iPhone (non signée) et pour le simulateur
+        working-directory: app/ios/App
+        run: |
+          set -o pipefail
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | tail -40
+          mkdir -p Payload && cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qry "$GITHUB_WORKSPACE/HMG-Fitness-iPhone-non-signee.ipa" Payload
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath simbuild CODE_SIGNING_ALLOWED=NO build | tail -20
+          cd simbuild/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/HMG-Fitness-simulateur-iPhone.zip" App.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HMG-Fitness-iphone
+          path: |
+            HMG-Fitness-iPhone-non-signee.ipa
+            HMG-Fitness-simulateur-iPhone.zip
+
+  publier:
+    name: Mettre en téléchargement
+    needs: [android, ios]
+    if: always() && (needs.android.result == 'success' || needs.ios.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - name: Publier sur la page « appli »
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ls -la out
+          NOTES="Appli HMG Fitness, construite le $(date -u +'%d/%m/%Y à %H:%M') UTC.
+
+          • Android : télécharge HMG-Fitness.apk sur le téléphone, ouvre-le et autorise l'installation.
+          • iPhone : HMG-Fitness-iPhone-non-signee.ipa (à signer avec un identifiant Apple pour l'installer) ; HMG-Fitness-simulateur-iPhone.zip pour un simulateur d'iPhone en ligne.
+          • Le plus simple sur iPhone : ouvrir hmgfitness.fr dans Safari > Partager > Sur l'écran d'accueil.
+
+          L'appli ouvre le site en direct : chaque mise à jour du site arrive dans l'appli sans la réinstaller."
+          gh release view appli >/dev/null 2>&1 || gh release create appli --title "Appli HMG Fitness" --notes "$NOTES" --target "$GITHUB_SHA"
+          gh release edit appli --notes "$NOTES"
+          gh release upload appli out/* --clobber

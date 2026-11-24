@@ -1,0 +1,33 @@
+{
+  "appId": "fr.hmgfitness.app",
+  "appName": "HMG Fitness",
+  "webDir": "www",
+  "backgroundColor": "#05070d",
+  "server": {
+    "url": "https://hmgfitness.fr/?source=appli",
+    "cleartext": false,
+    "allowNavigation": ["hmgfitness.fr", "*.supabase.co"]
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#05070d"
+  },
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#05070d",
+    "scrollEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 900,
+      "launchAutoHide": true,
+      "backgroundColor": "#05070d",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "overlaysWebView": true,
+      "style": "DARK",
+      "backgroundColor": "#00000000"
+    }
+  }
+}
