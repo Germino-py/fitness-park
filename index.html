@@ -838,7 +838,7 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .lbl.city.t2{font-weight:600;font-size:12.5px}
 .lbl.city::before{content:"";display:block;width:4px;height:4px;border-radius:50%;background:rgba(238,243,255,.7);margin:0 auto 3px}
 /* plan des rues : tuiles OpenStreetMap (sans clé) passées en sombre pour rester dans le thème */
-.leaflet-tile-pane{filter:saturate(1.12) contrast(1.03)}
+.leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.55)}
 .leaflet-container .leaflet-tile{background:#e8e8e8}
 /* marqueurs des salles */
 .ps-ico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));box-shadow:0 10px 30px rgba(var(--a-rgb),.35);animation:spin .6s cubic-bezier(.2,1.4,.4,1)}
