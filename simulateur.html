@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Simulateur HMG</title>
+<link rel="icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070d;--ink:#eef3ff;--muted:#93a0b8;--a1:#ecff8c;--a2:#c8ff1e;--a3:#9fe000;--glass:rgba(14,20,34,.62);--stroke:rgba(255,255,255,.1)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:radial-gradient(1200px 700px at 70% -10%,#18243f 0,transparent 60%),radial-gradient(900px 600px at 0% 110%,#1b2a12 0,transparent 55%),var(--bg);color:var(--ink);font:14px Inter,system-ui,sans-serif}
+body{display:flex;flex-direction:column;min-height:100vh}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;position:sticky;top:0;z-index:5;background:rgba(5,7,13,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--stroke)}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand img{width:34px;height:34px;border-radius:9px}
+.brand b{font:700 16px "Space Grotesk",sans-serif;letter-spacing:.02em}
+.brand small{display:block;color:var(--muted);font-size:11px}
+.seg{display:flex;gap:4px;padding:4px;max-width:100%;overflow-x:auto;scrollbar-width:none;border-radius:14px;background:var(--glass);border:1px solid var(--stroke)}
+.seg button,.btn{border:0;background:none;color:var(--muted);font:600 12px Inter,sans-serif;padding:8px 11px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed=true]{background:linear-gradient(135deg,var(--a1),var(--a2));color:#0b0d08}
+.btn{background:var(--glass);border:1px solid var(--stroke);color:var(--ink)}
+.btn:hover,.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed=true]:hover{color:#0b0d08}
+main{flex:1;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:36px;padding:28px 16px 40px}
+figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+figcaption{color:var(--muted);font-size:12px;text-align:center}
+figcaption b{color:var(--ink);font:600 13px "Space Grotesk",sans-serif;display:block}
+.holder{position:relative}
+.phone{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:var(--rad);padding:var(--bez);background:linear-gradient(145deg,#3a3f48,#16181d 40%,#2b2f36);box-shadow:0 0 0 2px #0b0c0f inset,0 40px 90px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.06)}
+.phone.android{background:linear-gradient(145deg,#2a2d33,#0f1013 45%,#22252b)}
+.screen{position:relative;width:var(--w);height:var(--h);border-radius:calc(var(--rad) - var(--bez));overflow:hidden;background:#000}
+.screen iframe{position:absolute;left:0;width:100%;border:0;background:#05070d}
+.sbar{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:0 30px;font:600 15px -apple-system,"SF Pro Text",Inter,sans-serif;color:#fff;pointer-events:none}
+.android .sbar{padding:0 20px;font:500 13px Roboto,Inter,sans-serif}
+.sbar .r{display:flex;gap:6px;align-items:center}
+.island{position:absolute;z-index:4;left:50%;transform:translateX(-50%);background:#000;pointer-events:none}
+.home{position:absolute;z-index:4;left:50%;bottom:8px;transform:translateX(-50%);width:140px;height:5px;border-radius:5px;background:rgba(255,255,255,.85);pointer-events:none}
+.android .home{width:110px;height:4px;bottom:9px}
+.btns i{position:absolute;background:#1d2026;border-radius:3px}
+.tip{max-width:780px;margin:0 auto 34px;padding:16px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--stroke);color:var(--muted);line-height:1.55;font-size:13px}
+.tip b{color:var(--ink)}
+@media (max-width:600px){header{padding:10px 16px}.brand small{display:none}main{gap:24px;padding:18px 16px 28px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><img src="icons/icon-192.png" alt=""><div><b>Simulateur HMG</b><small>Le site dans de vrais formats de téléphone</small></div></div>
+  <div class="seg" id="devs" role="group" aria-label="Téléphones"></div>
+  <div class="seg" role="group" aria-label="Mode">
+    <button data-mode="app" aria-pressed="true" title="Comme l'appli installée : plein écran">Appli</button>
+    <button data-mode="web" aria-pressed="false" title="Comme dans le navigateur">Navigateur</button>
+  </div>
+  <div class="seg" role="group" aria-label="Taille">
+    <button data-z="fit" aria-pressed="true">Ajuster</button>
+    <button data-z="1" aria-pressed="false">Taille réelle</button>
+  </div>
+  <button class="btn" id="reload" title="Recharger tous les téléphones">↻ Recharger</button>
+</header>
+<main id="stage"></main>
+<div class="tip"><b>Astuce :</b> chaque téléphone est le vrai site, à la vraie taille d'écran. Clique et fais glisser comme avec le doigt. Les boutons du haut choisissent les téléphones affichés, le mode <b>Appli</b> (plein écran, comme installée sur l'écran d'accueil) ou <b>Navigateur</b> (avec la barre d'adresse). Pour filmer, choisis un seul téléphone puis <b>Taille réelle</b>.</div>
+<script>
+const DEVICES = [
+  {k:"ip16", n:"iPhone 16 Pro", os:"ios", w:402, h:874, top:62, bot:34, rad:62, bez:13, isl:{w:124,h:36,t:11,r:18}},
+  {k:"ip16max", n:"iPhone 16 Pro Max", os:"ios", w:440, h:956, top:62, bot:34, rad:66, bez:13, isl:{w:126,h:37,t:11,r:19}, off:1},
+  {k:"ipse", n:"iPhone SE", os:"ios", w:375, h:667, top:20, bot:0, rad:44, bez:16, se:1, off:1},
+  {k:"s24", n:"Samsung Galaxy S24", os:"android", w:360, h:780, top:32, bot:24, rad:42, bez:9, isl:{w:12,h:12,t:12,r:6}},
+  {k:"px9", n:"Google Pixel 9", os:"android", w:412, h:923, top:36, bot:24, rad:50, bez:11, isl:{w:13,h:13,t:13,r:7}, off:1},
+];
+const URLBAR = {ios:{top:0, bot:82}, android:{top:56, bot:24}};
+let mode = "app", zoom = "fit";
+try{ const s = JSON.parse(localStorage.getItem("hmg-sim")||"null"); if(s){ mode=s.mode||mode; zoom=s.zoom||zoom; if(s.on) DEVICES.forEach(d=>d.off=!s.on.includes(d.k)); } }catch(e){}
+const save = () => { try{ localStorage.setItem("hmg-sim", JSON.stringify({mode,zoom,on:DEVICES.filter(d=>!d.off).map(d=>d.k)})); }catch(e){} };
+const devs = document.getElementById("devs"), stage = document.getElementById("stage");
+function now(){ const d=new Date(); return d.getHours()+":"+String(d.getMinutes()).padStart(2,"0"); }
+function phoneHTML(d){
+  const web = mode === "web", ub = URLBAR[d.os];
+  const top = web ? d.top + ub.top : 0, bot = web ? ub.bot : 0;
+  const src = "./?sim=" + d.k + (web ? "&sat=0&sab=0" : "&app=1&sat=" + d.top + "&sab=" + d.bot);
+  const island = d.isl ? `<div class="island" style="top:${d.isl.t}px;width:${d.isl.w}px;height:${d.isl.h}px;border-radius:${d.isl.r}px"></div>` : "";
+  const sig = `<svg width="17" height="11" viewBox="0 0 17 11" fill="#fff"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>`;
+  const bat = `<svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#fff"/><rect x="24" y="4" width="1.6" height="4" rx=".8" fill="#fff" opacity=".5"/></svg>`;
+  const sbH = d.os==="ios" ? (d.se ? 20 : 54) : d.top;
+  const sbar = `<div class="sbar" style="height:${sbH}px;${d.os==="ios"&&!d.se?"padding-top:6px;":""}${web?"background:#05070d;":""}"><span>${now()}</span><span class="r">${sig}${bat}</span></div>`;
+  const urlTop = web && ub.top ? `<div style="position:absolute;z-index:3;left:0;right:0;top:${d.top}px;height:${ub.top}px;background:#1f2228;display:flex;align-items:center;padding:0 12px"><div style="flex:1;height:38px;border-radius:19px;background:#2d3139;color:#cfd5df;font:13px Roboto,Inter,sans-serif;display:flex;align-items:center;padding:0 14px">🔒 hmgfitness.fr</div></div>` : "";
+  const urlBot = web && ub.bot && d.os==="android" ? `<div style="position:absolute;z-index:3;left:0;right:0;bottom:0;height:${ub.bot}px;background:#000"></div>` : web && ub.bot ? `<div style="position:absolute;z-index:3;left:0;right:0;bottom:0;height:${ub.bot}px;background:rgba(30,32,38,.94);display:flex;justify-content:center;padding-top:10px"><div style="width:86%;height:40px;border-radius:12px;background:#3a3d44;color:#e7e9ee;font:15px -apple-system,Inter,sans-serif;display:flex;align-items:center;justify-content:center">🔒 hmgfitness.fr</div></div>` : "";
+  const side = d.os==="ios" ? `<div class="btns"><i style="left:-3px;top:180px;width:3px;height:34px"></i><i style="left:-3px;top:235px;width:3px;height:64px"></i><i style="left:-3px;top:310px;width:3px;height:64px"></i><i style="right:-3px;top:260px;width:3px;height:100px"></i></div>` : `<div class="btns"><i style="right:-3px;top:200px;width:3px;height:110px"></i><i style="right:-3px;top:340px;width:3px;height:60px"></i></div>`;
+  const home = d.se ? `<div style="position:absolute;left:50%;bottom:-${d.bez+60}px"></div>` : `<div class="home"></div>`;
+  return `<div class="phone ${d.os}" style="--w:${d.w}px;--h:${d.h}px;--rad:${d.se?52:d.rad}px;--bez:${d.se?14:d.bez}px;${d.se?"padding:70px 14px 80px;":""}">${side}
+    <div class="screen">${sbar}${island}${urlTop}<iframe title="${d.n}" src="${src}" style="top:${top}px;height:${d.h-top-bot}px" allow="geolocation; camera; clipboard-write"></iframe>${urlBot}${home}</div>
+    ${d.se?`<div style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:54px;height:54px;border-radius:50%;border:2px solid #444a55"></div>`:""}</div>`;
+}
+function render(){
+  devs.innerHTML = DEVICES.map(d=>`<button data-dev="${d.k}" aria-pressed="${!d.off}">${d.n.replace("Samsung ","").replace("Google ","")}</button>`).join("");
+  document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.mode===mode));
+  document.querySelectorAll("[data-z]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.z===zoom));
+  const on = DEVICES.filter(d=>!d.off);
+  stage.innerHTML = on.map(d=>`<figure data-k="${d.k}"><div class="holder">${phoneHTML(d)}</div><figcaption><b>${d.n}</b>${d.w} × ${d.h} · ${d.os==="ios"?"iOS":"Android"}</figcaption></figure>`).join("") || `<p style="color:var(--muted)">Choisis au moins un téléphone en haut.</p>`;
+  fit();
+}
+function fit(){
+  const on = DEVICES.filter(d=>!d.off);
+  const availH = innerHeight - document.querySelector("header").offsetHeight - 110;
+  const availW = Math.min(innerWidth - 32, 1e9);
+  const figs = [...stage.querySelectorAll("figure")].map(f=>({f, ph:f.querySelector(".phone"), hold:f.querySelector(".holder")}));
+  const maxH = Math.max(...figs.map(x=>x.ph.offsetHeight)), sumW = figs.reduce((a,x)=>a + x.ph.offsetWidth, 0);
+  let common = Math.min(1, availH / maxH);
+  if(innerWidth > 700) common = Math.min(common, (innerWidth - 80 - 36*(figs.length-1)) / sumW);
+  figs.forEach(({ph,hold})=>{
+    const W = ph.offsetWidth, H = ph.offsetHeight;
+    const s = zoom==="fit" ? Math.max(Math.min(common, availW / W), .3) : Math.min(1, availW / W);
+    ph.style.transform = `scale(${s})`; hold.style.width = W*s + "px"; hold.style.height = H*s + "px";
+  });
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.dev){ const d = DEVICES.find(x=>x.k===b.dataset.dev); d.off = !d.off; save(); render(); }
+  else if(b.dataset.mode){ mode = b.dataset.mode; save(); render(); }
+  else if(b.dataset.z){ zoom = b.dataset.z; save(); render(); }
+  else if(b.id==="reload"){ render(); }
+});
+addEventListener("resize", fit);
+setInterval(()=>document.querySelectorAll(".sbar>span:first-child").forEach(s=>s.textContent=now()), 30000);
+render();
+</script>
+</body>
+</html>

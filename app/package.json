@@ -1,0 +1,22 @@
+{
+  "name": "hmg-fitness-appli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Appli HMG Fitness (Android + iPhone) : la même appli que hmgfitness.fr, dans une coque native Capacitor.",
+  "scripts": {
+    "www": "node prepare-www.js",
+    "android": "npm run www && npx cap add android && npx capacitor-assets generate --android --iconBackgroundColor '#05070d' --iconBackgroundColorDark '#05070d' --splashBackgroundColor '#05070d' --splashBackgroundColorDark '#05070d' && node native-setup.js android && npx cap sync android",
+    "ios": "npm run www && npx cap add ios && npx capacitor-assets generate --ios --iconBackgroundColor '#05070d' --splashBackgroundColor '#05070d' --splashBackgroundColorDark '#05070d' && node native-setup.js ios && npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/ios": "8.6.2",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "8.6.2"
+  }
+}
