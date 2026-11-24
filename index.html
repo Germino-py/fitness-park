@@ -2026,12 +2026,14 @@ function updateHeader(){
 
 /* ================= FICHE D'UNE SALLE ================ */
 let sheetMode=null, clubTab="avis", draftRating=0;
+/* Aventure : la fenêtre du bas reste visible pour le classement (et le centre de contrôle), les autres restent sur la carte */
+function gmKeep(){ $("sheet").classList.toggle("gm-keep",sheetMode==="rank"||sheetMode==="feat"); }
 function closeSheet(){ $("sheet").hidden=true; sheetMode=null; const prev=selected; selected=null; if(prev&&byId[prev]) drawMarker(byId[prev]); }
 function openClub(id,fly){
   const prev=selected; selected=id; if(prev&&byId[prev]) drawMarker(byId[prev]);
   const c=byId[id]; drawMarker(c);
   if(fly){ const p=pos(c); if(p&&!isDom(c)) map.flyTo(isMobile()?[p.lat-0.012*Math.pow(2,13-Math.max(map.getZoom(),12)),p.lon]:[p.lat,p.lon],Math.max(map.getZoom(),12.5),{duration:1.2}); }
-  sheetMode="club"; draftRating=0; renderClub();
+  sheetMode="club",gmKeep(); draftRating=0; renderClub();
 }
 function ringSvg(avg){ const C=2*Math.PI*36, off=C*(1-avg/10);
   return `<svg viewBox="0 0 84 84"><circle class="bgc" cx="42" cy="42" r="36"/><circle class="fg" cx="42" cy="42" r="36" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${off}"/></svg>`; }
@@ -2195,7 +2197,7 @@ async function sendPhoto(file){
 
 /* ================= LISTE DES SALLES ================ */
 let listSort="note", listQ="";
-function openList(){ sheetMode="list"; renderList(); }
+function openList(){ sheetMode="list",gmKeep(); renderList(); }
 function renderList(){
   const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const q=fold(listQ.trim());
@@ -2309,7 +2311,7 @@ async function ccLoad(){
 function renderFeat(){
   if(!isAdmin()) return;
   const sh=$("sheet"), was=sheetMode==="feat"&&!sh.hidden, body0=sh.querySelector(".sh-body"), sc=was&&body0?body0.scrollTop:0;
-  sheetMode="feat"; sh.hidden=false; sh.classList.add("big"); const sy=$("meSay"); if(sy) sy.remove();
+  sheetMode="feat",gmKeep(); sh.hidden=false; sh.classList.add("big"); const sy=$("meSay"); if(sy) sy.remove();
   const pend=db.photos.filter(p=>!p.approved).length+db.reviews.filter(r=>r.hidden).length, revs=db.reviews.filter(r=>!r.hidden).length;
   const list=FEATURES.filter(f=>CC_F[f.k]), onN=list.filter(f=>featOn(f.k)).length, ang=ANGEL_STYLES.find(a=>a.k===angelStyle())||ANGEL_STYLES[0];
   const st=(v,l,cls,act)=>`<${act?`button type="button" data-cc="${act}"`:"div"} class="cc-st${cls?" "+cls:""}"><b>${v==null?"–":v}</b><span>${l}</span></${act?"button":"div"}>`;
@@ -2434,7 +2436,7 @@ function celebrate(c,r,before){
 let rankPeriod="month", rankRows={};
 async function renderRank(load=true){
   if(!ptsOn()) return;
-  sheetMode="rank"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
+  sheetMode="rank",gmKeep(); const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const mo=rankPeriod==="month", s=score, rk=mo?s.rank_month:s.rank, rows=rankRows[rankPeriod];
   const ord=n=>n===1?"1er":n+"e";
   sh.innerHTML=`<div class="sh-head"><h2>Classement</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
@@ -2889,7 +2891,7 @@ function profCard(say){
       ${!featOn("feat_profile")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
       <div class="pf-stats${po?"":" n2"}">${st.map(([v,l,hot])=>`<div${hot?' class="hot"':""}><b>${v}</b><small>${l}</small></div>`).join("")}</div>
       ${po?`<button class="cy big-ck${s.today?" done":""}" data-pf-go="ck">${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>`:""}
-      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}${psOn()?`<button data-pf-go="pseudo">${ic("pen")} ${myPseudo?"Changer de pseudo":"Choisir mon pseudo"}</button>`:""}</div>
+      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()&&!document.body.classList.contains("gm-on")?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}${psOn()?`<button data-pf-go="pseudo">${ic("pen")} ${myPseudo?"Changer de pseudo":"Choisir mon pseudo"}</button>`:""}</div>
     </div></div>`;
 }
 let introTimer=null, pfMode=null;
@@ -2969,7 +2971,7 @@ document.addEventListener("change",async e=>{
   catch(err){ e.target.checked=!on; toast(err.message,1); }
 });
 function renderMod(){
-  sheetMode="mod"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
+  sheetMode="mod",gmKeep(); const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const pend=db.photos.filter(p=>!p.approved), pendR=db.reviews.filter(r=>r.hidden), last=db.reviews.filter(r=>!r.hidden).slice(0,150);
   const revRow=r=>`<div class="rev${r.hidden?" hid":""}" style="opacity:1"><div class="n">${r.rating}</div><div class="t"><b data-open="${r.club_id}" style="cursor:pointer">${esc(byId[r.club_id]?.n||r.club_id)}</b> · ${r.comment?esc(r.comment):"<i>sans commentaire</i>"}</div><div class="d">${whoHtml(r)} · ${frDateTime(r.created_at)}${VOTES&&r.comment&&!r.hidden?` · <span style="color:var(--done)">${r.up||0} d'accord</span> · <span style="color:var(--danger)">${r.down||0} pas d'accord</span>`:""}</div><div class="adm"><button class="mini${r.hidden?" cy":""}" data-hide="${r.id}">${r.hidden?"Publier":"Masquer"}</button><button class="mini danger" data-delrev="${r.id}">Suppr.</button></div></div>`;
   sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("shield")}</div><div class="cc-t"><small>HMG · Espace admin</small><h2>Modération</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
@@ -2982,7 +2984,7 @@ function renderMod(){
   </div>`;
 }
 function renderVisits(){
-  sheetMode="visits"; const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
+  sheetMode="visits",gmKeep(); const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const ids=Object.keys(db.visits).filter(id=>byId[id]).sort((a,b)=>(db.visits[b].d||"").localeCompare(db.visits[a].d||""));
   const local=migrateOldVisits(), toImport=Object.keys(local).filter(k=>!db.visits[k]);
   sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("check")}</div><div class="cc-t"><small>Ma tournée des salles</small><h2>Mes visites · ${ids.length} / ${CLUBS.length}</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
