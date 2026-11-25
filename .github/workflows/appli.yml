@@ -1,12 +1,15 @@
-# Fabrique l'appli HMG Fitness pour Android et iPhone (gratuit, sur les serveurs GitHub).
+# Fabrique l'appli HMG Fitness pour Android et iPhone (gratuit, sur les serveurs GitHub), pour les tests.
+# Tout le code du site est embarqué dans l'appli (app/build-www.js) : seules les données passent par Internet.
 # Résultat : https://github.com/Germino-py/fitness-park/releases/tag/appli
+# La version iPhone SIGNÉE, pour TestFlight et l'App Store, est fabriquée par ios-testflight.yml (lancement à la main).
 name: Appli Android + iPhone
 
 on:
   workflow_dispatch:
   push:
     branches: [main, "claude/**"]
-    paths: ["app/**", ".github/workflows/appli.yml"]
+    # l'appli embarque le site : elle est refaite quand l'appli OU le site changent
+    paths: ["app/**", "index.html", "css/**", "js/**", "fonts/**", "icons/**", ".github/workflows/appli.yml"]
 
 permissions:
   contents: write
@@ -19,15 +22,19 @@ jobs:
   android:
     name: Android (APK)
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
-      - name: Préparer le projet Android
+      - name: Préparer le projet Android (contenu embarqué, icônes, autorisations, liens)
         working-directory: app
-        run: npm ci && npm run android
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run android                   # www (build-www.js) + cap add android + icônes + native-setup.js android + cap sync android
       - name: Construire l'APK
         working-directory: app/android
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon --stacktrace
@@ -36,17 +43,23 @@ jobs:
         with: { name: HMG-Fitness-android, path: HMG-Fitness.apk }
 
   ios:
-    name: iPhone (IPA + simulateur)
+    name: iPhone (IPA non signée + simulateur)
     runs-on: macos-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with: { xcode-version: latest-stable }
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
-      - name: Préparer le projet iPhone
+      - name: Préparer le projet iPhone (contenu embarqué, icônes, Info.plist, confidentialité, réglages Xcode)
         working-directory: app
-        run: npm ci && npm run ios
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run ios                       # www (build-www.js) + cap add ios + icônes + native-setup.js ios + cap sync ios
+          gem list -i xcodeproj >/dev/null || sudo gem install xcodeproj --no-document
+          BUILD_NUMBER=$((100 + GITHUB_RUN_NUMBER)) ruby ios-setup.rb   # sans TEAM_ID : iPhone seul, version, PrivacyInfo, pas de signature
       - name: Construire pour iPhone (non signée) et pour le simulateur
         working-directory: app/ios/App
         run: |
@@ -79,13 +92,12 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           ls -la out
-          NOTES="Appli HMG Fitness, construite le $(date -u +'%d/%m/%Y à %H:%M') UTC.
+          NOTES="Appli HMG Fitness, construite le $(date -u +'%d/%m/%Y à %H:%M') UTC (version de test).
 
           • Android : télécharge HMG-Fitness.apk sur le téléphone, ouvre-le et autorise l'installation.
-          • iPhone : HMG-Fitness-iPhone-non-signee.ipa (à signer avec un identifiant Apple pour l'installer) ; HMG-Fitness-simulateur-iPhone.zip pour un simulateur d'iPhone en ligne.
-          • Le plus simple sur iPhone : ouvrir hmgfitness.fr dans Safari > Partager > Sur l'écran d'accueil.
+          • iPhone : la vraie appli arrive par TestFlight, puis par l'App Store. HMG-Fitness-iPhone-non-signee.ipa sert aux tests (à signer soi-même) ; HMG-Fitness-simulateur-iPhone.zip s'ouvre dans un simulateur d'iPhone.
 
-          L'appli ouvre le site en direct : chaque mise à jour du site arrive dans l'appli sans la réinstaller."
+          Tout le code de l'appli est dedans : seules les données (séances, avis, classement) passent par Internet. Pour avoir la dernière version, réinstalle l'appli depuis cette page."
           gh release view appli >/dev/null 2>&1 || gh release create appli --title "Appli HMG Fitness" --notes "$NOTES" --target "$GITHUB_SHA"
           gh release edit appli --notes "$NOTES"
           gh release upload appli out/* --clobber

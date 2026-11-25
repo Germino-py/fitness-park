@@ -1,0 +1,180 @@
+# Fabrique l'appli iPhone SIGNÉE et l'envoie sur TestFlight, sur un Mac de GitHub (aucun Mac nécessaire).
+# Lancer : onglet Actions > « iPhone > TestFlight » > Run workflow. Seulement à la main (jamais à chaque envoi de code).
+# Avant le 1er lancement : les 7 secrets Apple de 2-appli-ios.md §5.4 (étapes 1 à 16 du §5.2).
+name: iPhone > TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      envoyer:
+        description: "Envoyer sur TestFlight (sinon : seulement fabriquer l'IPA signée)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-testflight
+  cancel-in-progress: false
+
+jobs:
+  testflight:
+    name: Construire, signer, envoyer
+    runs-on: macos-26            # Xcode 26.x : exigé par Apple depuis le 28/04/2026
+    timeout-minutes: 60
+    # environment: apple         # (facultatif) si les secrets sont rangés dans un environnement protégé
+    env:
+      BUNDLE_ID: fr.hmgfitness.app
+      PROFILE_NAME: HMG Fitness App Store
+      TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+
+    steps:
+      - name: Vérifier les secrets Apple
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          IOS_DIST_P12_BASE64: ${{ secrets.IOS_DIST_P12_BASE64 }}
+          IOS_DIST_P12_PASSWORD: ${{ secrets.IOS_DIST_P12_PASSWORD }}
+          IOS_APPSTORE_PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROFILE_BASE64 }}
+          ENVOYER: ${{ inputs.envoyer }}
+        run: |
+          # pour signer : équipe, certificat (.p12 + mot de passe), profil ; pour envoyer : en plus, la clé de l'API App Store Connect
+          requis="APPLE_TEAM_ID IOS_DIST_P12_BASE64 IOS_DIST_P12_PASSWORD IOS_APPSTORE_PROFILE_BASE64"
+          [ "$ENVOYER" = "true" ] && requis="$requis ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_BASE64"
+          manque=""
+          for s in $requis; do [ -n "${!s}" ] || manque="$manque $s"; done
+          if [ -n "$manque" ]; then
+            echo "::error title=Secrets Apple manquants::Il manque :$manque. À créer dans Settings > Secrets and variables > Actions > New repository secret (voir 2-appli-ios.md §5.4 ; étapes 6 à 16 du §5.2)."
+            {
+              echo "### Impossible de fabriquer l'appli iPhone signée : secrets Apple manquants"
+              echo ""
+              echo "Il manque :$manque"
+              echo ""
+              echo "| Secret | Où le trouver |"
+              echo "|---|---|"
+              echo "| APPLE_TEAM_ID | developer.apple.com › Compte › Détails de l'abonnement (étape 6) |"
+              echo "| IOS_DIST_P12_BASE64, IOS_DIST_P12_PASSWORD | certificat Apple Distribution transformé en .p12 (étapes 8 à 10, §5.3) |"
+              echo "| IOS_APPSTORE_PROFILE_BASE64 | profil « HMG Fitness App Store » (étape 11, §5.3) |"
+              echo "| ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_BASE64 | App Store Connect › Intégrations › clé d'API (étape 13) |"
+              echo ""
+              echo "Les créer dans Settings › Secrets and variables › Actions (étape 16), puis relancer ce workflow."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if ! printf '%s' "$APPLE_TEAM_ID" | grep -Eq '^[A-Z0-9]{10}$'; then
+            echo "::error title=APPLE_TEAM_ID invalide::Le Team ID fait 10 lettres majuscules ou chiffres (ex. AB12CD34EF)."; exit 1
+          fi
+          echo "Secrets Apple présents."
+
+      - uses: actions/checkout@v4
+
+      - name: Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with: { xcode-version: "26" }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
+
+      - name: Contenu web embarqué + projet iPhone
+        working-directory: app
+        run: |
+          set -euo pipefail
+          npm ci
+          # garde-fou : jamais de server.url dans une version envoyée à Apple (build-www.js le refuse aussi)
+          node -e 'const c=require("./capacitor.config.json"); if(c.server){console.error("bloc server interdit pour l App Store");process.exit(1)}'
+          npm run ios                       # www (build-www.js) + cap add ios + icônes + native-setup.js ios + cap sync ios
+          gem list -i xcodeproj >/dev/null || sudo gem install xcodeproj --no-document
+          export APP_VERSION=$(node -p 'require("./package.json").version')
+          export BUILD_NUMBER=$((100 + GITHUB_RUN_NUMBER))
+          ruby ios-setup.rb
+          echo "Version $APP_VERSION ($BUILD_NUMBER)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Installer le certificat et le profil
+        env:
+          P12_BASE64: ${{ secrets.IOS_DIST_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_DIST_P12_PASSWORD }}
+          PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          KC="$RUNNER_TEMP/hmg.keychain-db"; KCP="$(openssl rand -hex 24)"
+          security create-keychain -p "$KCP" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KCP" "$KC"
+          printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          security import "$RUNNER_TEMP/dist.p12" -k "$KC" -P "$P12_PASSWORD" -f pkcs12 -A \
+            -T /usr/bin/codesign -T /usr/bin/security
+          rm -f "$RUNNER_TEMP/dist.p12"
+          curl -fsSL -o "$RUNNER_TEMP/wwdr.cer" https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer
+          security import "$RUNNER_TEMP/wwdr.cer" -k "$KC" >/dev/null 2>&1 || true
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KCP" "$KC" >/dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v -p codesigning "$KC"
+          P="$RUNNER_TEMP/hmg.mobileprovision"
+          printf '%s' "$PROFILE_BASE64" | base64 --decode > "$P"
+          security cms -D -i "$P" > "$RUNNER_TEMP/profil.plist"
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profil.plist")
+          NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profil.plist")
+          [ "$NAME" = "$PROFILE_NAME" ] || { echo "::error::Le profil s'appelle « $NAME », attendu « $PROFILE_NAME » (étape 11)"; exit 1; }
+          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$d"; cp "$P" "$d/$UUID.mobileprovision"
+          done
+
+      - name: Archiver (Release, signée)
+        working-directory: app/ios/App
+        run: |
+          set -o pipefail
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/HMG.xcarchive" archive | tail -80
+
+      - name: Fabriquer l'IPA
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>signingCertificate</key><string>Apple Distribution</string>
+            <key>provisioningProfiles</key><dict><key>${BUNDLE_ID}</key><string>${PROFILE_NAME}</string></dict>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/HMG.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" | tail -30
+          ls -la "$RUNNER_TEMP/export"
+
+      - name: Envoyer sur TestFlight
+        if: ${{ inputs.envoyer }}
+        env:
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s' "$ASC_KEY_P8_BASE64" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+          IPA="$RUNNER_TEMP/export/App.ipa"
+          xcrun altool --validate-app -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          xcrun altool --upload-app   -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+          echo "Envoyée : elle apparaît dans App Store Connect > TestFlight après 5 à 30 min." >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HMG-Fitness-ios-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/export/App.ipa
+            ${{ runner.temp }}/HMG.xcarchive/dSYMs
+          retention-days: 14
+
+      - name: Nettoyage
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/hmg.keychain-db" 2>/dev/null || true
+          rm -rf ~/.appstoreconnect "$HOME/Library/MobileDevice/Provisioning Profiles" \
+                 "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
