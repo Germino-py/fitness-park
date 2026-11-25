@@ -18,7 +18,7 @@ const CQI = {
   chev:'<path d="m9 6 6 6-6 6"/>', back:'<path d="m15 5-7 7 7 7"/>', x:'<path d="M18 6 6 18M6 6l12 12"/>',
   sac:'<path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
   swap:'<path d="M4 8h13l-3-3M20 16H7l3 3"/>', share:'<path d="M12 3v13M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>',
-  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>', pause:'<rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/>', pause:'<path d="M12 2.5v19M3.8 7.25l16.4 9.5M3.8 16.75l16.4-9.5"/><path d="m9.2 4.3 2.8 2 2.8-2M9.2 19.7l2.8-2 2.8 2M4.6 10.6l3.1-1.3-.4-3.4M19.4 13.4l-3.1 1.3.4 3.4M4.6 13.4l3.1 1.3-.4 3.4M19.4 10.6l-3.1-1.3.4-3.4"/>',
   pin:'<path d="M12 21.8s-7.4-6.1-7.4-12a7.4 7.4 0 0 1 14.8 0c0 5.9-7.4 12-7.4 12z"/><circle cx="12" cy="9.8" r="2.7"/>',
   bell:'<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>', sound:'<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>',
   vib:'<rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M3 8v8M21 8v8"/>', user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
