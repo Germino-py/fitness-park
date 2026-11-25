@@ -21,7 +21,7 @@
   function h(s){ var a=0x811c9dc5, b=0x45d9f3b; for(var i=0;i<s.length;i++){ var c=s.charCodeAt(i); var nb=Math.imul(b^c,0x5bd1e995)^(b>>>13); a=Math.imul(a^c,16777619); b=nb; } return (a>>>0).toString(36)+(b>>>0).toString(36); }
   function good(c){ return !!c&&H.indexOf(h(String(c).trim().toLowerCase()))>=0; }
   var ok=window.HMG_CIBLE==="appli"; /* [natif] l'appli embarquée n'a pas de porte (le bêta-test passe par TestFlight) */
-  try{ if(ok) throw 0; var u=new URL(location.href), q=u.searchParams.get("invite");
+  if(!ok) try{ var u=new URL(location.href), q=u.searchParams.get("invite");
     if(good(q)){ localStorage.setItem(K,JSON.stringify(String(q).trim().toLowerCase())); ok=true; u.searchParams.delete("invite"); history.replaceState(null,"",u.pathname+u.search+u.hash); }
     if(!ok) ok=good(JSON.parse(localStorage.getItem(K)||"null"));
     if(!ok){ var se=JSON.parse(localStorage.getItem("hmg-session")||"null"); ok=!!(se&&se.admin); }
