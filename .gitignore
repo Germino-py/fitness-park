@@ -1,0 +1,14 @@
+# Appli : fichiers fabriqués, jamais dans le dépôt
+app/www/
+app/node_modules/
+app/ios/
+app/android/
+node_modules/
+# Secrets de signature (jamais dans le dépôt)
+*.p8
+*.p12
+*.key
+*.csr
+*.cer
+*.mobileprovision
+*.b64

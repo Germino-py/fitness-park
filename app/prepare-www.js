@@ -1,9 +1,8 @@
-// Copie de secours du site dans l'appli (www/). L'appli ouvre hmgfitness.fr en direct
-// (capacitor.config.json > server.url) : chaque mise à jour du site arrive dans l'appli sans la republier.
+// Copie de secours du site dans l'appli (www/). (Sera remplacé par build-www.js : appli embarquée.)
 const fs = require("fs"), path = require("path");
 const root = path.join(__dirname, ".."), www = path.join(__dirname, "www");
 fs.rmSync(www, { recursive: true, force: true });
-fs.mkdirSync(path.join(www, "icons"), { recursive: true });
+fs.mkdirSync(www, { recursive: true });
 for (const f of ["index.html", "manifest.webmanifest", "apple-touch-icon.png", "hmg-logo-complet.png"]) fs.copyFileSync(path.join(root, f), path.join(www, f));
-for (const f of fs.readdirSync(path.join(root, "icons"))) fs.copyFileSync(path.join(root, "icons", f), path.join(www, "icons", f));
+for (const d of ["icons", "css", "js"]) fs.cpSync(path.join(root, d), path.join(www, d), { recursive: true });
 console.log("www prêt :", fs.readdirSync(www).join(", "));
