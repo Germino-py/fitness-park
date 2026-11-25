@@ -102,6 +102,8 @@ const VIB = {
   async montee() { await VIB.leger(); await pause(90); await VIB.moyen(); await pause(90); await VIB.fort(); await pause(160); await VIB.succes(); }, // légendaire
 };
 VIB.tap = VIB.leger; VIB.choix = VIB.selection;   // « choix » : nom utilisé par js/onglets.js
+// noms anglais (ceux de heroVibre dans js/heros.js et de @capacitor/haptics) : HMGN.vibrer("medium") marche aussi
+Object.assign(VIB, { light: VIB.leger, medium: VIB.moyen, heavy: VIB.fort, success: VIB.succes, warning: VIB.alerte, error: VIB.erreur });
 const vibrationsActives = () => lsJson(CLE_VIB, true) !== false;
 function vibrer(type) {
   if (!N || !vibrationsActives()) return Promise.resolve(false);
@@ -790,6 +792,7 @@ const HMGN = {
   plateforme: PLATEFORME,   // "ios" | "android" | "web"
   textes: TEXTES,
   // vibrations : "choix" (= "selection"), "leger" (= "tap"), "moyen", "fort", "succes", "alerte", "erreur", "double", "montee"
+  // (et les noms anglais : "light", "medium", "heavy", "success", "warning", "error")
   vibrer,
   tap: () => vibrer("leger"), succes: () => vibrer("succes"), alerte: () => vibrer("alerte"),
   vibrations: { actives: vibrationsActives, regler: on => { localStorage.setItem(CLE_VIB, JSON.stringify(!!on)); return !!on; } },

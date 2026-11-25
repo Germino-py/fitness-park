@@ -852,5 +852,5 @@ function heroPickHtml(first, hero, tone) {
     <div class="hv-tones" role="radiogroup" aria-label="${hero === "robot" ? "Finition du robot" : "Couleur de peau"}">${T.map(t => `<button type="button" role="radio" data-tone="${t.k}" aria-checked="${t.k === tone}" aria-label="${hvE(t.n)}" style="--sw:${t.c}"><i aria-hidden="true"></i></button>`).join("")}</div>
     <div class="hv-tone-n" aria-hidden="true">${hvE(tn.n)}</div>
     <button class="cy gm-go" style="width:100%" data-k="ok">${hero === "femme" ? "C'est elle !" : hero === "robot" ? "C'est mon robot !" : "C'est lui !"}</button>
-    ${first ? `<button type="button" class="gm-acct" data-acct="restore">J'ai déjà un compte sur un autre navigateur</button>` : ""}</div>`;
+    ${first ? `<button type="button" class="gm-acct" data-acct="restore">J'ai déjà un compte sur un autre ${window.HMG_CIBLE === "appli" ? "appareil" : "navigateur"}</button>` : ""}</div>`; /* [natif] pas de « navigateur » dans l'appli */
 }
