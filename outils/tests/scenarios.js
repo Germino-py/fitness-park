@@ -275,7 +275,7 @@ const ACTIONS = ["objectif", "seance", "debut", "fin", "pause", "hiber", "finPau
 // Joue un scénario sur le miroir HMGV. Rend [{i, type, r}] (une entrée par action ou relevé) et les écarts des « verifie ».
 function jouerMiroir(V, sc, opts) {
   opts = opts || {};
-  V.salles(SALLES_TEST);
+  V.salles(opts.salles || SALLES_TEST);
   const d = V.nouveau({ seed: opts.seed || "0123456789abcdef0123456789abcdef", no: 12345 });
   const res = [], fautes = []; let dernier = null, avant = 0;
   const heure = t => { const x = Date.parse(t); if (!(x >= avant)) throw new Error(`${sc.nom} : le temps recule à ${t}`); avant = x; return t; };

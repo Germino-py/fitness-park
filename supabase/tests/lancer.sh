@@ -22,7 +22,7 @@ trap fin EXIT
 "${COMME[@]}" "$PGBIN/initdb" -D "$TMP/data" -U postgres -A trust --locale=C.UTF-8 -E UTF8 >/dev/null
 "${COMME[@]}" "$PGBIN/pg_ctl" -D "$TMP/data" -l "$TMP/pg.log" -w \
   -o "-c listen_addresses='' -k $TMP -p $PORT -c timezone=UTC -c fsync=off" start >/dev/null
-export PGHOST="$TMP" PGPORT="$PORT" PGUSER=postgres PGDATABASE=postgres
+export PGHOST="$TMP" PGPORT="$PORT" PGUSER=postgres PGDATABASE=postgres PGOPTIONS="-c client_min_messages=warning"
 PSQL=(psql -X -q -v ON_ERROR_STOP=1)
 
 echo "== Base jetable prête ($TMP)"
@@ -38,9 +38,12 @@ done
 
 # Tests SQL : chaque fichier enregistre ses vérifications dans tests.resultats
 "${PSQL[@]}" -f "$ICI/02-outils-tests.sql" >/dev/null
+ARRET=0
 for f in "$ICI"/[1-9][0-9]-*.sql; do
   echo "-- $(basename "$f")"
-  "${PSQL[@]}" -f "$f" >/dev/null
+  if ! "${PSQL[@]}" -f "$f" >/dev/null 2>"$TMP/erreur.txt"; then
+    ARRET=1; echo "   ÉCHEC  $(basename "$f") s'est arrêté en route :"; sed 's/^/          /' "$TMP/erreur.txt" | head -5
+  fi
 done
 "${PSQL[@]}" -At -c "select case when ok then '   ok  ' else '   ÉCHEC' end || '  ' || fichier || ' · ' || nom || case when ok then '' else '  → ' || coalesce(detail, '') end from tests.resultats order by id"
 ECH=$("${PSQL[@]}" -At -c "select count(*) filter (where not ok) from tests.resultats")
@@ -54,6 +57,6 @@ CROISE=$?
 set -e
 
 echo
-echo "== Bilan SQL : $((TOT - ECH)) / $TOT vérifications réussies ; scénarios croisés : $([ $CROISE = 0 ] && echo 'ok' || echo 'ÉCHEC')"
+echo "== Bilan SQL : $((TOT - ECH)) / $TOT vérifications réussies$([ $ARRET = 0 ] || echo ' (un fichier s est arrêté)') ; scénarios croisés : $([ $CROISE = 0 ] && echo 'ok' || echo 'ÉCHEC')"
 if [ "${GARDER:-0}" = "1" ]; then echo "   Base gardée : PGHOST=$TMP PGPORT=$PORT psql -U postgres"; trap - EXIT; fi
-[ "$ECH" = "0" ] && [ "$CROISE" = "0" ]
+[ "$ECH" = "0" ] && [ "$CROISE" = "0" ] && [ "$ARRET" = "0" ]

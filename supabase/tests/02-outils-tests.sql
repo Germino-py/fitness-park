@@ -40,3 +40,16 @@ grant execute on all functions in schema tests to public;
 create or replace function tests.derniere_seance() returns bigint language sql security definer
   as $$ select max(id) from public.sessions where voter = (select voter from public.players where user_id = auth.uid()) $$;
 grant execute on function tests.derniere_seance() to public;
+
+-- Une séance complète à l'heure de test t (début), validée 45 minutes plus tard, à côté de la salle (lat, lon) ;
+-- la position varie un peu d'une séance à l'autre (sinon le signal « même position » écarte la séance du classement)
+create or replace function tests.seance(p_t timestamptz, p_lat float8, p_lon float8, p_meta jsonb default '{}') returns json language plpgsql as $$
+declare r json; e float8 := (extract(epoch from p_t)::bigint / 3600 % 997) * 0.000001;
+begin
+  perform tests.horloge(p_t::text);
+  r := public.session_start(p_lat + 0.0002 + e, p_lon + 0.0001, 20, p_meta);
+  if not (r ->> 'ok')::boolean then return r; end if;
+  perform tests.horloge((p_t + interval '45 minutes')::text);
+  return public.session_confirm((r -> 'session' ->> 'id')::bigint, p_lat + 0.0003, p_lon + 0.0002, 20);
+end $$;
+grant execute on function tests.seance(timestamptz, float8, float8, jsonb) to public;

@@ -90,7 +90,7 @@ function principal() {
   psql(`select app.import_gyms(${q(JSON.stringify(osm))}::jsonb);`);
   const enBase = JSON.parse(psql("select coalesce(json_agg(json_build_object('id', id, 'name', name, 'lat', lat, 'lon', lon, 'active', active) order by id), '[]') from public.gyms;"));
   const attendues = S.SALLES_TEST.map(g => ({ id: g.id, name: g.name, lat: g.lat, lon: g.lon, active: g.active !== false })).sort((a, b) => a.id < b.id ? -1 : 1);
-  if (!S.pareil(enBase, attendues)) { console.log("   ÉCHEC  les salles de la base ne sont pas celles des scénarios :\n" + differences(enBase, attendues).join("\n")); process.exit(1); }
+  if (!S.pareil(enBase, attendues)) { console.log("   ÉCHEC  les salles de la base ne sont pas celles des scénarios :\n      " + differences(enBase, attendues).join("\n      ")); process.exit(1); }
 
   let echecs = 0, etapes = 0;
   S.SCENARIOS.forEach((sc, n) => {
@@ -104,7 +104,7 @@ function principal() {
       }
     } catch (e) { fautes.push("serveur : " + e.message.split("\n").slice(0, 3).join(" ")); }
     let miroir = null;
-    try { miroir = S.jouerMiroir(V, sc, { seed }); } catch (e) { fautes.push("miroir : " + e.message); }
+    try { miroir = S.jouerMiroir(V, sc, { seed, salles: enBase }); } catch (e) { fautes.push("miroir : " + e.message); }
     if (miroir) {
       miroir.fautes.forEach(f => fautes.push("miroir, " + f));
       // les attendus, côté serveur

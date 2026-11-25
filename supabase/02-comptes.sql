@@ -348,6 +348,7 @@ begin
   select voter, user_id, visitor_no, created_at into t from players where voter = k.voter for no key update;
   if not found then perform app.log_attempt('legacy', false); return json_build_object('ok', false, 'why', 'inconnu'); end if;
   perform app.log_attempt('legacy', true);
+  if t.user_id is not null and t.user_id <> me then return json_build_object('ok', false, 'why', 'pris'); end if;   -- déjà repris ailleurs
   if not has_access() then
     -- un compte du site d'avant la migration a passé la porte du site : il entre sans invitation
     cut := coalesce((app.cfg('legacy_cutoff') #>> '{}')::timestamptz, '-infinity');
@@ -360,7 +361,6 @@ begin
   if t.user_id = me then
     return json_build_object('ok', true, 'why', 'deja', 'no', t.visitor_no, 'hero', k.hero, 'state', app.state_of(t.voter));
   end if;
-  if t.user_id is not null then return json_build_object('ok', false, 'why', 'pris'); end if;   -- déjà repris ailleurs
   keep := app.adopt(t.voter);                                -- ce qui a été fait dans l'appli avant n'est pas perdu
   perform app.after_claim(keep, p_old_stars);
   return json_build_object('ok', true, 'no', (select visitor_no from players where voter = keep), 'hero', k.hero,
