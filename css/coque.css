@@ -179,3 +179,5 @@ body.cq-full #cqTabs{transform:translateY(110%);transition:transform .3s}
 
 /* les petits messages passent au-dessus du bouton de l'Aventure et de la barre d'onglets */
 body.coque #toast{bottom:calc(var(--tabbar,60px) + var(--sab,0px) + 78px)}
+/* la séance se valide depuis l'Aventure (ou la fiche d'une salle) : pas de bouton flottant sur la carte */
+body.coque #bCheck{display:none!important}

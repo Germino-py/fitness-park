@@ -284,6 +284,7 @@ openMe=function(){ cqTab("moi"); };
 (function cqInit(){
   document.body.classList.add("coque");
   cqBar();
+  { const q=$("search"); if(q) q.placeholder="Une salle, une ville…"; }
   const h=decodeURIComponent(location.hash.slice(1));
   const t=h==="classement"||h==="moi"?h:(h==="carte"||byId[h])?"salles":"aventure";
   store.set("hmg-mode",t==="aventure"?"game":"map");
