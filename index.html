@@ -1578,6 +1578,37 @@ button.cc-st:hover{border-color:rgba(var(--a-rgb),.4)}
 .cc-tools .cc-tg{grid-column:1/-1;justify-content:space-between;flex-direction:row-reverse;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--stroke);font-size:12.5px;color:var(--ink)}
 .cc-warn{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;border-radius:14px;font-size:12px;line-height:1.4;color:var(--gold);background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.3)}
 
+/* ===================== Mon compte (le retrouver sur un autre navigateur) ===================== */
+.acct-m{z-index:2300}
+.acct{position:relative;width:min(420px,100%);text-align:center;padding:22px 20px 18px}
+.acct .x{position:absolute;top:12px;right:12px;width:34px;height:34px;padding:0;justify-content:center;border-radius:50%}
+.acct h2{margin:6px 0 6px;font:700 21px/1.2 var(--f-d)}
+.acct h2 .gr{background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.acct p{margin:0 0 10px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.acct p b{color:var(--ink)}
+.acct-tabs{display:flex;gap:4px;padding:4px;margin:4px 34px 14px 0;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--stroke)}
+.acct-tabs button{flex:1;justify-content:center;padding:8px 6px;border-radius:999px;border:0;background:transparent;font:700 12px var(--f-d);color:var(--muted);box-shadow:none}
+.acct-tabs button[aria-selected="true"]{background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3));color:var(--a-ink)}
+.acct-ico{width:54px;height:54px;margin:2px auto 4px;border-radius:18px;display:grid;place-items:center;color:var(--a2);background:rgba(var(--a-rgb),.12);border:1px solid rgba(var(--a-rgb),.4);box-shadow:0 0 26px rgba(var(--a-rgb),.25)}
+.acct-ico svg.i{width:26px;height:26px}
+.acct-ico.ok{color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2) 60%,var(--a3))}
+.acct-who{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;margin:0 0 8px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--stroke);font-size:12.5px;color:var(--muted)}
+.acct-who b{font:700 14px var(--f-d);color:var(--ink)}
+.acct-code{margin:0 0 12px;padding:14px 10px;border-radius:16px;font:700 17px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--a2);background:rgba(0,0,0,.35);border:1px dashed rgba(var(--a-rgb),.5);word-break:break-all;user-select:all;-webkit-user-select:all}
+.acct-row{display:flex;gap:8px;margin:0 0 10px}
+.acct-row button{flex:1;justify-content:center;padding:12px 10px;font-size:13px}
+.acct-tip{font-size:12.5px!important}
+.acct-warn{font-size:12px!important;color:var(--gold)!important;margin:4px 0 0!important}
+.acct-form{display:grid;gap:8px;margin-top:4px}
+.acct-form textarea{width:100%;resize:none;padding:12px;border-radius:14px;font:600 14px/1.4 ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:var(--ink);background:rgba(0,0,0,.3);border:1px solid var(--stroke);text-align:center}
+.acct-form textarea:focus{outline:none;border-color:rgba(var(--a-rgb),.6);box-shadow:0 0 0 3px rgba(var(--a-rgb),.15)}
+.acct-form .cy{justify-content:center;padding:13px;font-size:14px}
+.acct-msg{min-height:18px;font-size:12.5px;color:var(--muted)}.acct-msg.ko{color:#ff8a8a}.acct-msg.ok{color:var(--a2)}
+.gm-acct{display:block;width:100%;margin-top:10px;padding:8px;border:0;background:transparent;box-shadow:none;font:600 12.5px var(--f-b);color:var(--muted);text-decoration:underline;text-underline-offset:3px;justify-content:center}
+.gm-acct:hover{background:transparent;color:var(--ink)}
+.ps-acct{margin-top:2px}
+.acct-code span{display:inline-block;margin:0 5px;white-space:nowrap}
+
 </style>
 </head>
 <body>
@@ -2483,7 +2514,7 @@ function pseudoModal(first){
       <div id="psIdeas" class="ps-ideas"></div>
       <button class="cy" id="psGo" type="submit" disabled>${myPseudo?"Valider mon nouveau pseudo":"C'est mon pseudo"}</button>
     </form>
-    <button class="ghost" data-x id="psLater">${myPseudo?"Annuler":first?"Plus tard, je reste Machine "+myNo:"Plus tard"}</button>`);
+    ${myPseudo?"":`<button class="ghost ps-acct" type="button" data-acct="restore">J'ai déjà un compte</button>`}<button class="ghost" data-x id="psLater">${myPseudo?"Annuler":first?"Plus tard, je reste Machine "+myNo:"Plus tard"}</button>`);
   const inp=$("psIn"), go=$("psGo");
   const show=(st,v)=>{ const ok=st==="ok"; $("psMsg").textContent=PS_MSG[st]||PS_MSG.invalide; $("psMsg").className="ps-msg "+(st==="ok"?"ok":st==="wait"||st==="vide"||st==="court"?"":"ko");
     $("psSt").className="ps-st "+(st==="ok"?"ok":st==="wait"?"wait":st==="vide"?"":"ko"); go.disabled=!ok;
@@ -2891,7 +2922,7 @@ function profCard(say){
       ${!featOn("feat_profile")?`<div class="msg warn">Masqué au public : toi seul le vois. Active-le dans Admin → Fonctionnalités.</div>`:""}
       <div class="pf-stats${po?"":" n2"}">${st.map(([v,l,hot])=>`<div${hot?' class="hot"':""}><b>${v}</b><small>${l}</small></div>`).join("")}</div>
       ${po?`<button class="cy big-ck${s.today?" done":""}" data-pf-go="ck">${ic(s.today?"check":"bolt")} ${s.today?"Séance du jour validée":"Je suis à la salle · +10 points"}</button>`:""}
-      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()&&!document.body.classList.contains("gm-on")?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}${psOn()?`<button data-pf-go="pseudo">${ic("pen")} ${myPseudo?"Changer de pseudo":"Choisir mon pseudo"}</button>`:""}</div>
+      <div class="row2">${po?`<button data-pf-go="rank">${ic("trophy")} Classement</button>`:""}${mineOn()&&!document.body.classList.contains("gm-on")?`<button data-pf-go="mine">${ic("list")} Mes salles</button>`:""}${psOn()?`<button data-pf-go="pseudo">${ic("pen")} ${myPseudo?"Changer de pseudo":"Choisir mon pseudo"}</button>`:""}<button data-acct="save">${ic("shield")} Mon compte</button></div>
     </div></div>`;
 }
 let introTimer=null, pfMode=null;
@@ -3052,6 +3083,91 @@ $("bHome").addEventListener("click",()=>fitFrance(true));
 $("bTiles").addEventListener("click",()=>{ setTiles(!tilesOn); store.set("hmg-tiles",tilesOn); });
 $("bList").addEventListener("click",()=>sheetMode==="list"?closeSheet():openList());
 map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
+
+/* ================= MON COMPTE : le retrouver sur un autre navigateur ou un autre téléphone =================
+   Le compte d'un sportif, c'est sa clé secrète (voterId, 32 caractères) gardée dans le navigateur. Chaque navigateur a la sienne :
+   d'où un « nouveau compte » quand on passe de Chrome à Safari. On peut maintenant l'emporter :
+   - un lien secret (hmgfitness.fr/#compte=…) qui transporte la clé, le héros, sa tenue et « Mes salles » ;
+   - ou un code de 27 caractères (la clé en base 32 + 1 caractère de contrôle) à recopier, par exemple pour la future appli.
+   Le serveur garde déjà tout ce qui compte (séances, points, pseudo) sous cette clé : rien à changer dans la base.
+   La collection de l'aventure se reconstruit à l'identique (tirages déterministes à partir de la clé). */
+const ACB32="0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+function acctCode(hex){ let bits=""; for(const c of hex) bits+=parseInt(c,16).toString(2).padStart(4,"0"); bits+="00";
+  let s=""; for(let i=0;i<130;i+=5) s+=ACB32[parseInt(bits.slice(i,i+5),2)];
+  let ck=7; for(const c of s) ck=(ck*33+ACB32.indexOf(c))%32; return s+ACB32[ck]; }
+const acctFmt=c=>c.match(/.{1,9}/g).join(" ");
+function acctDecode(txt){ const s=String(txt||"").toUpperCase().replace(/[IL]/g,"1").replace(/O/g,"0").replace(/U/g,"V").replace(/[^0-9A-Z]/g,"");
+  if(s.length!==27) return null; let ck=7; for(const c of s.slice(0,26)){ const i=ACB32.indexOf(c); if(i<0) return null; ck=(ck*33+i)%32; }
+  if(ACB32[ck]!==s[26]) return null; let bits=""; for(const c of s.slice(0,26)) bits+=ACB32.indexOf(c).toString(2).padStart(5,"0");
+  let hex=""; for(let i=0;i<128;i+=4) hex+=parseInt(bits.slice(i,i+4),2).toString(16); return hex; }
+const acctB64=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const acctUnB64=s=>{ try{ return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))))); }catch(e){ return null; } };
+function acctLink(){ const g=typeof gmS!=="undefined"?gmS.eq:{}, e={}; for(const k in g) if(g[k]) e[k]=g[k];
+  const p={v:voterId}; if(e.hero) p.g=e; const m=Object.keys(myVisits||{}); if(m.length) p.m=m; return location.origin+location.pathname+"#compte="+acctB64(p); }
+/* ce que contient un lien ou un code collé */
+function acctParse(txt){ const t=String(txt||"").trim(), h=t.match(/#compte=([A-Za-z0-9_-]+)/)||t.match(/^compte=([A-Za-z0-9_-]+)$/);
+  if(h){ const p=acctUnB64(h[1]); return p&&/^[0-9a-f]{32}$/.test(p.v||"")?p:null; }
+  const v=acctDecode(t); return v?{v}:null; }
+async function acctPeek(v){ if(!LIVE) return null; try{ return await rpc("my_score",{p_voter:v}); }catch(e){ return null; } }
+function acctModalEl(){ let m=$("acctModal"); if(!m){ m=document.createElement("div"); m.className="modal acct-m"; m.id="acctModal"; document.body.appendChild(m);
+    m.addEventListener("click",e=>{ if(e.target===m||e.target.closest("[data-acct-x]")) m.remove(); }); } return m; }
+/* la fenêtre « Mon compte » : sauvegarder (code + lien) ou retrouver un compte */
+function acctModal(mode){
+  const m=acctModalEl(), code=acctCode(voterId), d=score.days||0;
+  m.innerHTML=`<div class="card glass acct" role="dialog" aria-label="Mon compte HMG"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button>
+    <div class="acct-tabs" role="tablist"><button role="tab" data-acct-tab="save" aria-selected="${mode!=="restore"}">Mon compte</button><button role="tab" data-acct-tab="restore" aria-selected="${mode==="restore"}">J'ai déjà un compte</button></div>
+    ${mode!=="restore"?`<div class="acct-ico">${ic("shield")}</div><h2>Emporte ton compte partout</h2>
+    <p>Tes séances, tes points${psOn()?", ton pseudo":""} et ton héros sont liés à <b>ce navigateur</b>. Pour les retrouver dans un autre navigateur ou sur un autre téléphone, garde ton code secret.</p>
+    <div class="acct-who"><b>${esc(myName())}</b><span>${d} séance${d>1?"s":""} · ${score.points||0} points</span></div>
+    <div class="acct-code" aria-label="Ton code secret">${acctFmt(code).split(" ").map(g=>`<span>${g}</span>`).join(" ")}</div>
+    <div class="acct-row"><button class="cy" data-acct-do="link">${ic("ext")} Envoyer mon lien</button><button data-acct-do="copy">${ic("check")} Copier le code</button></div>
+    <p class="acct-tip">Le plus simple : <b>Envoyer mon lien</b> (à toi-même, ou dans tes notes), puis ouvre-le dans l'autre navigateur. Ton compte arrive tout seul.</p>
+    <p class="acct-warn">Ne le donne à personne : c'est la clé de ton compte.</p>`
+    :`<div class="acct-ico">${ic("loc")}</div><h2>Retrouve ton compte</h2>
+    <p>Sur ton autre navigateur, ouvre ton profil puis <b>Mon compte</b>, et envoie-toi le lien. Tu peux aussi coller ici ton lien ou ton code secret.</p>
+    <form id="acctForm" class="acct-form" autocomplete="off"><textarea id="acctIn" rows="2" placeholder="Colle ton lien ou ton code (27 caractères)" aria-label="Ton lien ou ton code" autocapitalize="characters" spellcheck="false"></textarea>
+      <div id="acctMsg" class="acct-msg" aria-live="polite"></div><button class="cy" type="submit">Retrouver mon compte</button></form>
+    ${d?`<p class="acct-warn">Ce navigateur a déjà ${d} séance${d>1?"s":""} sous ${esc(myName())} : elles resteront sur l'autre compte.</p>`:""}`}
+  </div>`;
+  const f=$("acctForm"); if(f) f.addEventListener("submit",async e=>{ e.preventDefault(); const p=acctParse($("acctIn").value), msg=$("acctMsg");
+    if(!p){ msg.textContent="Ce n'est pas un lien ou un code HMG valide. Vérifie qu'il est complet."; msg.className="acct-msg ko"; return; }
+    if(p.v===voterId){ msg.textContent="C'est déjà le compte de ce navigateur."; msg.className="acct-msg ok"; return; }
+    msg.textContent="Je cherche ton compte…"; msg.className="acct-msg"; const s=await acctPeek(p.v);
+    if(s&&!s.no&&!s.days){ msg.textContent="Aucun compte trouvé avec ce code."; msg.className="acct-msg ko"; return; }
+    acctAdopt(p,s); });
+}
+/* adopter le compte : clé, numéro, score, héros et « Mes salles », puis on recharge proprement (sans le lien dans l'adresse) */
+function acctAdopt(p,s){
+  if(voterId) store.set("hmg-voter-old",voterId);
+  store.set("hmg-voter",p.v); if(s&&s.no) store.set("hmg-visitor",s.no);
+  store.set("hmg-pseudo",null); store.set("hmg-pseudo-later",true); store.set("hmg-score",s?{...s,day:today()}:{});
+  const eq=p.g&&typeof p.g==="object"?p.g:{}; store.set("hmg-game",{seen:null,open:[],items:[],stars:0,leg:{},eq,rebuild:1});
+  if(Array.isArray(p.m)){ const mv={...myVisits}; p.m.forEach(id=>{ if(byId[id]&&!mv[id]) mv[id]=today(); }); store.set("hmg-my-visits",mv); }
+  store.set("hmg-acct-welcome",true); setTimeout(()=>location.replace(location.pathname+location.search),150);
+}
+/* ouverture d'un lien « #compte=… » : on montre de qui il s'agit avant de basculer */
+async function acctFromHash(){
+  const p=acctParse(location.hash); history.replaceState(null,"",location.pathname+location.search); if(!p) return;
+  if(p.v===voterId){ toast("Tu es déjà sur ton compte."); return; }
+  const m=acctModalEl(); m.innerHTML=`<div class="card glass acct"><div class="acct-ico">${ic("loc")}</div><h2>Je retrouve ton compte…</h2></div>`;
+  const s=await acctPeek(p.v); if(s&&!s.no&&!s.days){ m.innerHTML=`<div class="card glass acct"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button><div class="acct-ico">${ic("x")}</div><h2>Compte introuvable</h2><p>Ce lien ne correspond à aucun compte HMG.</p><button class="cy" data-acct-x>OK</button></div>`; return; }
+  const nm=s&&s.no?(PSEUDOS[s.no]||"Machine "+s.no):"ton compte", d=s?s.days||0:0, here=score.days||0;
+  m.innerHTML=`<div class="card glass acct"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button><div class="acct-ico ok">${ic("check")}</div>
+    <h2>Content de te revoir, <span class="gr">${esc(nm)}</span> !</h2><p>${d} séance${d>1?"s":""}${s&&s.points?" · "+s.points+" points":""}${p.g&&p.g.hero?" · ton héros t'attend":""}. Ce navigateur va utiliser ce compte.</p>
+    ${here?`<p class="acct-warn">Les ${here} séance${here>1?"s":""} faites ici sous ${esc(myName())} restent sur l'autre compte.</p>`:""}
+    <div class="acct-row"><button data-acct-x>Annuler</button><button class="cy" id="acctGo">C'est moi</button></div></div>`;
+  $("acctGo").addEventListener("click",()=>acctAdopt(p,s));
+}
+document.addEventListener("click",async e=>{ const t=e.target;
+  const o=t.closest&&t.closest("[data-acct]"); if(o){ e.preventDefault(); e.stopPropagation(); if(typeof closeMe==="function") closeMe(); acctModal(o.dataset.acct); return; }
+  const tb=t.closest&&t.closest("[data-acct-tab]"); if(tb){ acctModal(tb.dataset.acctTab); return; }
+  const a=t.closest&&t.closest("[data-acct-do]"); if(!a) return; const k=a.dataset.acctDo;
+  if(k==="copy"){ try{ await navigator.clipboard.writeText(acctFmt(acctCode(voterId))); a.innerHTML=ic("check")+" Code copié"; }catch(err){ toast("Recopie ton code à la main, ou utilise « Envoyer mon lien ».",1); } }
+  if(k==="link"){ const url=acctLink();
+    if(navigator.share){ try{ await navigator.share({title:"Mon compte HMG",text:"Mon lien secret HMG Fitness : ouvre-le dans ton autre navigateur pour retrouver ton compte. Ne le partage avec personne.",url}); return; }catch(err){ if(err&&err.name==="AbortError") return; } }
+    try{ await navigator.clipboard.writeText(url); a.innerHTML=ic("check")+" Lien copié"; toast("Lien copié : colle-le dans ton autre navigateur."); }catch(err){ prompt("Copie ton lien :",url); } }
+}, true);
+
 
 /* ================= AVENTURE HMG (feat_game) =================
    Chaque séance validée (« Je suis à la salle », vérifiée par le serveur) fait avancer le petit héros d'un pas.
@@ -3473,8 +3589,21 @@ function gmStepSnd(i){ if(!SND.ready()||!SND.on()) return; try{ const t=SND.ctx.
 const gmSleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ---------- avancer : le héros marche case par case, ouvre les coffres, débloque les mondes */
-async function gmSync(){
-  if(!GM.on||GM.busy) return; const d=gDays();
+/* une seule synchro à la fois : le score du serveur, le minuteur d'ouverture et la séance validée peuvent tous la demander
+   en même temps ; sans ce verrou, deux fenêtres « Choisis ton héros » s'empilaient (la 2e revenait après le coffre) */
+async function gmSync(){ if(!GM.on) return; if(GM.sync){ GM.again=true; return; } GM.sync=true;
+  try{ await gmSync0(); } finally{ GM.sync=false; } if(GM.again&&GM.on){ GM.again=false; setTimeout(gmSync,60); } }
+/* compte retrouvé depuis un autre navigateur : on rouvre en silence tous les coffres déjà gagnés (mêmes tirages, même ordre) */
+function gmRebuild(d){ const eq={...GM_EQ0,...gmS.eq}; Object.assign(gmS,{open:[],items:[],stars:0,leg:{}});
+  for(let n=0;n<=d;n++){ const k=gmKind(n); if(!k) continue; const leg=gmLegRoll(n), item=leg?null:gmRoll(n); gmS.open.push(n);
+    if(leg) gmS.leg[leg.k]=n; else if(item) gmS.items.push(item.id); else gmS.stars=(gmS.stars||0)+1;
+    const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id); }
+  GM_CATS.forEach(([c])=>{ if(eq[c]&&!gmOwn(eq[c])) eq[c]=null; }); if(GM_LG[eq.hero]&&gmS.leg[eq.hero]==null) eq.hero="homme";
+  if(eq.hero&&!GM_LG[eq.hero]&&!GM_HEROES.some(h=>h.k===eq.hero)) eq.hero=null;
+  gmS.eq=eq; gmS.seen=d; delete gmS.rebuild; gmSave(); }
+async function gmSync0(){
+  if(GM.busy) return; const d=gDays();
+  if(gmS.rebuild){ gmRebuild(d); gmBuild(d); gmHud(); }
   if(gmS.seen===null||gmS.seen>d){ gmS.seen=Math.max(0,d-1); gmSave(); }
   if(!gmS.eq.hero){ await gmPickHero(true); }
   if(gmS.ssn!==gmSeason()&&!GM.busy){ gmS.ssn=gmSeason(); gmSave(); GM.busy=true; gmPaintHero("happy cheer"); await gmSsnBanner(gmS.ssn); gmPaintHero(); GM.busy=false; }
@@ -3546,7 +3675,7 @@ function gmOpenChest(n){ return new Promise(res=>{
 }); }
 
 /* ---------- choix du héros (première fois) */
-function gmPickHero(first){ return new Promise(res=>{
+function gmPickHero(first){ if(GM.pick) return GM.pick; return GM.pick=new Promise(res0=>{ const res=v=>{ GM.pick=null; res0(v); };
   let hero=gmS.eq.hero||"homme", tone=gmS.eq.tone||"clair";
   const ov=document.createElement("div"); ov.className="gm-ov";
   const draw=()=>{ const tc=GM_TONE[hero==="robot"?"robot":"human"];
@@ -3555,7 +3684,8 @@ function gmPickHero(first){ return new Promise(res=>{
       <p>${first?`Il démarre en <b>caleçon</b>. Chaque séance validée à la salle le fait avancer d'un pas et grossir ses muscles. Les <b>coffres</b> l'habillent, à ton rythme.`:"Ta collection et ta progression restent les mêmes."}</p>
       <div class="gm-pick">${GM_HEROES.map(h=>`<button data-hero="${h.k}" aria-pressed="${h.k===hero}">${gmBot({...gmS.eq,hero:h.k,tone},{cls:h.k===hero?"happy idle":"idle"})}<b>${h.n}</b><small>${h.s}</small></button>`).join("")}</div>
       <div class="gm-tone">${["clair","fonce"].map(t=>`<button data-tone="${t}" aria-pressed="${t===tone}"><i style="background:${tc[t].s}"></i>${hero==="robot"?(t==="clair"?"Blanc":"Noir"):(t==="clair"?"Peau claire":"Peau noire")}</button>`).join("")}</div>
-      <button class="cy gm-go" style="width:100%" data-k="ok">${hero==="femme"?"C'est elle !":hero==="robot"?"C'est mon robot !":"C'est lui !"}</button></div>`; };
+      <button class="cy gm-go" style="width:100%" data-k="ok">${hero==="femme"?"C'est elle !":hero==="robot"?"C'est mon robot !":"C'est lui !"}</button>
+      ${first?`<button type="button" class="gm-acct" data-acct="restore">J'ai déjà un compte sur un autre navigateur</button>`:""}</div>`; };
   draw(); document.body.appendChild(ov);
   ov.addEventListener("click",e=>{ const t=e.target, h=t.closest("[data-hero]"), tn=t.closest("[data-tone]"), k=t.closest("[data-k]");
     if(h){ hero=h.dataset.hero; draw(); gmSnd("pop"); return; } if(tn){ tone=tn.dataset.tone; draw(); return; }
@@ -3653,6 +3783,8 @@ $("modeSw").addEventListener("click",e=>{ const b=e.target.closest("[data-mode]"
   const order=CLUBS.filter(c=>!isDom(c)).map(c=>({c,p:pos(c)})).filter(x=>x.p).sort((a,b)=>b.p.lat-a.p.lat);
   order.forEach(x=>drawMarker(x.c)); pinWave();
   updateHeader();
+  if(/^#compte=/.test(location.hash)) acctFromHash();
+  if(store.get("hmg-acct-welcome",false)){ store.set("hmg-acct-welcome",false); setTimeout(()=>toast("Compte retrouvé : bon retour parmi nous !"),1200); }
   clearTimeout(introSafety); welcome(); refreshScore();
   if(feat("feat_game")&&location.hash!=="#carte"&&(location.hash==="#aventure"||store.get("hmg-mode","game")==="game")) gmSet(true,true);
   setTimeout(appInvite,feat("feat_game")?9000:6500);
