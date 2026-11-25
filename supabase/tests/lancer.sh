@@ -30,7 +30,7 @@ echo "== Base jetable prête ($TMP)"
 for f in supabase-competition.sql supabase-pseudos.sql supabase-ange.sql; do "${PSQL[@]}" -f "$RACINE/$f" >/dev/null; done
 echo "== Schéma actuel reconstitué (bouchon + scripts supabase-*.sql du dépôt)"
 "${PSQL[@]}" -f "$ICI/01-donnees-avant.sql" >/dev/null
-MIG=("$RACINE"/supabase/0[0-9]-*.sql)
+MIG=("$RACINE"/supabase/0[1-4]-*.sql)              # la structure (01 à 04) ; les données (05, 06…) à la fin
 for tour in 1 2; do
   for f in "${MIG[@]}"; do "${PSQL[@]}" -f "$f" >/dev/null; done
   echo "== Migrations appliquées (tour $tour sur 2 : elles se rejouent sans erreur) : $(basename -a "${MIG[@]}" | tr '\n' ' ')"
@@ -56,7 +56,16 @@ node "$ICI/scenarios-sql.js"
 CROISE=$?
 set -e
 
+# Les fichiers de données (05-salles-fitness-park.sql, puis 06-salles-osm.sql s'il existe) : 2 fois, sans erreur
+DONNEES=0
+for f in "$RACINE"/supabase/0[5-9]-*.sql; do
+  [ -e "$f" ] || continue
+  if "${PSQL[@]}" -f "$f" >/dev/null && "${PSQL[@]}" -f "$f" >/dev/null; then
+    echo "== Données $(basename "$f") appliquées 2 fois : $("${PSQL[@]}" -At -c "select count(*) || ' salles (' || count(*) filter (where source = 'fitnesspark') || ' Fitness Park, ' || count(*) filter (where not active) || ' pas encore ouvertes, ' || count(*) filter (where not precise) || ' positions approchées)' from public.gyms")"
+  else DONNEES=1; echo "   ÉCHEC  $(basename "$f")"; fi
+done
+
 echo
 echo "== Bilan SQL : $((TOT - ECH)) / $TOT vérifications réussies$([ $ARRET = 0 ] || echo ' (un fichier s est arrêté)') ; scénarios croisés : $([ $CROISE = 0 ] && echo 'ok' || echo 'ÉCHEC')"
 if [ "${GARDER:-0}" = "1" ]; then echo "   Base gardée : PGHOST=$TMP PGPORT=$PORT psql -U postgres"; trap - EXIT; fi
-[ "$ECH" = "0" ] && [ "$CROISE" = "0" ] && [ "$ARRET" = "0" ]
+[ "$ECH" = "0" ] && [ "$CROISE" = "0" ] && [ "$ARRET" = "0" ] && [ "$DONNEES" = "0" ]
