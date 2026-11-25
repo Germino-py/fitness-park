@@ -28,7 +28,13 @@ if(IS_APP) document.documentElement.classList.add("is-app");
 { const q=new URLSearchParams(location.search); if(q.has("sim")){ // simulateur : marges d'écran (encoche, barre du bas) du téléphone imité
   [["sat","top"],["sab","bottom"]].forEach(([k,n])=>{ if(q.has(k)) document.documentElement.style.setProperty("--sa-"+n, (+q.get(k)||0)+"px"); }); } }
 if(IS_NATIVE) document.documentElement.classList.add("is-native");
-if("serviceWorker" in navigator && !IS_NATIVE && (location.protocol === "https:" || location.hostname === "localhost")) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+/* [natif] EMBARQUE : la version embarquée dans l'appli iPhone / Android (app/build-www.js met HMG_CIBLE="appli" avant tout script,
+   puis js/native.js remplace vibrations, position, partage, presse-papiers et liens par les modules natifs).
+   Dans l'appli : pas de service worker, pas d'invitation à installer, pas d'espace admin, pas de bascule du fond de carte,
+   et aucun texte qui parle de « navigateur », de Safari ou d'Android.
+   (Même sens que APPLI de js/onglets.js ; un autre nom, car deux « const APPLI » globales se gêneraient.) */
+const EMBARQUE = window.HMG_CIBLE === "appli";
+if("serviceWorker" in navigator && !IS_NATIVE && !EMBARQUE && (location.protocol === "https:" || location.hostname === "localhost")) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
 let installEvt = null;
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; });
 addEventListener("appinstalled", () => { store.set("hmg-app-installed", 1); const b=$("appInv"); if(b) b.remove(); toast("HMG est sur ton écran d'accueil 💪"); });
@@ -37,6 +43,7 @@ addEventListener("online", () => toast("De retour en ligne ✅"));
 if(IS_APP) document.addEventListener("pointerdown", e => { if(navigator.vibrate && e.target.closest && e.target.closest("button")) try{ navigator.vibrate(8); }catch(_){} }, {passive:true});
 const APP_ICON = "icons/icon-192.png";
 function appInvite(force){
+  if(EMBARQUE) return; /* [natif] déjà dans l'appli */
   if(!force){
     if(IS_APP || !feat("feat_app") || store.get("hmg-app-installed", 0)) return;
     if(Date.now() - (+store.get("hmg-app-ask", 0)) < 7*864e5) return;
@@ -56,6 +63,7 @@ function appInvite(force){
   };
 }
 function appHowTo(){
+  if(EMBARQUE) return; /* [natif] */
   const m = document.createElement("div"); m.className = "modal";
   const share = `<span class="ai-share"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></span>`;
   const notSafari = IS_IOS && /CriOS|FxiOS|EdgiOS|Instagram|FBAN|FBAV|TikTok|musical_ly/i.test(navigator.userAgent);
@@ -253,7 +261,7 @@ if(TOUCH_DEV){ let mvT=0; const root=document.documentElement;
 map.on("zoomend",()=>$("map").classList.toggle("far",map.getZoom()<7.5));
 function setTiles(on){ tilesOn=on; if(on){ tiles.addTo(map); frLayer.setStyle({fillOpacity:0}); nbLayer.setStyle({fillOpacity:0}); } else { map.removeLayer(tiles); frLayer.setStyle({fillOpacity:.92}); nbLayer.setStyle({fillOpacity:.9}); }
   $("bTiles").classList.toggle("on",on); $("legal").classList.toggle("osm-on",on); $("bTiles").setAttribute("aria-pressed",on); updateLabels(); }
-if(store.get("hmg-tiles",true)) setTiles(true);
+if(EMBARQUE||store.get("hmg-tiles",true)) setTiles(true); /* [natif] pas de choix du fond dans l'appli */
 
 /* marqueurs : dessinés sur un seul canvas (et non 375 éléments de page) pour une carte fluide sur téléphone.
    Chaque style de pastille est dessiné une fois dans une petite image, puis recopiée : très rapide. */
@@ -578,6 +586,7 @@ $("bMe").addEventListener("click",()=>{
 
 /* ================= ADMIN ================ */
 function loginModal(){
+  if(EMBARQUE) return; /* [natif] l'espace admin reste sur le site */
   if(!LIVE){ toast("Branche d'abord la base Supabase (voir CONFIG) pour activer l'espace admin.",1); return; }
   const m=document.createElement("div"); m.className="modal"; m.innerHTML=`<form class="card glass" id="lf">
     <h2>Espace admin</h2><p>Réservé à ${esc(CONFIG.owner)}.</p>
@@ -600,6 +609,7 @@ function loginModal(){
 function applyAdminUi(){ $("adminBar").hidden=!isAdmin(); $("aShowProg").checked=db.settings.show_progress===true; drawStart(); $("bAdmin").textContent=isAdmin()?"Admin connecté":"Admin"; applyFeatures(); }
 async function reloadEverything(){ try{ await loadAll(); }catch(e){ toast("Impossible de charger les avis : "+e.message,1); } computeStats(); refreshMarkers(); updateHeader(); applyAdminUi(); if(sheetMode==="club") renderClub(); else if(sheetMode==="list") renderList(); else if(sheetMode==="mod") renderMod(); else if(sheetMode==="visits") renderVisits(); else if(sheetMode==="rank") renderRank(); else if(sheetMode==="feat") renderFeat(); refreshScore(); }
 $("bAdmin").addEventListener("click",()=>isAdmin()?null:loginModal());
+if(EMBARQUE) $("bAdmin").hidden=true; /* [natif] */
 $("aOut").addEventListener("click",async()=>{ session=null; store.set("hmg-session",null); if(routeLine){map.removeLayer(routeLine);routeLine=null;} await reloadEverything(); toast("Déconnecté."); });
 $("aShowProg").addEventListener("change",async e=>{
   const on=e.target.checked; try{ if(LIVE) await api("/rest/v1/settings?key=eq.show_progress",{method:"PATCH",body:{value:on},prefer:"return=minimal"}); db.settings.show_progress=on; if(!LIVE) demo.set("settings",db.settings); updateHeader(); toast(on?"Ta progression est maintenant visible par tous.":"Ta progression est masquée au public."); }
@@ -709,7 +719,7 @@ async function doCheckin(){
   ckModal(`<div class="radar"><i></i><i></i><i></i>${ic("loc")}</div><h2>Je cherche ta salle…</h2><p>Autorise la localisation : ta position sert seulement à vérifier que tu es sur place, elle n'est jamais affichée.</p>`);
   let g;
   try{ g=await new Promise((ok,ko)=>navigator.geolocation.getCurrentPosition(ok,ko,{enableHighAccuracy:true,timeout:20000,maximumAge:0})); }
-  catch(e){ checking=false; ckModal(`<div class="ck-ico bad">${ic("loc")}</div><h2>Position introuvable</h2><p>${e&&e.code===1?"Tu as refusé la localisation. Autorise-la pour hmgfitness.fr dans les réglages de ton navigateur, puis réessaie.":"Impossible d'obtenir ta position. Vérifie que la localisation est activée, puis réessaie."}</p><button class="cy" data-x>OK</button>`); return; }
+  catch(e){ checking=false; ckModal(`<div class="ck-ico bad">${ic("loc")}</div><h2>Position introuvable</h2><p>${EMBARQUE&&e&&e.texte?e.texte:e&&e.code===1?"Tu as refusé la localisation. Autorise-la pour hmgfitness.fr dans les réglages de ton navigateur, puis réessaie.":"Impossible d'obtenir ta position. Vérifie que la localisation est activée, puis réessaie."}</p>${EMBARQUE&&e&&e.code===1&&window.HMGN&&HMGN.peutOuvrirReglages?`<div class="row2"><button data-x data-hmgn-reglages>${HMGN.textes.ouvrirReglages}</button><button class="cy" data-x>OK</button></div>`:`<button class="cy" data-x>OK</button>`}`); return; } /* [natif] textes et réglages de l'appli */
   const here={lat:g.coords.latitude,lon:g.coords.longitude}, acc=Math.round(g.coords.accuracy||9999);
   let best=null, bd=1e12;
   for(const c of CLUBS){ if(c.s) continue; const p=pos(c); if(!p) continue; const d=mDist(here,p); if(d<bd){ bd=d; best=c; } }
@@ -734,11 +744,11 @@ function ckWhy(r,c,acc){
   const t={
     deja:[`${ic("check")}`,"ok","Séance déjà validée",`Ta séance du jour est comptée${r.club&&byId[r.club]?` à <b>${esc(byId[r.club].n)}</b>`:""}. Tu en veux encore : respect. Reviens demain pour 10 points de plus.`],
     loin:[ic("loc"),"","Encore un effort",`Tu es à environ ${fmtDist(r.dist||0)} de <b>${n}</b>. Rapproche-toi de l'entrée (moins de 200 m) et réessaie.`],
-    precision:[ic("loc"),"","Position trop imprécise",`Ton téléphone te situe à ±${r.acc||acc} m près. Active la localisation précise (GPS), mets-toi près de l'entrée ou d'une fenêtre, puis réessaie.`],
+    precision:[ic("loc"),"","Position trop imprécise",EMBARQUE&&window.HMGN?HMGN.textes.positionImprecise(r.acc||acc):`Ton téléphone te situe à ±${r.acc||acc} m près. Active la localisation précise (GPS), mets-toi près de l'entrée ou d'une fenêtre, puis réessaie.`], /* [natif] « Position exacte » */
     salle:[ic("loc"),"","Salle pas encore vérifiée",isAdmin()?`La position exacte de <b>${n}</b> n'est pas encore enregistrée. Ouvre Admin → Fonctionnalités → « Enregistrer les positions ».`:`La position exacte de <b>${n}</b> est en cours de vérification. Réessaie très bientôt.`],
     demo:[ic("loc"),"","Mode démo","Branche la base Supabase pour activer les points."]
   }[r.why]||[ic("x"),"bad","Oups","Réessaie dans un instant."];
-  ckModal(`<div class="ck-ico ${t[1]}">${t[0]}</div><h2>${t[2]}</h2><p>${t[3]}</p><div class="row2">${r.why==="deja"?`<button data-x data-rank>Voir le classement</button>`:""}<button class="cy" data-x>OK</button></div>`);
+  ckModal(`<div class="ck-ico ${t[1]}">${t[0]}</div><h2>${t[2]}</h2><p>${t[3]}</p><div class="row2">${r.why==="deja"?`<button data-x data-rank>Voir le classement</button>`:""}${EMBARQUE&&r.why==="precision"&&window.HMGN&&HMGN.peutOuvrirReglages?`<button data-x data-hmgn-reglages>${HMGN.textes.ouvrirReglages}</button>`:""}<button class="cy" data-x>OK</button></div>`); /* [natif] */
 }
 function celebrate(c,r,before){
   const cols=[ACC,ACC1,ACC3,"#ffffff",ACC,"#ffffff"];
@@ -1374,6 +1384,7 @@ $("bZin").addEventListener("click",()=>map.zoomIn());
 $("bZout").addEventListener("click",()=>map.zoomOut());
 $("bHome").addEventListener("click",()=>fitFrance(true));
 $("bTiles").addEventListener("click",()=>{ setTiles(!tilesOn); store.set("hmg-tiles",tilesOn); });
+if(EMBARQUE) $("bTiles").hidden=true; /* [natif] */
 $("bList").addEventListener("click",()=>sheetMode==="list"?closeSheet():openList());
 map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
 
@@ -1409,7 +1420,8 @@ function acctDecode(txt){ const s=String(txt||"").toUpperCase().replace(/[IL]/g,
 const acctB64=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const acctUnB64=s=>{ try{ return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))))); }catch(e){ return null; } };
 function acctLink(){ const g=typeof gmS!=="undefined"?gmS.eq:{}, e={}; for(const k in g) if(g[k]) e[k]=g[k];
-  const p={v:voterId}; if(e.hero) p.g=e; const m=Object.keys(myVisits||{}); if(m.length) p.m=m; return location.origin+location.pathname+"#compte="+acctB64(p); }
+  const p={v:voterId}; if(e.hero) p.g=e; const m=Object.keys(myVisits||{}); if(m.length) p.m=m;
+  return (EMBARQUE?"https://hmgfitness.fr/":location.origin+location.pathname)+"#compte="+acctB64(p); } /* [natif] dans l'appli, l'adresse serait capacitor://localhost */
 /* ce que contient un lien ou un code collé */
 function acctParse(txt){ const t=String(txt||"").trim(), h=t.match(/#compte=([A-Za-z0-9_-]+)/)||t.match(/^compte=([A-Za-z0-9_-]+)$/);
   if(h){ const p=acctUnB64(h[1]); return p&&/^[0-9a-f]{32}$/.test(p.v||"")?p:null; }
@@ -1417,27 +1429,27 @@ function acctParse(txt){ const t=String(txt||"").trim(), h=t.match(/#compte=([A-
 async function acctPeek(v){ if(!LIVE) return null; try{ return await rpc("my_score",{p_voter:v}); }catch(e){ return null; } }
 function acctModalEl(){ let m=$("acctModal"); if(!m){ m=document.createElement("div"); m.className="modal acct-m"; m.id="acctModal"; document.body.appendChild(m);
     m.addEventListener("click",e=>{ if(e.target===m||e.target.closest("[data-acct-x]")) m.remove(); }); } return m; }
-/* la fenêtre « Mon compte » : sauvegarder (code + lien) ou retrouver un compte */
+/* la fenêtre « Mon compte » : sauvegarder (code + lien) ou retrouver un compte ([natif] dans l'appli : « appareil » au lieu de « navigateur ») */
 function acctModal(mode){
   const m=acctModalEl(), code=acctMyCode(), d=score.days||0;
   m.innerHTML=`<div class="card glass acct" role="dialog" aria-label="Mon compte HMG"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button>
     <div class="acct-tabs" role="tablist"><button role="tab" data-acct-tab="save" aria-selected="${mode!=="restore"}">Mon compte</button><button role="tab" data-acct-tab="restore" aria-selected="${mode==="restore"}">J'ai déjà un compte</button></div>
     ${mode!=="restore"?`<div class="acct-ico">${ic("shield")}</div><h2>Emporte ton compte partout</h2>
-    <p>Tes séances, tes points${psOn()?", ton pseudo":""} et ton héros sont liés à <b>ce navigateur</b>. Pour les retrouver dans un autre navigateur ou sur un autre téléphone, garde ton code secret.</p>
+    <p>Tes séances, tes points${psOn()?", ton pseudo":""} et ton héros sont liés à <b>${EMBARQUE?"cet appareil":"ce navigateur"}</b>. Pour les retrouver ${EMBARQUE?"sur un autre appareil":"dans un autre navigateur ou sur un autre téléphone"}, garde ton code secret.</p>
     <div class="acct-who"><b>${esc(myName())}</b><span>${d} séance${d>1?"s":""} · ${score.points||0} points</span></div>
     <div class="acct-code" aria-label="Ton code secret">${acctFmt(code).split(" ").map(g=>`<span>${g}</span>`).join(" ")}</div>
     <div class="acct-row"><button class="cy" data-acct-do="link">${ic("ext")} Envoyer mon lien</button><button data-acct-do="copy">${ic("check")} Copier le code</button></div>
-    <p class="acct-tip">Le plus simple : <b>Envoyer mon lien</b> (à toi-même, ou dans tes notes), puis ouvre-le dans l'autre navigateur. Ton compte arrive tout seul.</p>
+    <p class="acct-tip">Le plus simple : <b>Envoyer mon lien</b> (à toi-même, ou dans tes notes), puis ouvre-le ${EMBARQUE?"sur ton autre appareil":"dans l'autre navigateur"}. Ton compte arrive tout seul.</p>
     <p class="acct-warn">Ne le donne à personne : c'est la clé de ton compte.</p>`
     :`<div class="acct-ico">${ic("loc")}</div><h2>Retrouve ton compte</h2>
-    <p>Sur ton autre navigateur, ouvre ton profil puis <b>Mon compte</b>, et envoie-toi le lien. Tu peux aussi coller ici ton lien ou ton code secret.</p>
+    <p>Sur ton autre ${EMBARQUE?"appareil":"navigateur"}, ouvre ton profil puis <b>Mon compte</b>, et envoie-toi le lien. Tu peux aussi coller ici ton lien ou ton code secret.</p>
     <form id="acctForm" class="acct-form" autocomplete="off"><textarea id="acctIn" rows="2" placeholder="Colle ton lien ou ton code (28 caractères)" aria-label="Ton lien ou ton code" autocapitalize="characters" spellcheck="false"></textarea>
       <div id="acctMsg" class="acct-msg" aria-live="polite"></div><button class="cy" type="submit">Retrouver mon compte</button></form>
-    ${d?`<p class="acct-warn">Ce navigateur a déjà ${d} séance${d>1?"s":""} sous ${esc(myName())} : elles resteront sur l'autre compte.</p>`:""}`}
+    ${d?`<p class="acct-warn">${EMBARQUE?"Cet appareil":"Ce navigateur"} a déjà ${d} séance${d>1?"s":""} sous ${esc(myName())} : elles resteront sur l'autre compte.</p>`:""}`}
   </div>`;
   const f=$("acctForm"); if(f) f.addEventListener("submit",async e=>{ e.preventDefault(); const p=acctParse($("acctIn").value), msg=$("acctMsg");
     if(!p){ msg.textContent="Ce n'est pas un lien ou un code HMG valide. Vérifie qu'il est complet."; msg.className="acct-msg ko"; return; }
-    if(p.v===voterId){ msg.textContent="C'est déjà le compte de ce navigateur."; msg.className="acct-msg ok"; return; }
+    if(p.v===voterId){ msg.textContent=EMBARQUE?"C'est déjà le compte de cet appareil.":"C'est déjà le compte de ce navigateur."; /* [natif] */ msg.className="acct-msg ok"; return; }
     msg.textContent="Je cherche ton compte…"; msg.className="acct-msg"; const s=await acctPeek(p.v);
     if(s&&!s.no&&!s.days){ msg.textContent="Aucun compte trouvé avec ce code."; msg.className="acct-msg ko"; return; }
     acctAdopt(p,s); });
@@ -1460,7 +1472,7 @@ async function acctFromHash(){
   const nm=s&&s.no?(PSEUDOS[s.no]||"Machine "+s.no):"", d=s?s.days||0:0, here=score.days||0;
   const info=[s?d+" séance"+(d>1?"s":""):"", s&&s.points?s.points+" points":"", p.g&&p.g.hero?"ton héros t'attend":""].filter(Boolean).join(" · ");
   m.innerHTML=`<div class="card glass acct"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button><div class="acct-ico ok">${ic("check")}</div>
-    <h2>Content de te revoir${nm?`, <span class="gr">${esc(nm)}</span>`:""} !</h2><p>${info?info+". ":""}Ce navigateur va utiliser ce compte.</p>
+    <h2>Content de te revoir${nm?`, <span class="gr">${esc(nm)}</span>`:""} !</h2><p>${info?info+". ":""}${EMBARQUE?"Cet appareil":"Ce navigateur"} va utiliser ce compte.</p>
     ${here?`<p class="acct-warn">Les ${here} séance${here>1?"s":""} faites ici sous ${esc(myName())} restent sur l'autre compte.</p>`:""}
     <div class="acct-row"><button data-acct-x>Annuler</button><button class="cy" id="acctGo">C'est moi</button></div></div>`;
   $("acctGo").addEventListener("click",()=>acctAdopt(p,s));
@@ -1471,8 +1483,8 @@ document.addEventListener("click",async e=>{ const t=e.target;
   const a=t.closest&&t.closest("[data-acct-do]"); if(!a) return; const k=a.dataset.acctDo;
   if(k==="copy"){ try{ await navigator.clipboard.writeText(acctFmt(acctMyCode())); a.innerHTML=ic("check")+" Code copié"; }catch(err){ toast("Recopie ton code à la main, ou utilise « Envoyer mon lien ».",1); } }
   if(k==="link"){ const url=acctLink();
-    if(navigator.share){ try{ await navigator.share({title:"Mon compte HMG",text:"Mon lien secret HMG Fitness : ouvre-le dans ton autre navigateur pour retrouver ton compte. Ne le partage avec personne.",url}); return; }catch(err){ if(err&&err.name==="AbortError") return; } }
-    try{ await navigator.clipboard.writeText(url); a.innerHTML=ic("check")+" Lien copié"; toast("Lien copié : colle-le dans ton autre navigateur."); }catch(err){ prompt("Copie ton lien :",url); } }
+    if(navigator.share){ try{ await navigator.share({title:"Mon compte HMG",text:`Mon lien secret HMG Fitness : ouvre-le ${EMBARQUE?"sur ton autre appareil":"dans ton autre navigateur"} pour retrouver ton compte. Ne le partage avec personne.`,url}); return; }catch(err){ if(err&&err.name==="AbortError") return; } }
+    try{ await navigator.clipboard.writeText(url); a.innerHTML=ic("check")+" Lien copié"; toast(EMBARQUE?"Lien copié : ouvre-le sur ton autre appareil.":"Lien copié : colle-le dans ton autre navigateur."); } /* [natif] */catch(err){ prompt("Copie ton lien :",url); } }
 }, true);
 
 

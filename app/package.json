@@ -2,21 +2,43 @@
   "name": "hmg-fitness-appli",
   "version": "1.0.0",
   "private": true,
-  "description": "Appli HMG Fitness (Android + iPhone) : la même appli que hmgfitness.fr, dans une coque native Capacitor.",
+  "description": "Appli HMG Fitness (iPhone + Android) : tout le code du site est embarqué dans l'appli (www/, construit par build-www.js) ; seules les données viennent du réseau.",
   "scripts": {
-    "www": "node prepare-www.js",
+    "www": "node build-www.js",
     "android": "npm run www && npx cap add android && npx capacitor-assets generate --android --iconBackgroundColor '#05070d' --iconBackgroundColorDark '#05070d' --splashBackgroundColor '#05070d' --splashBackgroundColorDark '#05070d' && node native-setup.js android && npx cap sync android",
-    "ios": "npm run www && npx cap add ios && npx capacitor-assets generate --ios --iconBackgroundColor '#05070d' --splashBackgroundColor '#05070d' --splashBackgroundColorDark '#05070d' && node native-setup.js ios && npx cap sync ios"
+    "ios": "npm run www && npx cap add ios && npx capacitor-assets generate --ios --iconBackgroundColor '#05070d' --splashBackgroundColor '#05070d' --splashBackgroundColorDark '#05070d' && node native-setup.js ios && npx cap sync ios",
+    "sync": "npm run www && npx cap sync"
   },
   "dependencies": {
+    "@aparajita/capacitor-secure-storage": "8.0.1",
+    "@capacitor/action-sheet": "8.1.1",
     "@capacitor/android": "8.6.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/app-launcher": "8.0.1",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/clipboard": "8.0.1",
     "@capacitor/core": "8.6.2",
+    "@capacitor/dialog": "8.0.1",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/geolocation": "8.2.5",
+    "@capacitor/haptics": "8.0.2",
     "@capacitor/ios": "8.6.2",
+    "@capacitor/keyboard": "8.0.6",
+    "@capacitor/local-notifications": "8.3.1",
+    "@capacitor/network": "8.0.1",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/share": "8.0.3",
     "@capacitor/splash-screen": "8.0.2",
     "@capacitor/status-bar": "8.0.4"
   },
   "devDependencies": {
     "@capacitor/assets": "4.0.0",
-    "@capacitor/cli": "8.6.2"
+    "@capacitor/cli": "8.6.2",
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/space-grotesk": "5.3.0",
+    "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
