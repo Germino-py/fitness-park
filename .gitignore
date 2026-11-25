@@ -12,3 +12,5 @@ node_modules/
 *.cer
 *.mobileprovision
 *.b64
+# Espaces de travail des agents
+.claude/

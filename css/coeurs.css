@@ -1,0 +1,67 @@
+/* ================= LES CŒURS : dessin, bande de la semaine, bilan, coup de mou, retour, pause ================= */
+.cv-c{display:inline-block;vertical-align:middle;overflow:visible;flex:none}
+.cv-c.plein,.cv-c.danger{filter:drop-shadow(0 0 5px rgba(200,255,30,.45))}
+.cv-c.gele{filter:drop-shadow(0 0 5px rgba(127,227,255,.45))}
+.cv-c.danger{animation:cvBat 1.4s ease-in-out infinite;transform-origin:50% 60%}
+@keyframes cvBat{0%,60%,100%{transform:scale(1)}30%{transform:scale(1.08)}}
+.cv-c.perd{animation:cvPerd 1.2s cubic-bezier(.4,0,.6,1) forwards;transform-origin:50% 60%}
+@keyframes cvPerd{0%{transform:none;opacity:1}20%{transform:scale(1.06)}45%{transform:rotate(-12deg) translateY(4px)}100%{transform:rotate(12deg) translateY(40px) scale(.7);opacity:0}}
+.cv-c.respire{animation:cvResp .8s ease-out}
+@keyframes cvResp{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06);opacity:1}100%{transform:none}}
+.cv-c.gagne{animation:cvGagne .9s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cvGagne{0%{clip-path:inset(100% 0 0 0);transform:scale(.9)}55%{clip-path:inset(0 0 0 0);transform:scale(1)}75%{transform:scale(1.25)}100%{transform:none}}
+
+/* l'en-tête de l'Aventure */
+.gm-hud .cv-hearts{all:unset;cursor:pointer;display:flex;align-items:center;gap:3px;padding:0 4px;min-height:42px;-webkit-tap-highlight-color:transparent}
+body.coque .gm-hud .btns [data-gm="share"]{display:none}
+body.coque .gm-cta p{display:none}
+.cv-sem{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,1fr) auto;align-items:center;gap:2px;margin-top:6px;padding:7px 8px 6px;border-radius:14px;background:rgba(255,255,255,.04);cursor:pointer;position:relative}
+.cv-sem .d{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cv-sem .d small{font:700 9.5px var(--f-b);color:#7d889f;letter-spacing:.04em}
+.cv-sem .d i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.12)}
+.cv-sem .d.ok i{background:var(--volt,#c8ff1e);box-shadow:0 0 8px rgba(200,255,30,.6)}
+.cv-sem .d.courte i{background:transparent;box-shadow:inset 0 0 0 2px var(--volt,#c8ff1e)}
+.cv-sem .d.auj i{background:transparent;box-shadow:inset 0 0 0 2px #fff}
+.cv-sem .d.auj small{color:#fff}
+.cv-sem .d.repos i{background:rgba(147,160,184,.28)}
+.cv-sem .d.futur i{width:5px;height:5px;margin:3px 0}
+.cv-sem b{padding-left:10px;font:700 14px var(--f-d);color:#fff;white-space:nowrap}
+.cv-sem.ok{background:linear-gradient(90deg,rgba(200,255,30,.16),rgba(200,255,30,.05));box-shadow:inset 0 0 0 1px rgba(200,255,30,.35)}
+.cv-sem.ok b{color:var(--volt,#c8ff1e)}
+.cv-dg{grid-column:1/-1;margin-top:4px;font-size:12px;color:#e9ffb0}
+.cv-dg.doux{color:#9fdcf2}
+.cv-band{position:absolute;z-index:19;left:50%;transform:translateX(-50%);top:calc(var(--hud-b,190px));width:min(520px,calc(100% - 24px));display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;font-size:13px;color:#e8eefb;cursor:pointer}
+.cv-band b{margin-left:auto;color:var(--volt,#c8ff1e)}
+#game .gm-hud + .cv-band{margin-top:8px}
+
+/* plein écran commun : bilan, coup de mou, retour */
+.cv-plein{position:fixed;inset:0;z-index:2150;display:grid;place-items:center;padding:calc(24px + var(--sat,0px)) 22px calc(24px + var(--sab,0px));text-align:center;
+  background:radial-gradient(80% 50% at 50% 35%,rgba(200,255,30,.13),transparent 70%),rgba(5,7,13,.97);opacity:0;transition:opacity .3s}
+.cv-plein.on{opacity:1}.cv-plein.out{opacity:0}
+.cv-plein .in{width:min(420px,100%);display:flex;flex-direction:column;align-items:center}
+.cv-plein .kick{font:800 11px var(--f-b);letter-spacing:.28em;text-transform:uppercase;color:var(--volt,#c8ff1e)}
+.bl-ring{margin:18px 0 8px;width:132px;height:132px;border-radius:50%;display:grid;place-content:center;gap:0;background:conic-gradient(var(--volt,#c8ff1e) var(--p,100%),rgba(255,255,255,.08) 0);position:relative}
+.bl-ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:#07090f}
+.bl-ring>*{position:relative}
+.bl-ring b{font:700 44px/1 var(--f-d);color:#fff}.bl-ring span{font:600 15px var(--f-b);color:#9aa6bf;margin-top:-2px}.bl-ring small{font-size:11px;color:#7d889f}
+.bl-hearts{display:flex;gap:12px;justify-content:center;margin:16px 0 6px;min-height:56px}
+.bl-t{margin:14px 0 8px;font:700 28px/1.15 var(--f-d);color:#fff}
+.bl-t.big{font-size:40px;letter-spacing:.02em;background:linear-gradient(135deg,#f4ffc9,#c8ff1e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bl-p{margin:0 0 6px;color:#c3cbdc;font-size:15.5px;line-height:1.5}
+.bl-x{margin:2px 0 0;color:var(--volt,#c8ff1e);font:600 14px var(--f-b)}
+.cv-plein .cq-btn{margin-top:22px}
+.cv-plein.bilan .bl-t,.cv-plein.bilan .bl-p,.cv-plein.bilan .bl-x,.cv-plein.bilan .bl-go{opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+.cv-plein.bilan .in.txt .bl-t,.cv-plein.bilan .in.txt .bl-p,.cv-plein.bilan .in.txt .bl-x,.cv-plein.bilan .in.txt .bl-go{opacity:1;transform:none}
+.cv-plein .cv-x{all:unset;cursor:pointer;position:absolute;top:calc(12px + var(--sat,0px));right:14px;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:#9aa6bf}
+.cv-plein .cv-x svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2}
+.z-hero{position:relative;margin:4px 0 0;width:150px;filter:saturate(.7)}
+.z-hero svg{width:150px;height:auto}
+.z-hero .zz{position:absolute;top:6px;right:-6px;font:800 18px var(--f-d);color:#9fdcf2;animation:cvZz 2.4s ease-in-out infinite}
+@keyframes cvZz{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-8px);opacity:1}}
+.cv-plein .confetti{position:absolute;inset:0;pointer-events:none}
+.cv-plein .confetti i{position:absolute;left:50%;top:34%;width:7px;height:12px;border-radius:2px;opacity:0;animation:conf 1.3s cubic-bezier(.1,.7,.3,1) forwards}
+.cv-raisons{display:flex;flex-wrap:wrap;gap:8px}
+.cv-raisons button{all:unset;cursor:pointer;padding:9px 14px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#dfe6f5;font:600 13.5px var(--f-b);min-height:24px}
+.cv-raisons button[aria-pressed="true"]{border-color:var(--volt,#c8ff1e);color:var(--volt,#c8ff1e);background:rgba(200,255,30,.1)}
+.cq-sheet h2 .cv-c{margin-right:4px}
+@media (prefers-reduced-motion:reduce){ .cv-c.danger,.cv-c.perd,.cv-c.gagne,.cv-c.respire,.z-hero .zz{animation:none} .cv-c.perd{opacity:0;transition:opacity .2s} }

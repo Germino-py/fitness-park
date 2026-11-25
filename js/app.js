@@ -164,7 +164,9 @@ const FEATURES = [
   {k:"feat_app", t:"Appli sur le téléphone", d:"Une bulle « Installe l'appli HMG » propose d'ajouter HMG sur l'écran d'accueil, comme une vraie appli (icône HMG, plein écran, s'ouvre même sans réseau). Sur Android : installation en un appui. Sur iPhone : les 2 gestes expliqués avec une petite animation. Montrée une fois par semaine maximum.", def:false},
   {k:"visitor_visits", t:"Salles des visiteurs", d:"Chaque visiteur coche « J'y suis déjà allé » et voit ses salles en doré (« Visitée par moi »). Gardé seulement sur son appareil.", def:true},
 ];
-const featOn = k => { const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
+/* [coque] dans l'appli à onglets (js/onglets.js), le jeu, le profil, les pseudos, l'ange et les séances sont toujours là (pas d'interrupteur à distance pour Apple) */
+const COQUE_FEATS = ["feat_points","feat_welcome","feat_profile","feat_pseudo","feat_angel","feat_game"];
+const featOn = k => { if(COQUE_FEATS.includes(k)) return true; const f=FEATURES.find(x=>x.k===k), v=db.settings[k]; return v===true||v==="true"||((v===undefined||v===null)&&!!(f&&f.def)); };
 const feat = k => isAdmin() || featOn(k);
 const SCORE0 = {points:0,month:0,rank:null,rank_month:null,streak:0,today:null,clubs:0,days:0};
 let score = {...SCORE0, ...store.get("hmg-score", {})};

@@ -1,0 +1,114 @@
+/* ================= L'ACCUEIL DES NOUVEAUX : 8 écrans plein écran ================= */
+body.onb-on{overflow:hidden}
+body.onb-on #cqTabs{display:none}
+body.onb-on #toast{bottom:auto;top:calc(62px + var(--sat,0px))}
+#onb{position:fixed;inset:0;z-index:1990;display:flex;flex-direction:column;overflow:hidden;color:#fff;
+  background:radial-gradient(90% 55% at 50% 22%,rgba(200,255,30,.14),transparent 70%),radial-gradient(70% 40% at 80% 100%,rgba(127,227,255,.07),transparent 70%),#05070d;
+  padding:calc(10px + var(--sat,0px)) 0 calc(14px + var(--sab,0px));transition:opacity .35s}
+#onb.out{opacity:0;pointer-events:none}
+.onb-top{flex:none;display:flex;align-items:center;gap:10px;min-height:44px;padding:0 16px}
+.onb-back{all:unset;cursor:pointer;flex:none;width:44px;height:44px;margin-left:-10px;display:grid;place-items:center;border-radius:50%;color:#cfd6e6}
+.onb-back svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.onb-prog{flex:1;display:flex;gap:5px;max-width:360px;margin:0 auto}
+.onb-back + .onb-prog{margin-left:0}
+.onb-prog i{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.12);transition:background .3s}
+.onb-prog i.on{background:var(--volt,#c8ff1e);box-shadow:0 0 8px rgba(200,255,30,.45)}
+
+.onb-ecran{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;width:min(460px,100%);margin:0 auto;padding:8px 22px 0;box-sizing:border-box;
+  opacity:0;transform:translateX(18px);transition:opacity .32s ease,transform .32s ease}
+.onb-ecran.in{opacity:1;transform:none}
+.onb-ecran h1{margin:14px 0 8px;font:700 30px/1.12 var(--f-d);letter-spacing:.01em}
+.onb-ecran>p{margin:0 0 14px;color:#c3cbdc;font-size:16px;line-height:1.5}
+.onb-kick{display:block;margin-top:6px;font:800 11px var(--f-b);letter-spacing:.28em;text-transform:uppercase;color:var(--volt,#c8ff1e)}
+.onb-bas{margin-top:auto;padding-top:18px;padding-bottom:2px}
+.onb-mini{margin:10px 0 0;text-align:center;color:#8d98b0;font-size:12.5px;line-height:1.45}
+.onb-mini a{color:#dfe6f5;text-decoration:underline;text-decoration-color:rgba(200,255,30,.5)}
+
+/* 1 · bienvenue : le héros sur son chemin */
+.e1{text-align:center;align-items:center}
+.e1 h1{font-size:36px}
+.onb-scene{position:relative;width:100%;flex:1;min-height:220px;max-height:340px;display:grid;place-items:end center;margin-top:6px}
+.onb-scene svg{position:relative;z-index:1;width:min(210px,52vw);height:auto;filter:drop-shadow(0 14px 30px rgba(0,0,0,.5))}
+.onb-chemin{position:absolute;left:-22px;right:-22px;bottom:-6px;height:70px;
+  background:radial-gradient(60% 80% at 50% 0%,rgba(200,255,30,.28),transparent 70%);
+  -webkit-mask:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent);mask:linear-gradient(90deg,transparent,#000 20%,#000 80%,transparent)}
+.onb-chemin::before{content:"";position:absolute;left:50%;top:10px;width:70%;height:3px;transform:translateX(-50%);border-radius:3px;
+  background:repeating-linear-gradient(90deg,rgba(200,255,30,.7) 0 14px,transparent 14px 26px);animation:onbRoute 1.6s linear infinite}
+@keyframes onbRoute{to{background-position:-26px 0}}
+.e1 .onb-bas{width:100%}
+
+/* 2 · choix du héros */
+.onb-heros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 14px}
+.onb-heros button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 10px;border-radius:20px;
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);transition:border-color .2s,background .2s,transform .2s}
+.onb-heros button svg{width:100%;max-width:110px;height:auto;margin-bottom:4px}
+.onb-heros button b{font:700 15px var(--f-d)}
+.onb-heros button small{color:#8d98b0;font-size:11.5px;text-align:center;line-height:1.25}
+.onb-heros button[aria-checked="true"]{border-color:var(--volt,#c8ff1e);background:rgba(200,255,30,.09);box-shadow:0 0 0 3px rgba(200,255,30,.12),0 12px 30px rgba(200,255,30,.08)}
+.onb-heros button[aria-checked="false"] svg{opacity:.75}
+.onb-heros button:active{transform:scale(.97)}
+.onb-tons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 6px}
+.onb-tons button{all:unset;cursor:pointer;width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
+.onb-tons button i{width:32px;height:32px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.onb-tons button[aria-checked="true"] i{box-shadow:0 0 0 3px #05070d,0 0 0 5px var(--volt,#c8ff1e)}
+
+/* 3 · objectif et cœurs */
+.onb-coeurs{display:flex;justify-content:center;gap:14px;margin:10px 0 0}
+.onb-coeurs span{opacity:0;animation:onbCoeur .6s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes onbCoeur{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:none}}
+.e3 h1{text-align:center}.e3>p{text-align:center}
+.onb-regles{list-style:none;margin:0 0 4px;padding:12px 14px;display:grid;gap:9px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+.onb-regles li{display:flex;align-items:center;gap:10px;color:#dfe6f5;font-size:14px;line-height:1.35}
+.onb-regles .b{width:16px;height:16px;display:grid;place-items:center;flex:none;color:var(--volt,#c8ff1e)}
+.onb-regles .b svg{width:16px;height:16px;fill:currentColor;stroke:none}
+
+/* 4 · localisation : le radar */
+.onb-radar{position:relative;width:180px;height:180px;margin:18px auto 6px;display:grid;place-items:center}
+.onb-radar i{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(200,255,30,.5);animation:onbRadar 2.7s ease-out infinite;opacity:0}
+.onb-radar i:nth-child(2){animation-delay:.9s}.onb-radar i:nth-child(3){animation-delay:1.8s}
+@keyframes onbRadar{0%{transform:scale(.25);opacity:.9}100%{transform:scale(1);opacity:0}}
+.onb-radar span{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#e9ff9a,#c8ff1e 60%,#9ccc00);box-shadow:0 0 34px rgba(200,255,30,.5)}
+.onb-radar span svg{width:30px;height:30px;fill:none;stroke:#05070d;stroke-width:2.4}
+.onb-sur{display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;padding:12px 14px;border-radius:16px;background:rgba(127,227,255,.07);color:#cdeefa;font-size:14px;line-height:1.45}
+.onb-sur svg{flex:none;width:20px;height:20px;fill:none;stroke:#7fe3ff;stroke-width:2}
+
+/* 5 · la salle */
+.e5 .cq-gyms{margin:12px 0 0}
+
+/* 6 · notifications : un faux message */
+.onb-notif{display:flex;gap:12px;align-items:flex-start;margin:22px 0 10px;padding:13px 14px;border-radius:22px;text-align:left;
+  background:rgba(255,255,255,.1);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:0 16px 40px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.1);
+  animation:onbNotif .7s cubic-bezier(.2,1.3,.4,1) .2s both}
+@keyframes onbNotif{0%{opacity:0;transform:translateY(-26px) scale(.96)}100%{opacity:1;transform:none}}
+.onb-notif .ic{flex:none;width:38px;height:38px;border-radius:10px;background:url(../icons/icon-192.png) center/cover,#c8ff1e}
+.onb-notif div{display:grid;grid-template-columns:1fr auto;gap:1px 8px;min-width:0}
+.onb-notif b{font:700 12px var(--f-b);letter-spacing:.06em;color:#c9d1e2;text-transform:uppercase}
+.onb-notif small{color:#8d98b0;font-size:12px}
+.onb-notif strong,.onb-notif div>span{grid-column:1/-1}
+.onb-notif strong{font:700 15px var(--f-b);color:#fff}
+.onb-notif div>span{font-size:14px;color:#dfe6f5;line-height:1.35}
+
+/* 7 · pseudo */
+.e7 form{display:flex;flex-direction:column;flex:1}
+.e7 .ps-in input{font-size:19px}
+.e7 .ps-msg{min-height:20px;margin:8px 2px 0}
+
+/* 8 · le coffre de bienvenue */
+.e8{text-align:center;align-items:center}
+.onb-coffre{position:relative;width:170px;height:170px;margin:34px auto 10px;display:grid;place-items:center;animation:onbCoffre 2.2s ease-in-out infinite}
+.onb-coffre .glow{position:absolute;inset:-30px;border-radius:50%;background:radial-gradient(circle,rgba(255,206,84,.45),rgba(200,255,30,.12) 50%,transparent 70%);animation:onbLueur 2.2s ease-in-out infinite}
+.onb-coffre svg{position:relative;width:150px;height:150px;filter:drop-shadow(0 0 18px rgba(255,206,84,.55))}
+@keyframes onbCoffre{0%,100%{transform:translateY(0) rotate(0)}40%{transform:translateY(-6px) rotate(-3deg)}60%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes onbLueur{0%,100%{opacity:.7;transform:scale(.95)}50%{opacity:1;transform:scale(1.06)}}
+.e8 .onb-bas{width:100%}
+
+/* le bouton de l'Aventure, montré juste après l'accueil */
+.gm-go.onb-tip{animation:onbTip 1.1s ease-in-out 4;box-shadow:0 0 0 0 rgba(200,255,30,.6)}
+@keyframes onbTip{0%,100%{box-shadow:0 0 0 0 rgba(200,255,30,.55)}50%{box-shadow:0 0 0 14px rgba(200,255,30,0)}}
+
+@media (max-height:640px){ .onb-ecran h1{font-size:26px} .e1 h1{font-size:30px} .onb-scene{min-height:160px} .onb-radar{width:130px;height:130px;margin-top:6px} .onb-coffre{margin-top:14px} }
+@media (prefers-reduced-motion:reduce){
+  .onb-ecran{transition:opacity .2s;transform:none}
+  .onb-chemin::before,.onb-radar i,.onb-coffre,.onb-coffre .glow,.gm-go.onb-tip,.onb-notif{animation:none}
+  .onb-coeurs span{animation:none;opacity:1} .onb-radar i:first-child{opacity:.5}
+}
