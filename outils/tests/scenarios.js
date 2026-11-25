@@ -201,12 +201,13 @@ const SCENARIOS = [
     ["objectif", T(2, 3, "08:02"), 9], ["verifie", { "ok": false, "why": "hors_limites" }]] },
   { nom: "Séance : une seule par jour, hors rayon, précision, pas d'objectif", etapes: [
     ["debut", T(0, 1, "09:00"), { lat: 48.8354, lon: 2.63, acc: 20 }], ["verifie", { "ok": false, "why": "objectif" }],
-    ["objectif", T(0, 1, "10:00"), 3],
+    ["objectif", T(0, 1, "10:00"), 3], ["verifie", { "state.last_day": null }],
     ["debut", T(0, 1, "11:00"), { lat: 48.8354, lon: 2.60, acc: 20 }], ["verifie", { "ok": false, "why": "loin", "club": "lognes", "dist": 2196 }],
     ["debut", T(0, 1, "11:01"), { lat: 48.8354, lon: 2.63, acc: 400 }], ["verifie", { "ok": false, "why": "precision", "acc": 400 }],
     S(0, 1, "12:00"), ["verifie", { "ok": true, "points": 10, "chest_due": false }],
     ["debut", T(0, 1, "19:00"), { lat: 48.8355, lon: 2.6301, acc: 20 }], ["verifie", { "ok": false, "why": "deja", "club": "lognes" }],
-    ["etat", T(0, 1, "19:05")], ["verifie", { "today.status": "validee", "today.club": "lognes", "week.days.0.d": L(0) }]] },
+    ["etat", T(0, 1, "19:05")], ["verifie", { "today.status": "validee", "today.club": "lognes", "week.days.0.d": L(0), "last_day": L(0) }],
+    ["etat", T(3, 2, "10:00")], ["verifie", { "last_day": L(0), "today": null }]] },
   { nom: "Toutes les salles de France : une salle OpenStreetMap vaut une Fitness Park ; la salle proposée par l'appli", etapes: [
     ["objectif", T(0, 1, "10:00"), 2], S(0, 2, "18:00", 50, "osm-n1001"),
     ["verifie", { "ok": true, "state.today.club": "osm-n1001", "state.today.club_name": "Basic-Fit Noisiel" }],

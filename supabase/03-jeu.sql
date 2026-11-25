@@ -718,7 +718,7 @@ begin
     'pause', pzj, 'pause_next', pzn,
     'pause_left_52', greatest(0, app.cfgi('pause_weeks_per_52', 6) - case when has_p then app.pause_used_52(p_voter, cw) else 0 end),
     'quests', qj, 'unseen_bilan', ub, 'chests', ch,
-    'usual_hour', uh, 'points_month', ptsm, 'rank_month', rkm,
+    'usual_hour', uh, 'last_day', (select max(day) from checkins where voter = p_voter), 'points_month', ptsm, 'rank_month', rkm,
     -- en plus du §14.10
     'onboarded', has_p, 'player', p_voter is not null, 'no', pno, 'pseudo', ppseudo, 'seed', pseed,
     'weeks_ok', case when has_p then p.weeks_ok else 0 end, 'phoenix', has_p and p.phoenix,
