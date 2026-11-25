@@ -60,8 +60,11 @@ on conflict (key) do nothing;
 -- -----------------------------------------------------------------------------------------------------
 -- 2. Tables
 -- -----------------------------------------------------------------------------------------------------
--- 2.1 Fuseau de chaque salle (outre-mer), déduit de sa position ; tenu à jour par un déclencheur
-alter table public.club_geo add column if not exists tz text not null default 'Europe/Paris';
+-- 2.1 Les salles où une séance peut être validée : TOUTES les salles de sport de France (décision de Mino), pas
+--     seulement les Fitness Park. Contenu de départ : les Fitness Park déjà placées (club_geo, ci-dessous), puis
+--     05-salles-fitness-park.sql (noms, adresses, positions approchées des autres). Les autres salles viendront
+--     d'OpenStreetMap (outils/salles.py, voir LISEZMOI.md). Données publiques : lisibles par tous, écrites par
+--     l'admin seulement. Les anciennes RPC du site (checkin) gardent club_geo et ne changent pas.
 create or replace function app.tz_for(lat double precision, lon double precision) returns text language sql immutable as $$
   select case
     when lat between 15.8 and 16.6 and lon between -61.9 and -60.9 then 'America/Guadeloupe'
@@ -71,14 +74,47 @@ create or replace function app.tz_for(lat double precision, lon double precision
     when lat between -13.1 and -12.6 and lon between 44.9 and 45.4 then 'Indian/Mayotte'
     else 'Europe/Paris' end
 $$;
-create or replace function app.trg_club_tz() returns trigger language plpgsql as $$
+create table if not exists public.gyms (
+  id text primary key check (id ~ '^[a-z0-9-]{1,80}$'),   -- Fitness Park : l'identifiant du site ; OSM : 'osm-n123', 'osm-w456'
+  name text not null check (char_length(name) between 1 and 120),
+  brand text check (char_length(brand) <= 60),
+  address text check (char_length(address) <= 200),
+  postcode text check (char_length(postcode) <= 10),
+  city text check (char_length(city) <= 80),
+  lat double precision not null check (lat between -90 and 90),
+  lon double precision not null check (lon between -180 and 180),
+  tz text not null default 'Europe/Paris',                 -- déduit de la position (outre-mer), par déclencheur
+  source text not null default 'admin' check (source in ('fitnesspark', 'osm', 'admin')),
+  osm_ref text unique check (osm_ref ~ '^(node|way|relation)/[0-9]+$'),
+  precise boolean not null default true,                   -- false : position approchée, à vérifier
+  active boolean not null default true,                    -- false : fermée ou pas encore ouverte (aucune nouvelle séance)
+  updated_at timestamptz not null default now()
+);
+create index if not exists gyms_lat_lon on public.gyms (lat, lon) where active;
+create or replace function app.trg_gym() returns trigger language plpgsql as $$
 begin
-  if new.lat is not null and new.lon is not null then new.tz := app.tz_for(new.lat, new.lon); end if;
+  new.tz := app.tz_for(new.lat, new.lon);
+  new.updated_at := now();
   return new;
 end $$;
-drop trigger if exists club_geo_tz on public.club_geo;
-create trigger club_geo_tz before insert or update of lat, lon on public.club_geo for each row execute function app.trg_club_tz();
-update public.club_geo set tz = app.tz_for(lat, lon) where lat is not null and lon is not null and tz is distinct from app.tz_for(lat, lon);
+drop trigger if exists gyms_tz on public.gyms;
+create trigger gyms_tz before insert or update on public.gyms for each row execute function app.trg_gym();
+-- Une position de Fitness Park enregistrée par l'admin sur le site (club_geo) met la salle à jour ici aussi
+create or replace function app.trg_club_geo_gym() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.lat is null or new.lon is null then return new; end if;
+  insert into gyms (id, name, brand, lat, lon, source, precise)
+    values (new.club_id, 'Fitness Park ' || initcap(replace(new.club_id, '-', ' ')), 'Fitness Park', new.lat, new.lon, 'fitnesspark', true)
+  on conflict (id) do update set lat = excluded.lat, lon = excluded.lon, precise = true where gyms.source = 'fitnesspark';
+  return new;
+end $$;
+drop trigger if exists club_geo_gym on public.club_geo;
+create trigger club_geo_gym after insert or update of lat, lon on public.club_geo for each row execute function app.trg_club_geo_gym();
+insert into public.gyms (id, name, brand, lat, lon, source, precise)
+  select club_id, 'Fitness Park ' || initcap(replace(club_id, '-', ' ')), 'Fitness Park', lat, lon, 'fitnesspark', true
+    from public.club_geo where lat is not null and lon is not null
+  on conflict (id) do update set lat = excluded.lat, lon = excluded.lon, precise = true
+   where gyms.source = 'fitnesspark' and (gyms.lat, gyms.lon, gyms.precise) is distinct from (excluded.lat, excluded.lon, true);
 
 -- 2.2 Séances validées : quelques colonnes de plus (les anciennes RPC du site les laissent à leur valeur par défaut)
 alter table public.checkins add column if not exists flags text[] not null default '{}';
@@ -89,7 +125,7 @@ alter table public.checkins add column if not exists session_id bigint;
 create table if not exists public.profiles (
   voter text primary key references public.players on delete cascade,
   tz text not null default 'Europe/Paris',
-  home_club_id text references public.club_geo on delete set null,
+  home_club_id text references public.gyms on delete set null,
   birth_year smallint check (birth_year between 1900 and 2100),
   soft_mode boolean not null default false,              -- « Jouer sans cœurs » (imposé aux moins de 18 ans)
   created_at timestamptz not null,
@@ -419,8 +455,8 @@ begin
   if p.home_club_id is not null then
     pb := pb || 'fidele'::text;
     if extract(week from w)::int % 4 = app.gm_hash(seed) % 4
-       and exists (select 1 from club_geo h, club_geo o where h.club_id = p.home_club_id and o.club_id <> h.club_id
-                     and o.lat is not null and app.dist_m(h.lat, h.lon, o.lat, o.lon) < 20000) then
+       and exists (select 1 from gyms h, gyms o where h.id = p.home_club_id and o.id <> h.id and o.active
+                     and o.lat between h.lat - 0.2 and h.lat + 0.2 and app.dist_m(h.lat, h.lon, o.lat, o.lon) < 20000) then
       pb := pb || 'explo'::text;
     end if;
   end if;
@@ -581,7 +617,7 @@ $$;
 create or replace function app.state_json(p_voter text) returns json language plpgsql stable set search_path = public as $$
 declare p public.profiles; has_p boolean := false; pno int; ppseudo text; pseed text; tz text := 'Europe/Paris'; today date; cw date; isod int;
         hmax int := app.cfgi('hearts_max', 3); steps int := 0; stars int := 0; lvl int; g int; gnext int; k text; ge int; se int;
-        nv int := 0; nc int := 0; s int; days json; sess json; tod json; pz public.pauses; pzj json; qj json := '[]'; ub json; ch json := '[]';
+        nv int := 0; nc int := 0; s int; days json; sess json; tod json; pz public.pauses; pzj json; pzn json; qj json := '[]'; ub json; ch json := '[]';
         uh text := '18:00'; mois date; ptsm int := 0; lbp int; rkm int; conva int := 0; gfrom date; minor boolean := false;
 begin
   if p_voter is not null then
@@ -606,11 +642,12 @@ begin
     select json_build_object('id', id, 'status', status, 'started_at', app.iso(started_at),
                              'confirm_from', app.iso(started_at + make_interval(mins => app.cfgi('session_min_minutes', 20))),
                              'confirm_until', app.iso(started_at + make_interval(mins => app.cfgi('session_max_minutes', 180))),
-                             'club', club_id) into sess
+                             'club', club_id, 'club_name', (select name from gyms where id = club_id)) into sess
       from sessions where voter = p_voter and status = 'ouverte' order by started_at desc limit 1;
-    select json_build_object('club', club_id, 'status', 'validee', 'points', points) into tod from checkins where voter = p_voter and day = today;
+    select json_build_object('club', club_id, 'club_name', (select name from gyms where id = club_id), 'status', 'validee', 'points', points)
+      into tod from checkins where voter = p_voter and day = today;
     if tod is null then
-      select json_build_object('club', club_id, 'status', status, 'points', 0) into tod
+      select json_build_object('club', club_id, 'club_name', (select name from gyms where id = club_id), 'status', status, 'points', 0) into tod
         from sessions where voter = p_voter and day = today and status in ('courte', 'rejetee');
     end if;
     with t as (select (extract(hour from l) * 60 + extract(minute from l))::int m from (
@@ -641,8 +678,14 @@ begin
       select count(*) into conva from app.counted(p_voter) c
        where c.day >= p.sick_since and c.day >= today - (app.cfgi('heal_window_days', 7) - 1) and c.day <= today;
     end if;
-    select * into pz from pauses where voter = p_voter and (end_week is null or end_week >= cw) order by start_week limit 1;
-    if pz.id is not null then pzj := json_build_object('kind', pz.kind, 'start_week', pz.start_week, 'end_week', pz.end_week); end if;
+    -- pause : celle qui couvre la semaine en cours ; pause_next : celle qui commence un lundi prochain (demandée
+    -- du jeudi au dimanche). until : le lundi où le héros reprend ; null pour une hibernation (sans fin prévue)
+    pz := app.pause_at(p_voter, cw);
+    if pz.id is not null then
+      pzj := json_build_object('kind', pz.kind, 'start_week', pz.start_week, 'end_week', pz.end_week, 'until', pz.end_week + 7);
+    end if;
+    select json_build_object('kind', kind, 'start_week', start_week, 'end_week', end_week, 'until', end_week + 7) into pzn
+      from pauses where voter = p_voter and start_week > cw order by start_week limit 1;
     if (app.pause_at(p_voter, cw)).id is null then
       select coalesce(json_agg(json_build_object('slot', slot, 'key', quest_key, 'reward', reward, 'done', done_at is not null) order by slot), '[]')
         into qj from quests where voter = p_voter and week = cw;
@@ -672,7 +715,7 @@ begin
     'week', json_build_object('start', cw, 'kind', coalesce(k, 'essai'), 'g', ge, 'safe', se, 'v', nv, 'c', nc, 's', s,
                               'days_left', 8 - isod, 'days', days),
     'session', sess, 'today', tod,
-    'pause', pzj,
+    'pause', pzj, 'pause_next', pzn,
     'pause_left_52', greatest(0, app.cfgi('pause_weeks_per_52', 6) - case when has_p then app.pause_used_52(p_voter, cw) else 0 end),
     'quests', qj, 'unseen_bilan', ub, 'chests', ch,
     'usual_hour', uh, 'points_month', ptsm, 'rank_month', rkm,
@@ -806,7 +849,7 @@ create or replace function public.session_start(p_lat double precision, p_lon do
                                                 p_meta jsonb default '{}'::jsonb) returns json
   language plpgsql security definer set search_path = public as $$
 declare v text; p public.profiles; c record; d double precision; jour date; fl text[] := '{}'; s record; meta jsonb := coalesce(p_meta, '{}');
-        lh text; nref int; last_at timestamptz; prev record; km double precision; nid bigint; t0 timestamptz := app.now();
+        lh text; nref int; last_at timestamptz; prev record; km double precision; nid bigint; t0 timestamptz := app.now(); r double precision;
 begin
   perform app.require_access();
   v := app.ensure_player();
@@ -832,14 +875,22 @@ begin
   if found then
     return json_build_object('ok', false, 'why', 'en_cours', 'session', (app.state_json(v) -> 'session'));
   end if;
-  select club_id, lat, lon, tz, app.dist_m(p_lat, p_lon, lat, lon) dd into c from club_geo
-   where lat is not null and lon is not null order by 5 limit 1;
+  -- la salle : celle que l'appli propose (p_meta.club) si elle est dans le rayon, sinon la plus proche ;
+  -- recherche dans un carré d'environ 5 km d'abord (index), puis partout (seulement pour dire « tu es à 12 km »)
+  r := app.cfgi('radius_base_m', 200) + least(p_acc, app.cfgi('radius_acc_bonus_max_m', 100));
+  select x.* into c from (
+    select id club_id, name, lat, lon, tz, app.dist_m(p_lat, p_lon, lat, lon) dd from gyms
+     where active and lat between p_lat - 0.05 and p_lat + 0.05 and lon between p_lon - 0.08 and p_lon + 0.08) x
+   order by case when x.club_id = meta ->> 'club' and x.dd <= r then 0 else 1 end, x.dd limit 1;
+  if not found then
+    select id club_id, name, lat, lon, tz, app.dist_m(p_lat, p_lon, lat, lon) dd into c from gyms where active order by 6 limit 1;
+  end if;
   if not found then return json_build_object('ok', false, 'why', 'salle'); end if;
   d := c.dd;
-  if d > app.cfgi('radius_base_m', 200) + least(p_acc, app.cfgi('radius_acc_bonus_max_m', 100)) then
+  if d > r then
     insert into session_attempts (voter, at, why, club_id, dist_m, acc_m)
       values (v, t0, 'loin', c.club_id, case when d < 2000 then (round(d / 10) * 10)::int end, round(p_acc));
-    return json_build_object('ok', false, 'why', 'loin', 'dist', round(d), 'club', c.club_id);
+    return json_build_object('ok', false, 'why', 'loin', 'dist', round(d), 'club', c.club_id, 'club_name', c.name);
   end if;
   jour := (t0 at time zone c.tz)::date;
   if exists (select 1 from checkins where voter = v and day = jour) or exists (select 1 from sessions where voter = v and day = jour) then
@@ -855,7 +906,7 @@ begin
   if p_acc <= 3 then fl := fl || 'precis'::text; end if;
   if extract(hour from (t0 at time zone c.tz)) < 5 then fl := fl || 'nuit'::text; end if;
   if exists (select 1 from sessions where voter = v and loc_hash = lh) then fl := fl || 'meme_pos'::text; end if;
-  select x.started_at, g.lat, g.lon into prev from sessions x join club_geo g on g.club_id = x.club_id
+  select x.started_at, g.lat, g.lon into prev from sessions x join gyms g on g.id = x.club_id
    where x.voter = v and x.started_at > t0 - interval '3 hours' and x.club_id <> c.club_id order by x.started_at desc limit 1;
   if found then
     km := app.dist_m(prev.lat, prev.lon, c.lat, c.lon) / 1000;
@@ -864,7 +915,7 @@ begin
   insert into sessions (voter, club_id, day, week, started_at, start_dist_m, start_acc_m, loc_hash, flags)
     values (v, c.club_id, jour, app.monday(jour), t0, round(d), round(p_acc), lh, fl) returning id into nid;
   insert into session_attempts (voter, at, why, club_id, dist_m, acc_m) values (v, t0, 'ok', c.club_id, (round(d / 10) * 10)::int, round(p_acc));
-  return json_build_object('ok', true, 'dist', round(d), 'club', c.club_id, 'session', (app.state_json(v) -> 'session'),
+  return json_build_object('ok', true, 'dist', round(d), 'club', c.club_id, 'club_name', c.name, 'session', (app.state_json(v) -> 'session'),
                            'state', app.state_json(v));
 end $$;
 
@@ -901,7 +952,8 @@ begin
     insert into session_attempts (voter, at, why, club_id, acc_m) values (v, t0, 'fin_precision', s.club_id, least(round(coalesce(p_acc, 9999)), 9999));
     return json_build_object('ok', false, 'why', 'precision', 'acc', least(round(coalesce(p_acc, 9999)), 9999));
   end if;
-  select lat, lon into c from club_geo where club_id = s.club_id;
+  select lat, lon into c from gyms where id = s.club_id;               -- même fermée depuis : la séance commencée se termine
+  if not found then return json_build_object('ok', false, 'why', 'salle'); end if;
   d := app.dist_m(p_lat, p_lon, c.lat, c.lon);
   if d > app.cfgi('radius_base_m', 200) + least(p_acc, app.cfgi('radius_acc_bonus_max_m', 100)) then
     insert into session_attempts (voter, at, why, club_id, dist_m, acc_m)
@@ -1024,7 +1076,7 @@ begin
   if p_club is null then
     update profiles set home_club_id = null, tz = 'Europe/Paris', updated_at = now() where voter = v;
   else
-    select tz into z from club_geo where club_id = p_club;
+    select tz into z from gyms where id = p_club;
     if not found then return json_build_object('ok', false, 'why', 'salle'); end if;
     update profiles set home_club_id = p_club, tz = z, updated_at = now() where voter = v;
   end if;
@@ -1151,6 +1203,68 @@ begin
   return json_build_object('ok', true, 'version', nv);
 end $$;
 
+-- 8.12 Les salles : les plus proches (choix de « ma salle », carte) et la recherche par nom, ville ou code postal.
+--      La table gyms est aussi lisible directement (GET /rest/v1/gyms?select=…), ce sont des données publiques.
+create or replace function app.fold(t text) returns text language sql immutable
+  as $$ select translate(lower(coalesce(t, '')), 'àâäáãåçéèêëíìîïñóòôöõúùûüýÿœæ''’-', 'aaaaaaceeeeiiiinooooouuuuyyoe   ') $$;
+create or replace function app.gym_json(g public.gyms, p_dist double precision) returns json language sql stable as $$
+  select json_build_object('id', g.id, 'name', g.name, 'brand', g.brand, 'address', g.address, 'postcode', g.postcode, 'city', g.city,
+                           'lat', g.lat, 'lon', g.lon, 'tz', g.tz, 'active', g.active, 'precise', g.precise,
+                           'dist', case when p_dist is not null then round(p_dist) end)
+$$;
+create or replace function public.gyms_near(p_lat double precision, p_lon double precision, p_limit integer default 20) returns json
+  language plpgsql stable security definer set search_path = public as $$
+declare n int := greatest(1, least(coalesce(p_limit, 20), 100));
+begin
+  perform app.require_access();
+  if p_lat is null or p_lon is null or not (p_lat between -90 and 90) or not (p_lon between -180 and 180) then return '[]'::json; end if;
+  return (select coalesce(json_agg(app.gym_json(x.g, x.dd) order by x.dd), '[]'::json) from (
+            select g, app.dist_m(p_lat, p_lon, g.lat, g.lon) dd from gyms g
+             where g.lat between p_lat - 0.5 and p_lat + 0.5 and g.lon between p_lon - 0.8 and p_lon + 0.8
+             order by 2 limit n) x);
+end $$;
+create or replace function public.gyms_search(p_q text, p_limit integer default 20) returns json
+  language plpgsql stable security definer set search_path = public as $$
+declare q text := btrim(app.fold(p_q)); n int := greatest(1, least(coalesce(p_limit, 20), 50));
+begin
+  perform app.require_access();
+  if char_length(q) < 2 or char_length(q) > 60 then return '[]'::json; end if;
+  return (select coalesce(json_agg(app.gym_json(x.g, null) order by x.rk, (x.g).name), '[]'::json) from (
+            select g, case when g.postcode = q or app.fold(g.city) = q then 0 when app.fold(g.name) like q || '%' then 1 else 2 end rk
+              from gyms g
+             where app.fold(g.name || ' ' || coalesce(g.brand, '') || ' ' || coalesce(g.city, '') || ' ' || coalesce(g.postcode, '')) like '%' || q || '%'
+             order by 2, g.name limit n) x);
+end $$;
+
+-- Pour Mino (SQL Editor) ou l'outil outils/salles.py : ajouter ou mettre à jour des salles d'un coup, depuis un
+-- tableau JSON [{"id","name","brand","address","postcode","city","lat","lon","source","osm_ref","precise","active"}].
+-- Une salle OSM à moins de 150 m d'une Fitness Park de même enseigne n'est pas ajoutée (doublon). Rend le nombre écrit.
+create or replace function app.import_gyms(p_rows jsonb) returns integer language plpgsql set search_path = public as $$
+declare r jsonb; n int := 0; src text;
+begin
+  for r in select * from jsonb_array_elements(coalesce(p_rows, '[]')) loop
+    src := coalesce(r ->> 'source', 'admin');
+    continue when r ->> 'id' is null or r ->> 'name' is null or r ->> 'lat' is null or r ->> 'lon' is null;
+    if src = 'osm' and app.fold(coalesce(r ->> 'brand', r ->> 'name')) like '%fitness park%' and exists (
+         select 1 from gyms g where g.source = 'fitnesspark' and g.lat between (r ->> 'lat')::float8 - 0.01 and (r ->> 'lat')::float8 + 0.01
+            and app.dist_m(g.lat, g.lon, (r ->> 'lat')::float8, (r ->> 'lon')::float8) < 150) then
+      continue;
+    end if;
+    insert into gyms (id, name, brand, address, postcode, city, lat, lon, source, osm_ref, precise, active)
+      values (r ->> 'id', left(r ->> 'name', 120), left(r ->> 'brand', 60), left(r ->> 'address', 200), left(r ->> 'postcode', 10),
+              left(r ->> 'city', 80), (r ->> 'lat')::float8, (r ->> 'lon')::float8, src, r ->> 'osm_ref',
+              coalesce((r ->> 'precise')::boolean, true), coalesce((r ->> 'active')::boolean, true))
+    on conflict (id) do update set name = excluded.name, brand = excluded.brand, address = excluded.address, postcode = excluded.postcode,
+      city = excluded.city, active = excluded.active, osm_ref = excluded.osm_ref,
+      -- une position précise (club_geo, admin) n'est jamais remplacée par une position approchée
+      lat = case when gyms.precise and not excluded.precise then gyms.lat else excluded.lat end,
+      lon = case when gyms.precise and not excluded.precise then gyms.lon else excluded.lon end,
+      precise = gyms.precise or excluded.precise;
+    n := n + 1;
+  end loop;
+  return n;
+end $$;
+
 -- -----------------------------------------------------------------------------------------------------
 -- 9. Admin et tâches planifiées
 -- -----------------------------------------------------------------------------------------------------
@@ -1200,7 +1314,7 @@ end $$;
 do $$
 declare t text; f regprocedure; s text;
 begin
-  foreach t in array array['profiles', 'goal_history', 'sessions', 'session_attempts', 'weekly_results', 'pauses',
+  foreach t in array array['gyms', 'profiles', 'goal_history', 'sessions', 'session_attempts', 'weekly_results', 'pauses',
                            'quests', 'star_ledger', 'chest_grants', 'game_saves'] loop
     execute format('alter table public.%I enable row level security', t);
     execute format('revoke all on public.%I from public, anon, authenticated', t);
@@ -1224,11 +1338,17 @@ begin
     'public.pause_start(text, integer)', 'public.pause_end()', 'public.set_soft_mode(boolean)', 'public.set_birth_year(integer)',
     'public.set_home_club(text)', 'public.ack_bilan(date)', 'public.open_chest(text, boolean)', 'public.leaderboard_v2(text)',
     'public.prev_week_v2()', 'public.load_game()', 'public.save_game(text, jsonb, integer)',
+    'public.gyms_near(double precision, double precision, integer)', 'public.gyms_search(text, integer)',
     'public.admin_suspects(integer)', 'public.admin_reject_session(bigint)'] loop
     execute format('revoke all on function %s from public, anon, authenticated', f);
     execute format('grant execute on function %s to authenticated', f);
   end loop;
 end $$;
+
+-- Les salles sont publiques : lecture seule pour tous (le site, l'appli, même sans compte), écriture admin
+drop policy if exists "salles: lecture" on public.gyms;
+create policy "salles: lecture" on public.gyms for select to anon, authenticated using (true);
+grant select on public.gyms to anon, authenticated;
 
 notify pgrst, 'reload schema';
 commit;

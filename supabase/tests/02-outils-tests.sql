@@ -36,3 +36,7 @@ create or replace function tests.compte(p_user uuid, p_invite boolean default tr
   insert into public.access_grants (user_id, via) select p_user, 'admin' where p_invite on conflict do nothing;
 $$;
 grant execute on all functions in schema tests to public;
+-- La dernière séance commencée par le compte connecté (pour « J'ai fini » dans les scénarios)
+create or replace function tests.derniere_seance() returns bigint language sql security definer
+  as $$ select max(id) from public.sessions where voter = (select voter from public.players where user_id = auth.uid()) $$;
+grant execute on function tests.derniere_seance() to public;
