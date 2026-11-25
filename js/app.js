@@ -1387,7 +1387,13 @@ map.on("click",()=>{ if(sheetMode==="club") closeSheet(); });
    La collection de l'aventure se reconstruit à l'identique (tirages déterministes à partir de la clé). */
 const ACB32="0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 /* héros + peau dans le code : liste à ne jamais réordonner (on ajoute seulement à la fin), sinon les anciens codes changent de héros */
-const acctHeroes=()=>typeof GM_HEROES==="undefined"?[]:[...GM_HEROES.map(h=>h.k),...Object.keys(GM_LG)].flatMap(h=>["clair","fonce"].map(t=>[h,t]));
+/* [heros] liste figée : les 14 premières entrées sont exactement celles des codes déjà donnés (3 héros puis 4 légendes, clair/foncé) ;
+   les teintes Hâlée/Titane (hale) et Mate/Cuivre (brun) du 25/11/2026 viennent après. 28 entrées : l'index (1 à 28) tient dans un caractère (31 au plus). */
+const ACCT_HEROES=[["homme","clair"],["homme","fonce"],["femme","clair"],["femme","fonce"],["robot","clair"],["robot","fonce"],
+  ["l_masse","clair"],["l_masse","fonce"],["l_classique","clair"],["l_classique","fonce"],["l_coach","clair"],["l_coach","fonce"],["l_reine","clair"],["l_reine","fonce"],
+  ["homme","hale"],["homme","brun"],["femme","hale"],["femme","brun"],["robot","hale"],["robot","brun"],
+  ["l_masse","hale"],["l_masse","brun"],["l_classique","hale"],["l_classique","brun"],["l_coach","hale"],["l_coach","brun"],["l_reine","hale"],["l_reine","brun"]];
+const acctHeroes=()=>ACCT_HEROES; /* [/heros] */
 const acctHeroIdx=(eq)=>{ if(!eq||!eq.hero) return 0; const i=acctHeroes().findIndex(([h,t])=>h===eq.hero&&t===(eq.tone||"clair")); return i<0||i>30?0:i+1; };
 function acctCode(hex,hi){ let bits=""; for(const c of hex) bits+=parseInt(c,16).toString(2).padStart(4,"0"); bits+="00";
   let s=""; for(let i=0;i<130;i+=5) s+=ACB32[parseInt(bits.slice(i,i+5),2)];
