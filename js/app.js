@@ -40,7 +40,7 @@ addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = 
 addEventListener("appinstalled", () => { store.set("hmg-app-installed", 1); const b=$("appInv"); if(b) b.remove(); toast("HMG est sur ton écran d'accueil 💪"); });
 addEventListener("offline", () => toast("Hors connexion : la carte reste là, les avis reviendront avec le réseau.", 1));
 addEventListener("online", () => toast("De retour en ligne ✅"));
-if(IS_APP) document.addEventListener("pointerdown", e => { if(navigator.vibrate && e.target.closest && e.target.closest("button")) try{ navigator.vibrate(8); }catch(_){} }, {passive:true});
+if(IS_APP && !EMBARQUE) document.addEventListener("pointerdown", e => { if(navigator.vibrate && e.target.closest && e.target.closest("button")) try{ navigator.vibrate(8); }catch(_){} }, {passive:true}); /* [natif] dans l'appli, toucher un bouton ne vibre pas (3-ux-appli §5.1) */
 const APP_ICON = "icons/icon-192.png";
 function appInvite(force){
   if(EMBARQUE) return; /* [natif] déjà dans l'appli */

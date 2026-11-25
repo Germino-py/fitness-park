@@ -228,23 +228,25 @@ async function ouvrir(url) {
 
 /* ================= STOCKAGE SÛR (trousseau iOS, Keystore Android) ================= */
 let trousseauPret = null;
-const trousseau = () => trousseauPret || (trousseauPret = SecureStorage.setKeyPrefix("hmg_").then(() => SecureStorage));
+/* attention : ne jamais faire passer l'objet SecureStorage (un Proxy de Capacitor) par une promesse : JavaScript lui
+   demanderait « .then », que Capacitor prend pour une méthode native inexistante, et la promesse ne finirait jamais. */
+const trousseau = () => trousseauPret || (trousseauPret = SecureStorage.setKeyPrefix("hmg_").then(() => true));
 const stockage = {
   /* valeur (souvent une chaîne) ou null ; ne rejette jamais. Lit le trousseau de l'appareil ET le trousseau iCloud. */
   async get(cle) {
     if (!N) return lsJson("hmg-stockage:" + cle, null);
-    return tente("trousseau (lecture)", async () => { const v = await (await trousseau()).get(String(cle), false, true); return v === undefined ? null : v; }, null);
+    return tente("trousseau (lecture)", async () => { await trousseau(); const v = await SecureStorage.get(String(cle), false, true); return v === undefined ? null : v; }, null);
   },
   /* opts.icloud (vrai par défaut) : synchronisé avec le trousseau iCloud (revient sur un nouvel iPhone).
      Pour un jeton de session propre à l'appareil, passer {icloud:false}. Renvoie true si c'est écrit. */
   async set(cle, valeur, opts) {
     const icloud = !(opts && opts.icloud === false);
     if (!N) { lsMettreJson("hmg-stockage:" + cle, valeur); return true; }
-    return tente("trousseau (écriture)", async () => { const s = await trousseau(); if (!icloud) await s.remove(String(cle), true); await s.set(String(cle), valeur, false, icloud); return true; }, false);
+    return tente("trousseau (écriture)", async () => { await trousseau(); if (!icloud) await SecureStorage.remove(String(cle), true); await SecureStorage.set(String(cle), valeur, false, icloud); return true; }, false);
   },
   async remove(cle) {
     if (!N) { lsDel("hmg-stockage:" + cle); return true; }
-    return tente("trousseau (effacement)", async () => { await (await trousseau()).remove(String(cle), true); return true; }, false);
+    return tente("trousseau (effacement)", async () => { await trousseau(); await SecureStorage.remove(String(cle), true); return true; }, false);
   },
 };
 
@@ -281,29 +283,29 @@ function installerRecopie() {
 /* Au lancement : ce que localStorage a perdu revient du trousseau (identité) puis de Preferences (le reste).
    Règle simple : si localStorage a une valeur, c'est elle qui compte (elle est recopiée) ; sinon on restaure. */
 async function restaurer() {
-  const remis = [];
-  for (const k of IDENTITE) {
-    if (lsGet(k) !== null) continue;
-    const v = await stockage.get(k);
-    if (typeof v === "string" && identiteValide(k, v)) { lsSet(k, v); remis.push(k); }
-  }
-  const { keys } = await Preferences.keys();
-  for (const k of keys) {
-    if (!aRecopier(k) || lsGet(k) !== null) continue;
-    const { value } = await Preferences.get({ key: k });
-    if (value !== null) { lsSet(k, value); remis.push(k); }
-  }
+  const remis = [], delai = (p, ms, v) => Promise.race([p, pause(ms).then(() => v)]);
+  // le trousseau et Preferences sont lus en même temps : si l'un traîne, l'autre restaure quand même
+  const [ids, prefs] = await Promise.all([
+    delai(Promise.all(IDENTITE.map(k => stockage.get(k))), 1200, IDENTITE.map(() => undefined)),
+    delai((async () => {
+      const { keys } = await Preferences.keys();
+      const vals = await Promise.all(keys.filter(aRecopier).map(async k => [k, (await Preferences.get({ key: k })).value]));
+      return { keys, vals };
+    })().catch(e => { signaler("Preferences (lecture)", e); return null; }), 1200, null),
+  ]);
+  IDENTITE.forEach((k, i) => { const v = ids[i]; if (lsGet(k) === null && typeof v === "string" && identiteValide(k, v)) { lsSet(k, v); remis.push(k); } });
+  if (prefs) for (const [k, v] of prefs.vals) if (v !== null && lsGet(k) === null) { lsSet(k, v); remis.push(k); }
   // première ouverture avec cette version : on sauvegarde ce qui existe déjà
-  const connues = new Set(keys);
-  if (LS) for (const k of Object.keys(LS)) if (aRecopier(k) && !connues.has(k)) enAttente.set(k, lsGet(k));
-  for (const k of IDENTITE) { const v = lsGet(k); if (identiteValide(k, v) && (await stockage.get(k)) !== v) await sauverIdentite(k, v); }
+  if (LS && prefs) { const connues = new Set(prefs.keys); for (const k of Object.keys(LS)) if (aRecopier(k) && !connues.has(k)) enAttente.set(k, lsGet(k)); }
+  // l'identité de localStorage est la bonne : le trousseau la suit (sans retarder le lancement)
+  IDENTITE.forEach((k, i) => { const v = lsGet(k); if (identiteValide(k, v) && ids[i] !== undefined && ids[i] !== v) sauverIdentite(k, v); });
   viderRecopie();
   return remis;
 }
 async function effacerTout() {   // « Supprimer mon compte » : trousseau, Preferences, localStorage, notifications, fichiers partagés
   await notifs.annuler();
   if (N) {
-    await tente("trousseau (vider)", async () => (await trousseau()).clear(true));
+    await tente("trousseau (vider)", async () => { await trousseau(); await SecureStorage.clear(true); });
     await tente("Preferences (vider)", () => Preferences.clear());
     await tente("fichiers", () => Filesystem.rmdir({ path: "partage", directory: Directory.Cache, recursive: true }));
   }
@@ -412,6 +414,7 @@ function bilanDuServeur(b, st) {   // le bilan déjà calculé (unseen_bilan) : 
   if (r === "sauve" && b.gel_used) r = "gel";
   if (r === "rate" && (b.hearts_after === 0 || b.fell_sick)) r = "rhume";
   if (r === "atteint" && b.kind === "reprise") r = "reprise";
+  if (r === "doux" && b.met) r = "doux_ok";                // mode doux : « doux » + met = objectif atteint
   return [r, texteBilan(r, { S: b.s != null ? +b.s : null, G: b.g != null ? +b.g : null, objectif: st.goalNext, serie: b.streak_after != null ? +b.streak_after : st.streak,
     coeurs: b.hearts_after != null ? +b.hearts_after : st.hearts, coffre: (st.coffres || []).some(c => c && c.kind === "semaine") })];
 }
