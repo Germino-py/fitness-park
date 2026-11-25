@@ -1,4 +1,5 @@
 "use strict";
+if(window.HMG_PRIVE) throw new Error("HMG : accès privé (test avant la sortie de l'appli)");
 /* =====================================================================================
    HÉROS « Chibi Volt » (v2) — le petit héros de l'Aventure HMG, ses objets, « Ma collection » et « Choisis ton héros »
    Chargé AVANT js/app.js. Tout est global (script classique) et préfixé hv / hc / hero pour ne rien écraser.
@@ -603,7 +604,7 @@ function heroVibre(kind) {
   const ok = r => { if (r && r.catch) r.catch(() => { }); };
   try {
     const N = window.HMGN, H = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics;
-    if (N && N.natif) return ok(kind === "success" ? N.succes && N.succes() : kind === "warning" ? N.alerte && N.alerte() : N.tap && N.tap());
+    if (N && N.natif && N.vibrer) return ok(N.vibrer(kind));   // le pont comprend selection, light, medium, heavy, success, warning
     if (H) return ok(kind === "selection" ? H.selectionChanged() : kind === "success" || kind === "warning" ? H.notification({ type: kind.toUpperCase() }) : H.impact({ style: kind === "medium" ? "MEDIUM" : kind === "heavy" ? "HEAVY" : "LIGHT" }));
     if (navigator.vibrate) navigator.vibrate({ selection: 6, light: 10, medium: 18, heavy: 28, success: [12, 40, 18], warning: [20, 60, 20] }[kind] || 8);
   } catch (e) { }

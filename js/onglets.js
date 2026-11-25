@@ -1,4 +1,5 @@
 "use strict";
+if(window.HMG_PRIVE) throw new Error("HMG : accès privé (test avant la sortie de l'appli)");
 /* ================= L'APPLI À ONGLETS (coque) =================
    Aventure · Salles · Classement · Moi, comme une vraie appli iPhone (3-ux-appli.md §2).
    Chargé après js/app.js : s'appuie sur ses fonctions globales (gmSet, gmBot, rpc, score…).
@@ -173,7 +174,7 @@ function cqReglages(){
       ${row("pause","pause","Mode pause",st&&st.pause?"En pause":null,"Vacances, blessure : tes cœurs sont gelés")}
       ${row("masalle","pin","Ma salle",ma?esc(ma.n):"À choisir")}</div>
     <div class="cq-sec">Notifications</div><div class="cq-list">
-      ${sw("n-danger","heart","Cœur en danger",n.danger)}${sw("n-arrivee","pin","Arrivée à ma salle",n.arrivee)}${sw("n-bilan","bell","Bilan du lundi",n.bilan)}${sw("n-rappel","bell","Rappel de séance",n.rappel,"Désactivé par défaut")}</div>
+      ${sw("n-danger","heart","Cœur en danger",n.danger)}${sw("n-bilan","bell","Bilan du lundi",n.bilan)}${sw("n-rappel","bell","Rappel de séance",n.rappel,"Désactivé par défaut")}</div>
     ${APPLI?"":`<p class="cq-note">Sur le site, rien n'est envoyé : les rappels arrivent avec l'appli iPhone.</p>`}
     <div class="cq-sec">Sons et vibrations</div><div class="cq-list">
       ${sw("son","sound","Sons du jeu",(()=>{ try{ return SND.on(); }catch(e){ return true; } })())}${sw("vib","vib","Vibrations",store.get("hmg-vib",true)!==false)}</div>
@@ -230,9 +231,10 @@ async function cqDonnees(){
 }
 async function cqPosition(){
   let et="inconnu"; try{ if(window.HMGN&&HMGN.position&&HMGN.position.etat) et=await HMGN.position.etat(); else if(navigator.permissions) et=(await navigator.permissions.query({name:"geolocation"})).state; }catch(e){}
-  const t={granted:"Autorisée quand l'appli est ouverte",prompt:"Pas encore demandée",denied:"Refusée"}[et]||"Gérée par ton téléphone";
+  const t={granted:"Autorisée quand l'appli est ouverte",prompt:"Pas encore demandée",denied:"Refusée",desactivee:"Localisation coupée sur ton téléphone"}[et]||"Gérée par ton téléphone";
+  const reg=(et==="denied"||et==="desactivee")&&!(window.HMGN&&HMGN.natif&&!HMGN.peutOuvrirReglages);
   const f=cqFeuille(`<h2>Localisation</h2><p><b style="color:#fff">${t}</b></p><p>HMG utilise ta position seulement quand tu touches « Je suis à la salle », pour vérifier que tu es bien dans ta salle (moins de 200 m), et pour te montrer les salles autour de toi. Elle n'est jamais affichée, jamais partagée, jamais suivie en arrière-plan.</p>
-    ${et==="denied"?`<button class="cq-btn" data-reg>Ouvrir les Réglages</button>`:`<button class="cq-btn ghost" data-sh-x>OK</button>`}`);
+    ${reg?`<button class="cq-btn" data-reg>Ouvrir les Réglages</button>`:`${et==="denied"||et==="desactivee"?`<p class="cq-note">Va dans les réglages de ton téléphone › Localisation pour l'autoriser.</p>`:""}<button class="cq-btn ghost" data-sh-x>OK</button>`}`);
   const r=f.el.querySelector("[data-reg]"); if(r) r.onclick=()=>{ try{ if(window.HMGN&&HMGN.reglages) HMGN.reglages(); else toast("Ouvre les réglages de ton navigateur pour autoriser la position."); }catch(e){} f.fermer(); };
 }
 function cqCommentCoeurs(){
@@ -263,6 +265,7 @@ function cqSupprimer(){
       if(!(window.HMGS&&HMGS.supprimerCompte)) throw new Error("indispo");
       await HMGS.supprimerCompte();
       try{ if(window.HMGN&&HMGN.notifs&&HMGN.notifs.annulerTout) await HMGN.notifs.annulerTout(); }catch(er){}
+      try{ if(window.HMGN&&HMGN.effacerTout) await HMGN.effacerTout(); }catch(er){}   // trousseau compris : l'identité ne doit pas revenir à la réinstallation
       const garder=["hmg-invite","hmg-session"]; Object.keys(localStorage).filter(k=>/^hmg-/.test(k)&&!garder.includes(k)).forEach(k=>localStorage.removeItem(k));
       store.set("hmg-adieu",1); location.replace(location.pathname);
     }catch(er){ b.disabled=false; b.textContent="Supprimer définitivement"; f.fermer(); toast("La suppression n'a pas abouti. Vérifie ta connexion et réessaie, ou écris-nous depuis Aide.",1); }

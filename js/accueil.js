@@ -1,4 +1,5 @@
 "use strict";
+if(window.HMG_PRIVE) throw new Error("HMG : accès privé (test avant la sortie de l'appli)");
 /* ================= L'ACCUEIL DES NOUVEAUX (onboarding) =================
    8 écrans, une décision par écran, environ 55 secondes (3-ux-appli.md §3) :
    1 Bienvenue · 2 Héros · 3 Objectif · 4 Localisation · 5 Ta salle · 6 Notifications (appli seulement) · 7 Pseudo · 8 Coffre de bienvenue.
@@ -78,7 +79,7 @@ const ONB = {
     <div class="cq-gyms" id="onbL" role="radiogroup"></div>
     <div class="onb-bas"><button class="cq-btn" data-o="salle" ${ONB_CHOIX.gym?"":"disabled"}>C'est ma salle</button><button class="cq-link" data-o="sanssalle">Je n'ai pas encore de salle</button></div>`,
   6:()=>`<div class="onb-notif" aria-hidden="true"><span class="ic"></span><div><b>HMG</b><small>maintenant</small><strong>Ton cœur compte sur toi 💚</strong><span>Encore 1 séance d'ici dimanche pour le garder.</span></div></div>
-    <h1>On veille sur tes cœurs</h1><p>Un rappel quand un cœur est en danger, un petit mot quand tu arrives à ta salle, et ton bilan chaque lundi. Jamais plus d'un message par jour.</p>
+    <h1>On veille sur tes cœurs</h1><p>Un rappel quand un cœur est en danger, et ton bilan chaque lundi. Jamais plus d'un message par jour.</p>
     <div class="onb-bas"><button class="cq-btn" data-o="notif">Continuer</button></div>`,
   7:()=>{ if(!ONB_CHOIX.ps){ for(let i=0;i<12&&!ONB_CHOIX.ps;i++){ const v=onbNoms[Math.floor(Math.random()*onbNoms.length)]+"_"+Math.floor(10+Math.random()*89); if(psLocal(v)==="ok") ONB_CHOIX.ps=v; } }
     return `<h1>Dernière chose : ton nom de légende</h1><p>Il s'affiche au classement et sur tes avis. Il est unique : personne d'autre ne pourra le prendre.</p>

@@ -1,4 +1,5 @@
 "use strict";
+if(window.HMG_PRIVE) throw new Error("HMG : accès privé (test avant la sortie de l'appli)");
 /* ================= LES CŒURS (système de vies) =================
    Affichage du jeu décrit dans 1-jeu-vies.md (règles) et 3-ux-appli.md §4 (dessin, animations, textes).
    Le serveur décide de tout (my_state) ; ce fichier ne fait qu'afficher, animer et proposer.
