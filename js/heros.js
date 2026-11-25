@@ -56,7 +56,7 @@ const HV_TONE = {
   robot: {
     clair: { s: "#f7f9fe", m: "#d5dcea", d: "#9ca8c0", j: "#4a5470", ln: "#8a95ae" },
     fonce: { s: "#58627d", m: "#394159", d: "#212637", j: "#0c0f17", ln: "#151a26" },
-    hale:  { s: "#e9edf3", m: "#b6c0ce", d: "#7d889d", j: "#363d4d", ln: "#6c778c" },
+    hale:  { s: "#cfd7e2", m: "#9ba7b9", d: "#67728a", j: "#2b3142", ln: "#58637a" },
     brun:  { s: "#f8c4a0", m: "#de9367", d: "#aa5f37", j: "#3c2418", ln: "#8a4a2a" }
   }
 };
@@ -64,7 +64,7 @@ HV_TONE.human.bronze = { s: "#f0b88c", m: "#d8945f", d: "#b4703f", ln: "#97592f"
 HV_TONE.robot.bronze = HV_TONE.robot.hale;
 /* les 4 teintes, dans l'ordre d'affichage : [clé, peau humaine, finition du robot]. Hâlée et Mate sont nouvelles (25/11/2026). */
 const HV_TONES = [["clair", "Claire", "Blanc"], ["hale", "Hâlée", "Titane"], ["brun", "Mate", "Cuivre"], ["fonce", "Noire", "Noir"]];
-const HV_SW = { human: { clair: "#ffe1cd", hale: "#f2c49e", brun: "#cb8f64", fonce: "#93603e" }, robot: { clair: "#f7f9fe", hale: "#b6c0ce", brun: "#de9367", fonce: "#394159" } };
+const HV_SW = { human: { clair: "#ffe1cd", hale: "#f2c49e", brun: "#cb8f64", fonce: "#93603e" }, robot: { clair: "#f7f9fe", hale: "#9ba7b9", brun: "#de9367", fonce: "#394159" } };
 /* teintes proposées pour un héros (une légende prend celles de son héros de base) : [{k, n, c}] */
 function gmTones(hero) {
   const L = hvSafe(() => GM_LG[hero]), rob = (L ? L.base : hero) === "robot";
@@ -684,7 +684,7 @@ function hcRenderStage(anim) {
   if (anim) { hr.classList.remove("pop"); void hr.offsetWidth; hr.classList.add("pop"); }
   const ns = hcQ(".hc-tt small"); if (ns) ns.textContent = `Aventure HMG · ${d} séance${d > 1 ? "s" : ""}`;
   const pct = N ? Math.max(0, Math.min(100, Math.round((d - GM_MUS[real].d) / (N.d - GM_MUS[real].d) * 100))) : 100;
-  hcQ(".hc-chip").innerHTML = `<b><span aria-hidden="true">💪</span> ${hvE(M.n)}</b><small>${sick ? "Un peu malade · ça revient vite" : N ? `${hvE(N.n)} à ${N.d} séances` : "Niveau max atteint"}</small><div class="pb"><i style="width:${pct}%"></i></div>`;
+  hcQ(".hc-chip").innerHTML = `<b><span aria-hidden="true">💪</span> ${hvE(M.n)}</b><small>${sick ? "Un peu malade" : N ? `${hvE(N.n)} à ${N.d} séances` : "Niveau max atteint"}</small><div class="pb"><i style="width:${pct}%"></i></div>`;
   hcQ(".hc-chip").setAttribute("aria-label", `Physique : ${M.n}${N && !sick ? `, ${N.n} à ${N.d} séances` : ""}`);
   const n = gmS.items.filter(id => GM_IT[id]).length, rg = hcQ(".hc-ring");
   rg.style.setProperty("--p", Math.round(n / GM_TOTAL * 100)); rg.innerHTML = `<span><b>${n}</b><small>/ ${GM_TOTAL}</small></span>`; rg.setAttribute("aria-label", `${n} objet${n > 1 ? "s" : ""} sur ${GM_TOTAL}`);
@@ -701,7 +701,7 @@ function hcRenderStage(anim) {
     h = `<div class="info"><b>${hvE(S.n)}</b><small><span class="pill" style="background:${S.c}">Ensemble</span>${k}/${S.ids.length} pièce${S.ids.length > 1 ? "s" : ""}</small></div>`
       + `<button class="act" data-act="setwear"${k ? "" : " disabled"}>${k === S.ids.length ? "Tout porter" : "Porter"}</button><button class="x" data-act="close" aria-label="Annuler l'essai">${HC_IC.x}</button>`; }
   else { const k = GM_CATS.filter(([c]) => gmS.eq[c]).length, L = hcLegOn();
-    h = `<div class="info"><b>${hvE(hcHeroN(gmS.eq.hero))} · ${L ? "Légende" : hvE(hcToneN(gmS.eq))}</b><small>${gmS.items.length ? `${k} objet${k > 1 ? "s" : ""} porté${k > 1 ? "s" : ""} · touche un objet pour l'essayer` : "Ouvre ton premier coffre pour l'habiller"}</small></div><button class="act ghost" data-act="pick">Changer</button>`; }
+    h = `<div class="info"><b>${hvE(hcHeroN(gmS.eq.hero))} · ${L ? "Légende" : hvE(hcToneN(gmS.eq))}</b><small>${gmS.items.length ? `${k} objet${k > 1 ? "s" : ""} porté${k > 1 ? "s" : ""} · touche pour essayer` : "Ton premier coffre va l'habiller"}</small></div><button class="act ghost" data-act="pick">Changer</button>`; }
   hcQ(".hc-sheet").innerHTML = h;
 }
 function hcRenderRbar() {
@@ -773,7 +773,9 @@ function hcSetTab(k, focus) {
 function hcClose() {
   const el = HC.el; if (!el) return; HC.el = null; clearTimeout(HC.ct); document.removeEventListener("keydown", hcKey, true);
   el.classList.remove("in"); el.classList.add("out"); setTimeout(() => el.remove(), 280);
-  if (HC.focus && HC.focus.focus) try { HC.focus.focus({ preventScroll: true }); } catch (e) { }
+  /* l'onglet Moi (js/onglets.js) montre le héros : on le remet à jour avec la nouvelle tenue */
+  hvSafe(() => { if (CQ.tab === "moi" && !CQ.sub) cqMoi(); });
+  if (HC.focus && HC.focus.focus && HC.focus.isConnected) try { HC.focus.focus({ preventScroll: true }); } catch (e) { }
 }
 function hcKey(e) {
   if (!HC.el || document.querySelector(".gm-pickov,.gm-chest")) return;
@@ -792,7 +794,8 @@ function heroColl() {
     <div class="hc-stage"><div class="hc-floor" aria-hidden="true"></div><div class="hc-chip" role="img"></div><div class="hc-ring" role="img"></div><div class="hc-hero" role="img" data-act="hero"></div><div class="hc-sheet"></div></div>
     <div class="hc-rbar"></div><div class="hc-tabs" role="tablist" aria-label="Catégories"></div><div class="hc-list" id="hcList" role="tabpanel"></div><div class="hc-sr" aria-live="polite"></div></div>`;
   document.body.appendChild(el); HC.el = el; hcRefresh();
-  requestAnimationFrame(() => { el.classList.add("in"); const b = el.querySelector("[data-act=back]"); if (b) b.focus({ preventScroll: true }); if (HC.tab !== "all") hcSetTab(HC.tab); });
+  /* le focus va sur la fenêtre elle-même (VoiceOver lit « Ma collection »), sans anneau sur le bouton retour */
+  el.tabIndex = -1; requestAnimationFrame(() => { el.classList.add("in"); el.focus({ preventScroll: true }); if (HC.tab !== "all") hcSetTab(HC.tab); });
   if (HC.sel) hcSay(`Nouveau : ${GM_IT[HC.sel].n}. Bouton Porter pour l'équiper.`);
   document.addEventListener("keydown", hcKey, true);
   const L = el.querySelector(".hc-list"); let raf = 0;
