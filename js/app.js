@@ -1484,7 +1484,7 @@ const GM_W=[
   {k:"jungle", n:"Jungle Protéine",      d:"Ça pousse, comme tes muscles",    c:["#1d0f33","#0a0718"], wc:"#c77dff"},
   {k:"volcan", n:"Volcans d'Auvergne",   d:"Là où l'on forge les légendes",   c:["#3a0c06","#140303"], wc:"#ff5a36", mon:[["puy",.55,100]]},
   {k:"cosmos", n:"Station Orbitale",     d:"Au-delà de tes limites",          c:["#0b0a2a","#020208"], wc:"#c8ff1e", mon:[["ariane",.45,-110]]}];
-const GM_RAR={C:{t:"Commun",c:"#c9d3e6"},R:{t:"Rare",c:"#3fd8ff"},E:{t:"Épique",c:"#c77dff"},L:{t:"Légendaire",c:"#ffd166"}};
+const GM_RAR={C:{t:"Commun",c:"#c3cddf"},R:{t:"Rare",c:"#3fd8ff"},E:{t:"Épique",c:"#c08cff"},L:{t:"Légendaire",c:"#ffc93d"}}; /* [heros] couleurs de rareté revues (5-avatars-inventaire.md) */
 const GM_CATS=[["skin","Hauts"],["legs","Bas"],["feet","Chaussures"],["hat","Sur la tête"],["neck","Au cou"],["face","Lunettes"],["back","Dans le dos"],["hand","En main"],["aura","Auras"]];
 const GM_ITEMS=[
   {id:"blanc",cat:"skin",n:"T-shirt blanc",r:"C",say:"Enfin un t-shirt ! Ton héros a déjà moins froid."},{id:"volt",cat:"skin",n:"T-shirt Volt",r:"R"},{id:"braise",cat:"skin",n:"T-shirt Braise",r:"R"},{id:"ocean",cat:"skin",n:"T-shirt Océan",r:"R"},
@@ -1518,6 +1518,9 @@ const gmS=Object.assign({seen:null,open:[],items:[],stars:0,eq:{},leg:{}},store.
 const GM_EQ0={hero:null,tone:"clair",skin:null,legs:null,feet:null,hat:null,neck:null,face:null,back:null,hand:null,aura:null};
 gmS.eq=Object.assign({...GM_EQ0},gmS.eq||{});
 if(!gmS.leg||typeof gmS.leg!=="object") gmS.leg={};
+/* [heros] objets déjà vus dans « Ma collection » (pastille NOUVEAU) : au premier lancement, tout ce qui est déjà gagné compte comme vu
+   (compte retrouvé par son code : la liste se remplit à la première ouverture de la collection, une fois la collection reconstruite) */
+if(!Array.isArray(gmS.vus)&&!gmS.rebuild) gmS.vus=gmS.items.slice();
 const gmLegOn=(k,n)=>gmS.leg[k]!=null&&(n==null||n>gmS.leg[k]);
 const gmSave=()=>store.set("hmg-game",gmS);
 const gmOwn=id=>!!(GM_IT[id]&&(GM_IT[id].def||gmS.items.includes(id)));
@@ -1547,126 +1550,11 @@ const gmWorld=w=>GM_W[((w%GM_W.length)+GM_W.length)%GM_W.length];
 const gmLap=w=>Math.floor(w/GM_W.length)+1;
 const gmWorldOf=d=>Math.min(Math.floor(d/GM_PER),Math.floor(Math.max(0,d-1)/GM_PER)+(d%GM_PER===0&&d>0?1:0));
 
-/* ---------- le petit héros (SVG) : homme, femme ou robot, peau claire ou foncée, + objets de la collection */
-function gmBot(eq,o={}){
-  const LG=GM_LG[eq.hero];
-  if(LG) eq={...eq,tone:LG.tone,skin:eq.skin||LG.skin,legs:eq.legs||LG.legs||"short_noir",feet:eq.feet||"baskets",hat:eq.hat||LG.hat||null,aura:eq.aura||LG.aura||null};
-  const u="gb"+(++gmUid), hero=LG?LG.base:(eq.hero||"homme"), rob=hero==="robot", fem=hero==="femme", tone=eq.tone==="fonce"?"fonce":eq.tone==="bronze"?"bronze":"clair";
-  const lv=LG?4:(o.mus!=null?o.mus:gmHeroLv()), wd=LG?LG.wide:GM_MUS[lv].w, dx=12*(wd-1), hs=LG?LG.hair:"";
-  const T={...(rob?GM_TONE.robot[tone==="bronze"?"clair":tone]:tone==="bronze"?{s:"#dc9a6a",d:"#b47248",h:"#24160d"}:GM_TONE.human[tone]),...(hs==="blond"?{h:"#e8b84f"}:{})}, K=GM_SKIN[eq.skin]||GM_SKIN.blanc, st=!!o.static;
-  const hat=eq.hat, face=eq.face, back=eq.back, hand=eq.hand, aura=eq.aura, top=!!GM_SKIN[eq.skin];
-  const emb=(eq.skin==="volt"||eq.skin==="or")?"#0a0f02":"#c8ff1e";
-  const ey=rob?-53:-48, p=[];
-  p.push(`<defs><linearGradient id="${u}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[0]}"/><stop offset=".55" stop-color="${K[1]}"/><stop offset="1" stop-color="${K[2]}"/></linearGradient>
-    <radialGradient id="${u}h" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="${T.s}"/><stop offset=".75" stop-color="${T.s}"/><stop offset="1" stop-color="${T.d}"/></radialGradient>
-    <linearGradient id="${u}au" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6c4"/><stop offset=".5" stop-color="#ffd166"/><stop offset="1" stop-color="#c48a00"/></linearGradient>
-    <radialGradient id="${u}fl" cx=".5" cy=".62" r=".6"><stop offset="0" stop-color="#ffe08a" stop-opacity=".95"/><stop offset=".45" stop-color="#ff7a3d" stop-opacity=".7"/><stop offset="1" stop-color="#ff3b1f" stop-opacity="0"/></radialGradient>
-    <linearGradient id="${u}sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#2b1460"/></linearGradient>
-    <linearGradient id="${u}bd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${T.d}"/><stop offset=".28" stop-color="${T.s}"/><stop offset=".72" stop-color="${T.s}"/><stop offset="1" stop-color="${T.d}"/></linearGradient>
-    <linearGradient id="${u}lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>`);
-  p.push(`<ellipse cx="0" cy="0" rx="16" ry="3.6" fill="#000" opacity=".38"/><g class="b-all">`);
-  /* dans le dos */
-  if(aura==="flammes") p.push(`<g class="b-aura"><path d="M0 -90 C12 -78 30 -66 28 -36 C27 -12 14 2 0 2 C-14 2 -27 -12 -28 -36 C-30 -66 -12 -78 0 -90Z" fill="url(#${u}fl)"/><path d="M-8 -78 C-4 -70 -14 -66 -12 -56 M9 -80 C14 -70 6 -66 10 -58" stroke="#ffd166" stroke-width="1.4" fill="none" opacity=".7"/></g>`);
-  if(back==="cape") p.push(`<path class="b-cape" d="M-10 -32 Q0 -35 10 -32 L19 -4 Q10 0 0 -3 Q-10 0 -19 -4Z" fill="#e8264a"/><path class="b-cape" d="M-6 -31 L-12 -6 Q-15 -5 -17 -5 L-9 -31Z" fill="#ff5a77" opacity=".7"/>`);
-  if(back==="ailes"){ const w=`<path d="M9 -28 C18 -46 38 -50 41 -36 C37 -37 35 -32 31 -32 C33 -26 28 -23 24 -25 C23 -19 17 -19 12 -22Z" fill="#fff" stroke="#cfe3ff" stroke-width="1"/><path d="M16 -33 C24 -40 32 -41 36 -37 M17 -27 C22 -31 26 -31 29 -30" stroke="#cfe3ff" stroke-width="1" fill="none"/>`;
-    p.push(`<g class="b-wingR">${w}</g><g class="b-wingL"><g transform="scale(-1,1)">${w}</g></g>`); }
-  if(back==="jetpack") p.push(`<g class="b-flame"><path d="M-17 -15 Q-22 -4 -17 3 Q-12 -4 -17 -15Z" fill="#ffb547"/><path d="M17 -15 Q12 -4 17 3 Q22 -4 17 -15Z" fill="#ffb547"/><path d="M-17 -14 Q-19 -8 -17 -4 Q-15 -8 -17 -14Z M17 -14 Q15 -8 17 -4 Q19 -8 17 -14Z" fill="#fff4c4"/></g>
-    <rect x="-22" y="-35" width="9" height="21" rx="4.5" fill="#3a4256"/><rect x="13" y="-35" width="9" height="21" rx="4.5" fill="#3a4256"/><rect x="-22" y="-28" width="9" height="3" fill="#c8ff1e"/><rect x="13" y="-28" width="9" height="3" fill="#c8ff1e"/><rect x="-21" y="-16" width="7" height="3" rx="1" fill="#1b2130"/><rect x="14" y="-16" width="7" height="3" rx="1" fill="#1b2130"/>`);
-  if(back==="sac") p.push(`<rect x="-16.5" y="-34" width="33" height="21" rx="7" fill="#ff7a3d"/><rect x="-16.5" y="-24" width="33" height="3" fill="#c2410c"/>`);
-  /* jambes */
-  const LEGS={short_noir:{c:"#1b2130",s:"#c8ff1e"},jogging:{c:"#6b7489",s:"#3d4456",long:1},short_volt:{c:"#c8ff1e",s:"#0a0f02"},legging:{c:`url(#${u}lg)`,s:"#ff4fd8",long:1},short_or:{c:`url(#${u}au)`,s:"#fff4b8"}};
-  const SHOES={baskets:{c:"#1b2130",s:"#c8ff1e"},baskets_bl:{c:"#f4f6fb",s:"#c8ff1e",b:"#a7b3ca"},baskets_volt:{c:"#c8ff1e",s:"#0a0f02"},montantes:{c:"#ff3b5c",s:"#fff",hi:1},baskets_or:{c:`url(#${u}au)`,s:"#fff4b8"}};
-  const BAS=LEGS[eq.legs], SH=SHOES[eq.feet], limb=rob?T.d:T.s;
-  const leg=x=>`<rect x="${x}" y="-15" width="6.4" height="13" rx="3.2" fill="${BAS&&BAS.long?BAS.c:limb}"/>`+(BAS&&BAS.long?`<rect x="${x-.2}" y="-5.8" width="6.8" height="2.2" rx="1" fill="${BAS.s}"/>`:"")
-    +(SH?`${SH.hi?`<rect x="${x-.7}" y="-8.2" width="7.8" height="6.6" rx="2.6" fill="${SH.c}"/><path d="M${x+.4} -6.2 H${x+6}" stroke="${SH.s}" stroke-width="1.1"/>`:""}<ellipse cx="${x+3.2}" cy="-1.9" rx="5.6" ry="3.1" fill="${SH.c}"/>${SH.b?`<path d="M${x-2.4} -.5 H${x+8.8}" stroke="${SH.b}" stroke-width="1.8" stroke-linecap="round"/>`:""}<path d="M${x-2.2} -0.4 H${x+8.6}" stroke="${SH.s}" stroke-width="1.3" stroke-linecap="round"/>`
-      :`<ellipse cx="${x+3.2}" cy="-1.8" rx="4.7" ry="2.7" fill="${rob?T.h:T.d}"/>${rob?"":`<ellipse cx="${x+2.4}" cy="-2.6" rx="2.2" ry="1" fill="${T.s}" opacity=".7"/>`}`);
-  p.push(`<g class="b-legL">${leg(-8.4)}</g><g class="b-legR">${leg(2)}</g>`);
-  /* corps : le t-shirt gagné, sinon torse nu (les muscles se dessinent avec le physique) */
-  const tw=12*wd, sw=12*Math.min(wd,1.2), mc=`stroke="${T.d}" stroke-width="1.1" fill="none" stroke-linecap="round"`;
-  if(top){
-    p.push(`<rect x="${-tw}" y="-34" width="${2*tw}" height="22" rx="9" fill="url(#${u}k)"/>`);
-    if(wd>1.15) p.push(`<path d="M${-7*wd} -27 Q0 -23 ${7*wd} -27 M-1 -24 V-14" stroke="#000" stroke-opacity=".18" stroke-width="1.2" fill="none"/>`);
-    if(!rob) p.push(fem?`<path d="M-4.5 -34 Q0 -28.5 4.5 -34Z" fill="${T.s}"/>`:`<path d="M-4 -34 Q0 -30.5 4 -34Z" fill="${T.d}" opacity=".9"/>`);
-    if(eq.skin==="galaxie") p.push(`<circle cx="-6" cy="-27" r=".8" fill="#fff"/><circle cx="5" cy="-22" r=".6" fill="#fff"/><circle cx="7" cy="-29" r=".9" fill="#fff"/><circle cx="-3" cy="-19" r=".6" fill="#fff"/>`);
-    if(!rob) p.push(`<path d="M1 -29 L-2.6 -24.2 H0 L-1 -20.5 L2.8 -25.6 H0.2Z" fill="${emb}"/>`);
-  } else {
-    p.push(`<rect x="${-tw}" y="-34" width="${2*tw}" height="22" rx="9" fill="url(#${u}bd)"/><ellipse cx="${-tw*.42}" cy="-30" rx="${tw*.26}" ry="1.6" fill="#fff" opacity="${tone==="fonce"&&!rob?.07:.16}"/>`);
-    if(rob) p.push(`<path d="M${-tw+3} -29.5 H${tw-3} M${-tw+3} -19.5 H${tw-3}" stroke="${T.h}" stroke-opacity=".55" stroke-width="1"/>${[[-1,-31.6],[1,-31.6],[-1,-17.4],[1,-17.4]].map(([s,y])=>`<circle cx="${s*(tw-3.6)}" cy="${y}" r=".9" fill="${T.h}"/>`).join("")}`);
-    else {
-      if(lv===0) p.push(`<path d="M${-tw+2.6} -28 q1.8 1 3.6 0 M${-tw+2.6} -25.4 q1.8 1 3.6 0 M${tw-2.6} -28 q-1.8 1 -3.6 0 M${tw-2.6} -25.4 q-1.8 1 -3.6 0" ${mc} opacity=".7"/>`);
-      if(lv>=2) p.push(`<path d="M${-7*wd} -27.4 Q${-3.6*wd} -24.4 -.6 -27.4 M.6 -27.4 Q${3.6*wd} -24.4 ${7*wd} -27.4" ${mc}/>`);
-      if(lv>=3) p.push(`<path d="M0 -24 V-19 M-3.2 -22.4 H-1.1 M1.1 -22.4 H3.2 M-3 -19.9 H-1.1 M1.1 -19.9 H3" ${mc} opacity=".85"/>`);
-      if(lv>=4) p.push(`<path d="M${-tw+2.4} -25 Q${-tw+4.2} -21.6 ${-tw+3.2} -18.8 M${tw-2.4} -25 Q${tw-4.2} -21.6 ${tw-3.2} -18.8" ${mc} opacity=".7"/>`);
-      if(lv<3) p.push(`<ellipse cx="0" cy="-20.4" rx=".75" ry="1" fill="${T.d}"/>`);
-      if(fem) p.push(`<path d="M${-tw+.8} -32.2 Q0 -35.8 ${tw-.8} -32.2 L${tw-.8} -26.6 Q0 -24.2 ${-tw+.8} -26.6Z" fill="#6ec6ff"/><path d="M${-tw+.8} -26.8 Q0 -24.4 ${tw-.8} -26.8" stroke="#f4f8ff" stroke-width="1.6" fill="none"/><circle cx="-4" cy="-30.4" r=".85" fill="#fff"/><circle cx="3.6" cy="-29.4" r=".85" fill="#fff"/>`);
-    }
-  }
-  if(rob) p.push(`<circle cx="0" cy="-25" r="3.6" fill="#0a0f1c"/><circle cx="0" cy="-25" r="2" fill="#c8ff1e"/>`);
-  /* bas : caleçon à pois au début, puis shorts, jogging, legging… */
-  if(!BAS) p.push(`<path d="M${-sw} -18.6 H${sw} V-11.4 Q${sw} -9.2 ${sw-2.4} -9.2 H1.5 L0 -11.4 L-1.5 -9.2 H${-sw+2.4} Q${-sw} -9.2 ${-sw} -11.4Z" fill="#6ec6ff"/><rect x="${-sw}" y="-19.4" width="${2*sw}" height="2.9" rx="1.3" fill="#f4f8ff"/>${[[-7,-14.2],[-2.6,-15.4],[3.4,-13.8],[7.8,-15.2],[-8.8,-11.4],[6.4,-11.2],[-4.4,-11.8],[1,-12.6]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".95" fill="#fff"/>`).join("")}`);
-  else p.push(`<path d="M${-sw} -18.5 H${sw} V-14.5 Q${sw} -11.5 9 -11.5 H-9 Q${-sw} -11.5 ${-sw} -14.5Z" fill="${BAS.c}"/>${BAS.long?`<path d="M${-sw} -18.4 H${sw}" stroke="${BAS.s}" stroke-width="1.6"/><path d="M-1.4 -17.6 l-.8 3 M1.4 -17.6 l.8 3" stroke="#fff" stroke-opacity=".6" stroke-width=".8"/>`:`<path d="M${-sw+1.6} -17 V-12.6 M${sw-1.6} -17 V-12.6" stroke="${BAS.s}" stroke-width="1.2" stroke-linecap="round"/>`}`);
-  if(eq.neck){ const sc=eq.neck==="echarpe_or"?["#ffd166","#c48a00","#fff4b8"]:["#11151f","#c8ff1e","#c8ff1e"];
-    p.push(`<path d="M-13 -37 Q0 -30 13 -37 L13.5 -31.5 Q0 -24.5 -13.5 -31.5Z" fill="${sc[0]}"/><path d="M-11 -35.6 Q0 -29.6 11 -35.6" stroke="${sc[1]}" stroke-width="1.3" fill="none"/>
-      <path d="M-9 -31 L-12 -16 L-5.5 -16 L-3.6 -29.6Z" fill="${sc[0]}"/><path d="M-10.6 -22 L-5 -22 M-11.2 -19 L-5.4 -19" stroke="${sc[1]}" stroke-width="1.2"/><path d="M-12 -16 v2.4 M-10 -16 v2.4 M-8 -16 v2.4 M-6 -16 v2.4" stroke="${sc[2]}" stroke-width=".9"/>`); }
-  if(back==="sac") p.push(`<path d="M-7.5 -34 L-6.5 -19 M7.5 -34 L6.5 -19" stroke="#ff7a3d" stroke-width="2.6" stroke-linecap="round"/>`);
-  /* bras */
-  const aw=6*Math.min(wd,1.35), arm=(x,hx)=>`<rect x="${x-(aw-6)/2}" y="-32" width="${aw}" height="15" rx="${aw/2}" fill="${limb}"/>${!rob&&lv>=3?`<ellipse cx="${x+3}" cy="-26.2" rx="${(aw/2+.5+.45*(lv-3)).toFixed(2)}" ry="4.6" fill="${limb}"/>`:""}${rob||!top?"":`<rect x="${(x-(aw-6)/2-.4).toFixed(2)}" y="-33" width="${(aw+.8).toFixed(2)}" height="6.5" rx="3" fill="${K[1]}"/>`}<circle cx="${hx}" cy="-16.5" r="3.3" fill="${T.s}"/>`;
-  p.push(`<g transform="translate(${-dx} 0)"><g class="b-armL"><g transform="rotate(10 -12 -29)">${arm(-16.5,-13.5)}</g></g></g>`);
-  /* tête */
-  p.push(`<g class="b-head">`);
-  if(fem) p.push(`<g class="b-ponytail"><path d="M9 -67 C24 -74 34 -61 31 -45 C30 -37 26 -32 22 -30 C25 -40 23 -52 9 -58Z" fill="${T.h}"/><path d="M14 -64 C24 -66 29 -56 28 -46" stroke="#fff" stroke-opacity=".18" stroke-width="1.6" fill="none"/><ellipse cx="12" cy="-64" rx="3.4" ry="2.6" fill="#c8ff1e"/></g>`);
-  if(rob){
-    p.push(`<circle cx="-17" cy="-51" r="3.3" fill="${T.d}"/><circle cx="17" cy="-51" r="3.3" fill="${T.d}"/><circle cx="-17" cy="-51" r="1.4" fill="#c8ff1e"/><circle cx="17" cy="-51" r="1.4" fill="#c8ff1e"/>`);
-    if(!hat||hat==="aureole"||hat==="bandeau") p.push(`<g class="b-ant"><path d="M0 -67 V-74" stroke="${T.h}" stroke-width="2"/><circle cx="0" cy="-76" r="3.2" fill="#c8ff1e"/></g>`);
-    p.push(`<rect x="-17" y="-68" width="34" height="33" rx="14" fill="url(#${u}h)"/><ellipse cx="-8" cy="-63" rx="5" ry="2.4" fill="#fff" opacity=".45"/>
-      <rect x="-13" y="-62" width="26" height="19" rx="8.5" fill="#0a0f1c"/>
-      <g class="b-eyes"><rect x="-8" y="-57.5" width="4.4" height="8.5" rx="2.2" fill="#c8ff1e"/><rect x="3.6" y="-57.5" width="4.4" height="8.5" rx="2.2" fill="#c8ff1e"/><path d="M-2.4 -46.4 Q0 -44.6 2.4 -46.4" stroke="#c8ff1e" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>
-      ${st?"":`<g class="b-happy" stroke="#c8ff1e" stroke-width="1.8" fill="none" stroke-linecap="round"><path d="M-8.6 -52 Q-5.8 -57 -3 -52"/><path d="M3 -52 Q5.8 -57 8.6 -52"/><path d="M-3 -47.4 Q0 -44 3 -47.4"/></g>
-      <g class="b-sleep" stroke="#c8ff1e" stroke-width="1.5" fill="none" stroke-linecap="round"><path d="M-8.4 -53 Q-5.8 -51 -3.2 -53"/><path d="M3.2 -53 Q5.8 -51 8.4 -53"/></g>`}
-      <ellipse cx="-12" cy="-40.5" rx="2.6" ry="1.4" fill="#ff7aa0" opacity=".5"/><ellipse cx="12" cy="-40.5" rx="2.6" ry="1.4" fill="#ff7aa0" opacity=".5"/>`);
-  } else {
-    p.push(`<circle cx="-16.4" cy="-48" r="3.4" fill="${T.d}"/><circle cx="16.4" cy="-48" r="3.4" fill="${T.d}"/><circle cx="0" cy="-50" r="17" fill="url(#${u}h)"/>`);
-    p.push(`<g class="b-eyes"><ellipse cx="-6.2" cy="-48" rx="2.5" ry="3.3" fill="#1a1322"/><ellipse cx="6.2" cy="-48" rx="2.5" ry="3.3" fill="#1a1322"/><circle cx="-5.3" cy="-49.4" r="1" fill="#fff"/><circle cx="7.1" cy="-49.4" r="1" fill="#fff"/>
-      ${fem?`<path d="M-8.4 -50 L-10.6 -51.6 M-8 -51.2 L-9.6 -53.2 M8.4 -50 L10.6 -51.6 M8 -51.2 L9.6 -53.2" stroke="#1a1322" stroke-width="1.1" stroke-linecap="round"/>`:""}${fem?`<path d="M-3.2 -42.2 Q0 -38.6 3.2 -42.2 Q0 -41 -3.2 -42.2Z" fill="#e0476f"/>`:`<path d="M-3 -42 Q0 -39.2 3 -42" stroke="#7a2b2b" stroke-width="1.4" fill="none" stroke-linecap="round"/>`}</g>`);
-    if(!st) p.push(`<g class="b-happy"><path d="M-8.6 -47.5 Q-6.2 -51.6 -3.8 -47.5 M3.8 -47.5 Q6.2 -51.6 8.6 -47.5" stroke="#1a1322" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M-3.6 -42.6 Q0 -36.6 3.6 -42.6Z" fill="#7a2b2b"/></g>
-      <g class="b-sleep" stroke="#1a1322" stroke-width="1.4" fill="none" stroke-linecap="round"><path d="M-8.6 -48 Q-6.2 -46 -3.8 -48"/><path d="M3.8 -48 Q6.2 -46 8.6 -48"/></g>`);
-    p.push(`<path d="M-8.8 -54.6 Q-6.2 -56.2 -3.6 -55 M3.6 -55 Q6.2 -56.2 8.8 -54.6" stroke="${T.h}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-      <ellipse cx="-10.6" cy="-43" rx="2.8" ry="1.6" fill="#ff7aa0" opacity="${tone==="fonce"?.3:.45}"/><ellipse cx="10.6" cy="-43" rx="2.8" ry="1.6" fill="#ff7aa0" opacity="${tone==="fonce"?.3:.45}"/>`);
-    if(hs==="chauve") p.push(`<ellipse cx="-6" cy="-62" rx="5" ry="2.6" fill="#fff" opacity=".3" transform="rotate(-25 -6 -62)"/>`);
-    else if(!/^(casquette|bonnet)/.test(hat||"")) p.push(fem
-      ?`<path d="M-17.6 -47 C-19.6 -65 -8 -71.5 1 -71 C13 -71 20 -63 17.8 -47 C16 -55 12 -60 5 -60.5 C0 -57.5 -7 -57.5 -11 -59.5 C-14 -56.5 -16 -52 -17.6 -47Z" fill="${T.h}"/><path d="M-17.4 -51 C-19 -43 -17.5 -37 -14 -34.5 C-15.2 -40 -15.2 -46 -14 -52Z" fill="${T.h}"/>`
-      :`<path d="M-17 -53 C-18.6 -66 -8 -71.6 1 -71 C12 -70.6 18.6 -64.5 17 -53 C16 -58 13.5 -61.5 8.5 -62 C4 -65.5 -4 -65 -8.5 -62.5 C-12.5 -62 -15.6 -58.5 -17 -53Z" fill="${T.h}"/><path d="M-6 -70 C0 -79 12 -76 10.5 -67.5 C6 -71.5 0 -71.5 -6 -70Z" fill="${T.h}"/><path d="M-16.8 -53 V-47 M16.8 -53 V-47" stroke="${T.h}" stroke-width="2" stroke-linecap="round"/>`);
-    else if(hs!=="chauve") p.push(fem?`<path d="M-17.4 -51 C-19 -43 -17.5 -37 -14 -34.5 C-15.2 -40 -15.2 -46 -14 -52Z" fill="${T.h}"/>`:"");
-  }
-  if(LG&&LG.beard&&!rob) p.push(`<path d="M-15.6 -46 Q-15 -34 0 -32.6 Q15 -34 15.6 -46 Q12 -38.4 6 -38.6 Q3 -41.4 0 -40.6 Q-3 -41.4 -6 -38.6 Q-12 -38.4 -15.6 -46Z" fill="${T.h}"/><path d="M-3.2 -39.6 Q0 -37.8 3.2 -39.6" stroke="#7a2b2b" stroke-width="1.3" fill="none" stroke-linecap="round"/>`);
-  /* lunettes */
-  if(face==="soleil") p.push(`<path d="M-17 ${ey-2} H-12 M12 ${ey-2} H17" stroke="#111" stroke-width="1.4"/><rect x="-12.5" y="${ey-4.5}" width="10.5" height="8" rx="3.4" fill="url(#${u}sg)" stroke="#111" stroke-width="1"/><rect x="2" y="${ey-4.5}" width="10.5" height="8" rx="3.4" fill="url(#${u}sg)" stroke="#111" stroke-width="1"/><path d="M-2 ${ey-2} H2" stroke="#111" stroke-width="1.4"/><path d="M-10 ${ey-2.6} l3 -1 M4.4 ${ey-2.6} l3 -1" stroke="#fff" stroke-width="1" opacity=".8" stroke-linecap="round"/>`);
-  if(face==="cyber") p.push(`<rect x="-16.5" y="${ey-4.6}" width="33" height="8.4" rx="4.2" fill="rgba(63,216,255,.42)" stroke="#3fd8ff" stroke-width="1"/><path d="M-13 ${ey-2.6} H6" stroke="#e6fbff" stroke-width="1" opacity=".75" stroke-linecap="round"/>`);
-  if(face==="coeur"){ const h=cx=>`<path d="M${cx} ${ey+3.6} C${cx-6.4} ${ey-.6} ${cx-3.8} ${ey-6.4} ${cx} ${ey-2.6} C${cx+3.8} ${ey-6.4} ${cx+6.4} ${ey-.6} ${cx} ${ey+3.6}Z" fill="#ff3b7a" stroke="#b0124a" stroke-width=".8"/>`; p.push(h(-6.4)+h(6.4)+`<path d="M-1.6 ${ey-2} H1.6" stroke="#b0124a" stroke-width="1.2"/>`); }
-  /* sur la tête */
-  if(hat==="bandeau") p.push(`<path d="M-17.6 -56 Q0 -64.5 17.6 -56 L17.8 -51.6 Q0 -60 -17.8 -51.6Z" fill="#ff3b5c"/><path d="M16.5 -55 L25 -53.5 L22.5 -49.5Z M16.5 -53.5 L23.5 -48 L19.5 -46.5Z" fill="#e8264a"/>`);
-  if(hat==="casquette") p.push(`<path d="M-18 -52.5 C-18.5 -66 -9 -72.5 0 -72.5 C9 -72.5 18.5 -66 18 -52.5 Q0 -57.5 -18 -52.5Z" fill="#1b2130"/><path d="M3 -55 Q20 -59.5 31 -53 Q19.5 -50 3 -52Z" fill="#0e121b"/><path d="M1 -68 L-2.4 -63.4 H0 L-1 -59.8 L2.6 -64.6 H0.2Z" fill="#c8ff1e"/><circle cx="0" cy="-72.4" r="1.6" fill="#c8ff1e"/>`);
-  if(hat==="bonnet") p.push(`<path d="M-18 -52 C-18 -68 -9 -74 0 -74 C9 -74 18 -68 18 -52Z" fill="#3fd8ff"/><path d="M-9 -72 V-56 M0 -74 V-56 M9 -72 V-56" stroke="#2aa9d6" stroke-width="1.4"/><rect x="-19" y="-57.5" width="38" height="7" rx="3.5" fill="#1f9fd0"/><circle cx="0" cy="-75.5" r="4.4" fill="#fff"/>`);
-  if(hat==="bonnet_hmg"||hat==="bonnet_volt"){ const v=hat==="bonnet_volt", a=v?"#c8ff1e":"#11151f", b=v?"#0a0f02":"#c8ff1e";
-    p.push(`<path d="M-18 -52 C-18 -68 -9 -74 0 -74 C9 -74 18 -68 18 -52Z" fill="${a}"/><path d="M-9 -72 V-58 M0 -74 V-58 M9 -72 V-58" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/><rect x="-19" y="-58" width="38" height="8" rx="3.5" fill="${b}"/><text x="0" y="-51.9" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-weight="700" font-size="6.4" letter-spacing=".6" fill="${a}">HMG</text><circle cx="0" cy="-75.5" r="4.6" fill="${b}"/>`); }
-  if(hat==="casque") p.push(`<path d="M-19 -50 C-21 -76 21 -76 19 -50" stroke="#1b2130" stroke-width="3.6" fill="none"/><rect x="-23" y="-57" width="7.4" height="14" rx="3.4" fill="#1b2130" stroke="#c8ff1e" stroke-width="1.1"/><rect x="15.6" y="-57" width="7.4" height="14" rx="3.4" fill="#1b2130" stroke="#c8ff1e" stroke-width="1.1"/>`);
-  if(hat==="crete") p.push(`<path d="M-7 -64.5 L-6.5 -78 L-2.2 -68 L0 -84 L3.2 -68 L7.6 -77.5 L8 -63.5 Q0 -67.5 -7 -64.5Z" fill="#ff4fd8" stroke="#b0129a" stroke-width=".8"/>`);
-  if(hat==="aureole") p.push(`<g class="b-halo"><ellipse cx="0" cy="-81" rx="12.5" ry="3.6" fill="none" stroke="#ffd166" stroke-opacity=".35" stroke-width="5"/><ellipse cx="0" cy="-81" rx="12.5" ry="3.6" fill="none" stroke="#ffe9a3" stroke-width="2.2"/></g>`);
-  if(hat==="couronne") p.push(`<path d="M-11.5 -63.5 L-13.5 -78 L-6 -71 L0 -82.5 L6 -71 L13.5 -78 L11.5 -63.5Z" fill="url(#${u}au)" stroke="#a87400" stroke-width=".8"/><circle cx="0" cy="-67.5" r="2" fill="#ff3b5c"/><circle cx="-6.5" cy="-66.5" r="1.4" fill="#3fd8ff"/><circle cx="6.5" cy="-66.5" r="1.4" fill="#2bffa0"/>`);
-  p.push(`</g>`);
-  /* bras droit + objet en main */
-  const it={haltere:`<rect x="6" y="-17.6" width="15" height="2.2" rx="1" fill="#cfd6e6"/><rect x="4.4" y="-21.5" width="3.6" height="10" rx="1.3" fill="#2a3142"/><rect x="19" y="-21.5" width="3.6" height="10" rx="1.3" fill="#2a3142"/><rect x="4.4" y="-17.4" width="3.6" height="1.8" fill="#c8ff1e"/><rect x="19" y="-17.4" width="3.6" height="1.8" fill="#c8ff1e"/>`,
-    haltereor:`<rect x="5" y="-17.8" width="17" height="2.6" rx="1" fill="#fff2b0"/><rect x="2.8" y="-23" width="4.6" height="13" rx="1.6" fill="url(#${u}au)"/><rect x="19.6" y="-23" width="4.6" height="13" rx="1.6" fill="url(#${u}au)"/><circle cx="4" cy="-22" r=".9" fill="#fff"/><circle cx="21" cy="-21" r=".9" fill="#fff"/>`,
-    kettle:`<path d="M9.6 -18.5 Q13.5 -25 17.4 -18.5" stroke="#2a3142" stroke-width="2.2" fill="none"/><circle cx="13.5" cy="-11.5" r="6" fill="#2a3142"/><circle cx="11.6" cy="-13.2" r="1.6" fill="#fff" opacity=".35"/><path d="M10 -10 H17" stroke="#c8ff1e" stroke-width="1.2"/>`,
-    shaker:`<rect x="10" y="-25.5" width="7" height="14" rx="2.2" fill="#c8ff1e" opacity=".9"/><rect x="9.6" y="-28" width="7.8" height="3.6" rx="1.2" fill="#1b2130"/><rect x="11" y="-21" width="5" height="1.4" fill="#0a0f02" opacity=".5"/>`}[hand]||"";
-  p.push(`<g transform="translate(${dx} 0)"><g class="b-armR"><g transform="rotate(-10 12 -29)">${hand==="shaker"?it+arm(10.5,13.5):arm(10.5,13.5)+it}</g></g></g>`);
-  /* devant */
-  if(aura==="etincelles") p.push(`<g class="b-spk" fill="#fff6b0">${[[-25,-62],[24,-46],[-21,-22],[23,-74]].map(([x,y])=>`<path d="M${x} ${y-5} L${x+1.3} ${y-1.3} L${x+5} ${y} L${x+1.3} ${y+1.3} L${x} ${y+5} L${x-1.3} ${y+1.3} L${x-5} ${y} L${x-1.3} ${y-1.3}Z"/>`).join("")}</g>`);
-  if(aura==="eclairs") p.push(`<path class="b-bolt" d="M-27 -66 L-21 -54 L-26 -52 L-19 -38" stroke="#c8ff1e" stroke-width="2.2" fill="none" stroke-linejoin="round"/><path class="b-bolt" d="M27 -60 L21 -48 L26 -46 L19 -31" stroke="#c8ff1e" stroke-width="2.2" fill="none" stroke-linejoin="round"/>`);
-  if(!st) p.push(`<g class="b-zz"><text x="15" y="-70">z</text><text x="20" y="-77">Z</text></g>`);
-  p.push(`</g>`);
-  return `<svg class="gmb ${o.cls==null?"idle":o.cls}" viewBox="-40 -94 80 98"${st?` xmlns="http://www.w3.org/2000/svg" width="${o.w||400}" height="${o.h||490}"`:""} aria-hidden="true">${p.join("")}</svg>`;
-}
+/* ---------- le petit héros (SVG) */
+/* [heros] le dessin « Chibi Volt » est dans js/heros.js (drawHero, chargé avant ce fichier) ; gmBot n'est plus qu'une enveloppe.
+   Options : cls (humeur), mus (palier), lite (fantôme), static/w/h (partage), pad (socle), etat ("malade" | "convalescent" | "pause").
+   Le héros du joueur (eq === gmS.eq) suit window.HMG_HEROS_ETAT ; les autres joueurs jamais. */
+function gmBot(eq,o={}){ return drawHero(eq,o); } /* [/heros] */
 
 /* ---------- coffre (SVG) */
 function gmChestSvg(col,opened,big){
@@ -1832,7 +1720,7 @@ function gmPlace(pos,scroll){ const p=gmPoint(pos), hr=$("gmHero"); if(!hr) retu
   if(scroll!==false){ const sc=$("game").querySelector(".gm-scroll"); const target=p.y-sc.clientHeight*.56, tx=(sc.scrollWidth-sc.clientWidth)/2+p.x*.55;
     sc.scrollTop=scroll===0?target:sc.scrollTop+(target-sc.scrollTop)*.14; sc.scrollLeft=scroll===0?tx:sc.scrollLeft+(tx-sc.scrollLeft)*.14; } }
 function gmMood(){ const hh=new Date().getHours(); return score.today?"happy idle":(hh>=23||hh<6)?"sleep":"idle"; }
-function gmPaintHero(cls){ const hr=$("gmHero"); if(!hr) return; hr.innerHTML=gmBot(gmS.eq,{cls:cls||gmMood()}); hr.classList.toggle("cold",gmSeason()==="hiver"&&!gmS.eq.skin&&!GM_LG[gmS.eq.hero]); }
+function gmPaintHero(cls){ const hr=$("gmHero"); if(!hr) return; hr.innerHTML=drawHero(gmS.eq,{cls:cls||gmMood(),dyn:true}); /* [heros] dyn : les humeurs changent par simple classe (gmHeroCls) ; suit window.HMG_HEROS_ETAT */ hr.classList.toggle("cold",gmSeason()==="hiver"&&!gmS.eq.skin&&!GM_LG[gmS.eq.hero]); }
 function gmSky(){ const g=$("game"); if(!g) return; const s=gmSeason(); g.dataset.ssn=s; let k=g.querySelector(".gm-sky");
   if(!k){ k=document.createElement("div"); k.className="gm-sky"; k.setAttribute("aria-hidden","true"); g.querySelector(".gm-scroll").after(k); }
   if(k.dataset.s===s) return; k.dataset.s=s; const r=gmRng(gmHash("sky"+s)), o=[], N={hiver:48,printemps:26,ete:18,automne:24}[s];
@@ -1844,7 +1732,7 @@ function gmSky(){ const g=$("game"); if(!g) return; const s=gmSeason(); g.datase
 function gmSsnBanner(s){ return new Promise(res=>{ const S=GM_SSN[s], b=document.createElement("div"); b.className="gm-banner glass ssn"; b.style.setProperty("--wc",{hiver:"#bfe6ff",printemps:"#ff9ad5",ete:"#ffd166",automne:"#ff9a3d"}[s]);
   b.innerHTML=`<b>${esc(S.h)}</b><span>${S.e} ${esc(S.n)}</span><small>${esc(S.t)}</small>`; document.body.appendChild(b); gmSnd("magic");
   setTimeout(()=>{ b.remove(); res(); },3200); }); }
-function gmHeroCls(c){ const s=$("gmHero")&&$("gmHero").querySelector(".gmb"); if(s) s.setAttribute("class","gmb "+c); }
+function gmHeroCls(c){ const s=$("gmHero")&&$("gmHero").querySelector(".hh"); if(s) s.setAttribute("class","hh "+c+(s.dataset.et?" "+s.dataset.et:"")); } /* [heros] garde l'état (hv-malade…) */
 
 /* ---------- les autres sportifs (classement) en petits fantômes sur le chemin */
 async function gmGhosts(){
@@ -1854,9 +1742,9 @@ async function gmGhosts(){
   const L=GM.lay, per={}; let k=0;
   for(const r of GM.ghosts){ if(r.me) continue; const d=Math.round((r.points||0)/10); if(d<L.i0||d>L.i1||k>=24) continue; const j=per[d]=(per[d]||0)+1; if(j>3) continue; k++;
     const p=L.P(d), x=p.x+(j===1?-48:j===2?48:0), y=p.y+(j===3?44:4), r2=gmRng(gmHash(String(r.no)))();
-    const eq={hero:GM_HEROES[(r2*3)|0].k,tone:r2>.5?"fonce":"clair",skin:d>=3?["blanc","volt","braise","ocean"][(r2*4)|0]:null,legs:d>=6?(r2>.7?"jogging":"short_noir"):null,feet:d>=13?"baskets":null,hand:"haltere"}, ml=gmMusLv(d);
+    const eq={hero:GM_HEROES[(r2*3)|0].k,tone:["clair","hale","brun","fonce"][((r2*97)%1*4)|0] /* [heros] 4 teintes */,skin:d>=3?["blanc","volt","braise","ocean"][(r2*4)|0]:null,legs:d>=6?(r2>.7?"jogging":"short_noir"):null,feet:d>=13?"baskets":null,hand:"haltere"}, ml=gmMusLv(d);
     const el=document.createElement("div"); el.className="gm-ghost"; el.style.left=x+"px"; el.style.top=y+"px"; el.dataset.ghost=`${nameOf(r.no)} · ${d} séance${d>1?"s":""} · ${GM_MUS[ml].n}`;
-    el.innerHTML=gmBot(eq,{cls:"idle",mus:ml})+`<i>${esc(String(nameOf(r.no)).replace(/^Machine /,"n°"))}</i>`; col.appendChild(el); }
+    el.innerHTML=drawHero(eq,{cls:"idle",mus:ml,lite:true}) /* [heros] fantôme : aplats, figé, mis en cache ; jamais d'état de forme */+`<i>${esc(String(nameOf(r.no)).replace(/^Machine /,"n°"))}</i>`; col.appendChild(el); }
 }
 
 /* ---------- interface */
@@ -1963,59 +1851,40 @@ function gmOpenChest(n){ return new Promise(res=>{
     const cols=[rc,"#ffffff",ACC,rc,ACC1]; for(let j=0;j<46;j++){ const a=Math.PI*2*j/46+Math.random()*.3, dd=160+Math.random()*260, c=document.createElement("i"); c.className="cf";
       c.style.cssText=`background:${cols[j%cols.length]};--x:${Math.round(Math.cos(a)*dd)}px;--y:${Math.round(Math.sin(a)*dd-60)}px;--r:${Math.round(Math.random()*900-450)}deg;animation-delay:${Math.round(Math.random()*150)}ms`; ov.appendChild(c); setTimeout(()=>c.remove(),2000); }
     const pv=item?{...gmS.eq,[item.cat]:item.id}:gmS.eq, worn=item&&gmS.eq[item.cat]===item.id;
-    ov.querySelector(".loot").innerHTML=leg?`<span class="rar">Légende débloquée</span>${gmBot({...gmS.eq,hero:leg.k,hat:null,aura:null,skin:null,legs:null,feet:null},{cls:"happy cheer"}).replace('class="gmb','class="pv gmb')}<h3>${esc(leg.n)}</h3>
+    ov.querySelector(".loot").innerHTML=leg?`<span class="rar">Légende débloquée</span>${drawHero({...gmS.eq,hero:leg.k,hat:null,aura:null,skin:null,legs:null,feet:null},{cls:"happy cheer",pad:true}).replace('class="hh','class="pv hh') /* [heros] */}<h3>${esc(leg.n)}</h3>
       <p>${esc(leg.s)}.</p><div class="pwr"><b>Pouvoir · ${esc(leg.pw)}</b>${esc(leg.pd)} Actif dès maintenant.</div>
       <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="leg">Jouer avec</button></div>`
-      :item?`<span class="rar">${GM_RAR[item.r].t}</span>${gmBot(pv,{cls:"happy idle"}).replace('class="gmb','class="pv gmb')}<h3>${esc(item.n)}</h3>
+      :item?`<span class="rar">${GM_RAR[item.r].t}</span>${drawHero(pv,{cls:"happy idle",pad:true}).replace('class="hh','class="pv hh') /* [heros] */}<h3>${esc(item.n)}</h3>
       <p>${item.say?esc(item.say):pickR(["Il te va à merveille.","Avec ça, la salle va trembler.","Style de champion, ","Les autres vont être jaloux."]).replace(/, $/,`, <b>${esc(myName())}</b>.`)}</p>
       ${item2?`<div class="pwr"><b>Pose classique · 2e objet</b>${esc(item2.n)} (${GM_RAR[item2.r].t.toLowerCase()}) rejoint ta collection.</div>`:""}
       <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="wear">${worn?"Super !":"Le porter"}</button></div>`
       :`<span class="rar">Étoile HMG</span><div style="font-size:84px;line-height:1.4">⭐</div><h3>Collection complète !</h3><p>Tu as déjà tous les objets : <b>+1 étoile</b>. Respect, ${esc(myName())}.</p><div class="row2"><button class="cy" data-k="later">Continuer</button></div>`;
     ov.querySelector(".loot").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(!b) return; e.stopPropagation();
-      if(b.dataset.k==="leg"&&leg){ gmS.eq.hero=leg.k; gmS.eq.hat=null; gmS.eq.aura=null; gmS.eq.skin=null; gmS.eq.legs=null; gmS.eq.feet=null; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
-      if(b.dataset.k==="wear"&&item){ gmS.eq[item.cat]=item.id; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
+      if(b.dataset.k==="leg"&&leg){ heroIncarne(leg.k) /* [heros] garde le héros de base et la tenue pour « Quitter » (Ma collection) */; gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
+      if(b.dataset.k==="wear"&&item){ gmS.eq[item.cat]=item.id; heroVu(item.id) /* [heros] porté = déjà vu */; gmSave(); gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1500); }
       ov.style.transition="opacity .3s"; ov.style.opacity=0; setTimeout(()=>{ ov.remove(); gmMark(GM.pos); gmHud(); res(); },300); }); }
 }); }
 
 /* ---------- choix du héros (première fois) */
 function gmPickHero(first){ if(GM.pick) return GM.pick; return GM.pick=new Promise(res0=>{ const res=v=>{ GM.pick=null; res0(v); };
-  let hero=gmS.eq.hero||"homme", tone=gmS.eq.tone||"clair";
+  let hero=GM_LG[gmS.eq.hero]?(gmS.eq.base||"homme"):(gmS.eq.hero||"homme"), tone=gmS.eq.tone||"clair"; /* [heros] légende incarnée : on part de son héros de base */
   const ov=document.createElement("div"); ov.className="gm-ov gm-pickov";
-  const draw=()=>{ const tc=GM_TONE[hero==="robot"?"robot":"human"];
-    ov.innerHTML=`<div class="card glass" role="dialog" aria-label="Choisis ton héros">${first?"":`<button class="x" data-k="x" aria-label="Fermer">${ic("x")}</button>`}
-      <div class="kick">L'Aventure HMG</div><h2>${first?"Choisis ton héros":"Change de héros"}</h2>
-      <p>${first?`Il démarre en <b>caleçon</b>. Chaque séance validée à la salle le fait avancer d'un pas et grossir ses muscles. Les <b>coffres</b> l'habillent, à ton rythme.`:"Ta collection et ta progression restent les mêmes."}</p>
-      <div class="gm-pick">${GM_HEROES.map(h=>`<button data-hero="${h.k}" aria-pressed="${h.k===hero}">${gmBot({...gmS.eq,hero:h.k,tone},{cls:h.k===hero?"happy idle":"idle"})}<b>${h.n}</b><small>${h.s}</small></button>`).join("")}</div>
-      <div class="gm-tone">${["clair","fonce"].map(t=>`<button data-tone="${t}" aria-pressed="${t===tone}"><i style="background:${tc[t].s}"></i>${hero==="robot"?(t==="clair"?"Blanc":"Noir"):(t==="clair"?"Peau claire":"Peau noire")}</button>`).join("")}</div>
-      <button class="cy gm-go" style="width:100%" data-k="ok">${hero==="femme"?"C'est elle !":hero==="robot"?"C'est mon robot !":"C'est lui !"}</button>
-      ${first?`<button type="button" class="gm-acct" data-acct="restore">J'ai déjà un compte sur un autre navigateur</button>`:""}</div>`; };
+  /* [heros] 3 héros, 4 teintes : contenu dans js/heros.js (en secours, un simple bouton : la fenêtre doit toujours pouvoir se fermer) */
+  const draw=()=>{ try{ ov.innerHTML=heroPickHtml(first,hero,tone); }catch(er){ ov.innerHTML=`<div class="card glass" role="dialog" aria-label="Choisis ton héros"><h2>Ton héros t'attend</h2><button class="cy gm-go" style="width:100%" data-k="ok">C'est parti !</button></div>`; } };
   draw(); document.body.appendChild(ov);
   ov.addEventListener("click",e=>{ const t=e.target, h=t.closest("[data-hero]"), tn=t.closest("[data-tone]"), k=t.closest("[data-k]");
-    if(h){ hero=h.dataset.hero; draw(); gmSnd("pop"); return; } if(tn){ tone=tn.dataset.tone; draw(); return; }
+    /* [heros] après redessin, le focus revient sur le bouton touché (VoiceOver, clavier) */
+    if(h){ hero=h.dataset.hero; draw(); gmSnd("pop"); heroVibre("light"); const f=ov.querySelector(`[data-hero="${hero}"]`); if(f) f.focus({preventScroll:true}); return; }
+    if(tn){ tone=tn.dataset.tone; draw(); heroVibre("selection"); const f=ov.querySelector(`[data-tone="${tone}"]`); if(f) f.focus({preventScroll:true}); return; }
     if(k){ const ok=k.dataset.k==="ok"; if(!ok&&first) return;
       /* d'abord fermer et enregistrer : la fenêtre ne doit jamais rester bloquée, même si un effet plante */
-      ov.remove(); if(ok){ gmS.eq.hero=hero; gmS.eq.tone=tone; gmSave(); } res();
+      ov.remove(); if(ok){ try{ if(GM_LG[gmS.eq.hero]) heroQuitte(); }catch(er){} /* [heros] */ gmS.eq.hero=hero; gmS.eq.tone=tone; gmSave(); } res();
       try{ gmHud(); if(ok){ gmPaintHero("happy cheer"); setTimeout(()=>{ try{ gmPaintHero(); }catch(er){} },1500); gmSnd("fanfare"); } }catch(er){} } });
 }); }
 
 /* ---------- collection */
-function gmColl(){
-  const ov=document.createElement("div"); ov.className="gm-ov gm-coll";
-  const draw=()=>{ ov.innerHTML=`<div class="card glass" role="dialog" aria-label="Ma collection"><button class="x" data-k="x" aria-label="Fermer">${ic("x")}</button>
-    <div class="top">${gmBot(gmS.eq,{cls:"happy idle"})}<h2>Ma collection</h2><div class="cnt"><b>${gmS.items.length}</b> / ${GM_TOTAL} objets${gmS.stars?` · ⭐ ${gmS.stars}`:""} · ${gDays()} séance${gDays()>1?"s":""}</div>
-      <div class="cnt mus">💪 Physique <b>${GM_MUS[gmHeroLv()].n}</b>${GM_MUS[gmHeroLv()+1]?` · <span>${GM_MUS[gmHeroLv()+1].n} à ${GM_MUS[gmHeroLv()+1].d} séances</span>`:" · niveau max"}</div>
-      <div class="row"><button class="mini" data-k="hero">Changer de héros</button><button class="mini" data-k="share">Partager</button></div></div>
-    <div class="body"><h4>Légendes · ${Object.keys(gmS.leg).length}/${GM_LEG.length}</h4><div class="gm-grid leg">${GM_LEG.map((l,i)=>{ const own=gmS.leg[l.k]!=null, on=gmS.eq.hero===l.k;
-      return `<button class="gm-it leg${own?" own":" lock"}${on?" on":""}" style="--rc:#ffd166" ${own?`data-hero="${l.k}"`:"disabled"}>${gmBot({...gmS.eq,hero:l.k,hat:null,aura:null,skin:null,legs:null,feet:null},{cls:""})}<b>${own?esc(l.n):"Légende mystère"}</b><small>${esc(l.pw).toUpperCase()}</small><em>${own?esc(l.pd):`Grand coffre à ${20*(i+1)} séances`}</em></button>`; }).join("")}</div>
-      ${GM_CATS.map(([c,t])=>`<h4>${t}</h4><div class="gm-grid">${[{id:"",cat:c,n:gmNone(c,gmS.eq),r:"C",def:1}].concat(GM_ITEMS.filter(i=>i.cat===c)).map(i=>{ const own=i.def||gmOwn(i.id), on=(gmS.eq[c]||"")===i.id;
-      return `<button class="gm-it${own?" own":" lock"}${on?" on":""}" style="--rc:${GM_RAR[i.r].c}" ${own?`data-eq="${c}:${i.id}"`:"disabled"} aria-label="${esc(i.n)}">${gmBot({...gmS.eq,[c]:i.id||null},{cls:""})}<b>${own?esc(i.n):"???"}</b><small>${i.id?GM_RAR[i.r].t.toUpperCase():""}${i.hmg?" · HMG":""}</small></button>`; }).join("")}</div>`).join("")}
-      <p style="color:var(--muted);font-size:12px;margin:16px 0 0">Les objets sortent des coffres au hasard. Ta collection est gardée sur cet appareil, comme tes points.</p></div></div>`; };
-  draw(); document.body.appendChild(ov);
-  ov.addEventListener("click",async e=>{ const t=e.target, q=t.closest("[data-eq]"), k=t.closest("[data-k]");
-    const lh=t.closest("[data-hero]"); if(lh){ gmS.eq.hero=lh.dataset.hero; gmSave(); const sc=ov.querySelector(".body").scrollTop; draw(); ov.querySelector(".body").scrollTop=sc; gmPaintHero("happy cheer"); setTimeout(()=>gmPaintHero(),1400); gmSnd("crown"); return; }
-    if(q){ const [c,id]=q.dataset.eq.split(":"); gmS.eq[c]=id||null; gmSave(); const sc=ov.querySelector(".body").scrollTop; draw(); ov.querySelector(".body").scrollTop=sc; gmPaintHero(); gmSnd("pop"); return; }
-    if(k||t===ov){ const v=k&&k.dataset.k; ov.remove(); if(v==="hero"){ await gmPickHero(false); } else if(v==="share") gmShare(); } });
-}
+/* [heros] « Ma collection » plein écran : js/heros.js (heroColl) */
+function gmColl(){ heroColl(); }
 
 /* ---------- partager son héros (image story 1080×1920 pour Insta / TikTok) */
 async function gmShare(){
@@ -2024,7 +1893,7 @@ async function gmShare(){
     const gr=x.createLinearGradient(0,0,0,1920); gr.addColorStop(0,W.c[1]); gr.addColorStop(.5,W.c[0]); gr.addColorStop(1,"#04060b"); x.fillStyle=gr; x.fillRect(0,0,1080,1920);
     const rg=x.createRadialGradient(540,900,40,540,900,620); rg.addColorStop(0,W.wc+"55"); rg.addColorStop(1,"transparent"); x.fillStyle=rg; x.fillRect(0,0,1080,1920);
     const rr=gmRng(7); for(let i=0;i<140;i++){ x.globalAlpha=.2+rr()*.6; x.fillStyle="#fff"; x.beginPath(); x.arc(rr()*1080,rr()*1920,rr()*2.4+.6,0,7); x.fill(); } x.globalAlpha=1;
-    const svg=gmBot(gmS.eq,{static:true,w:720,h:882}), img=new Image(); img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+    const svg=drawHero(gmS.eq,{static:true,w:720,h:882,cls:"happy idle",etat:""}) /* [heros] image de partage : toujours en forme et souriant */, img=new Image(); img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
     await new Promise((ok,ko)=>{ img.onload=ok; img.onerror=ko; });
     x.fillStyle="rgba(0,0,0,.35)"; x.beginPath(); x.ellipse(540,1310,250,40,0,0,7); x.fill(); x.drawImage(img,180,440,720,882);
     x.textAlign="center"; x.fillStyle=W.wc; x.font="700 34px 'Space Grotesk',sans-serif"; x.fillText(("MONDE "+(w+1)+" · "+W.n).toUpperCase(),540,250);
