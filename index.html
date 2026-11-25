@@ -13,7 +13,46 @@
 <meta name="application-name" content="HMG Fitness">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="canonical" href="https://hmgfitness.fr/">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="noindex, nofollow">
+<script>/* ===== Accès privé (test avant la sortie de l'appli) : seulement avec un lien d'invitation de Mino =====
+   Lien : hmgfitness.fr/?invite=CODE . Les codes ne sont pas écrits ici, seulement leur empreinte.
+   Ajouter / retirer une personne = ajouter / retirer une empreinte dans H. */
+(function(){ var K="hmg-invite", H=["kf0kn9dvf2mv","fmors21eqnvrv"];
+  function h(s){ var a=0x811c9dc5, b=0x45d9f3b; for(var i=0;i<s.length;i++){ var c=s.charCodeAt(i); var nb=Math.imul(b^c,0x5bd1e995)^(b>>>13); a=Math.imul(a^c,16777619); b=nb; } return (a>>>0).toString(36)+(b>>>0).toString(36); }
+  function good(c){ return !!c&&H.indexOf(h(String(c).trim().toLowerCase()))>=0; }
+  var ok=false;
+  try{ var u=new URL(location.href), q=u.searchParams.get("invite");
+    if(good(q)){ localStorage.setItem(K,JSON.stringify(String(q).trim().toLowerCase())); ok=true; u.searchParams.delete("invite"); history.replaceState(null,"",u.pathname+u.search+u.hash); }
+    if(!ok) ok=good(JSON.parse(localStorage.getItem(K)||"null"));
+    if(!ok){ var se=JSON.parse(localStorage.getItem("hmg-session")||"null"); ok=!!(se&&se.admin); }
+  }catch(e){}
+  window.HMG_PRIVE=!ok; if(ok) return;
+  document.documentElement.classList.add("prive");
+  window.hmgEntrer=function(f){ var v=f.code.value.replace(/^.*invite=/,"").trim().toLowerCase(), m=document.getElementById("priveMsg");
+    if(good(v)){ try{ localStorage.setItem(K,JSON.stringify(v)); }catch(e){} location.replace(location.pathname); }
+    else { m.textContent="Ce code ne marche pas. Vérifie le lien qu'on t'a envoyé."; } return false; };
+  document.addEventListener("DOMContentLoaded",function(){ var d=document.createElement("div"); d.id="prive";
+    d.innerHTML='<div class="pv-card"><div class="pv-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></div>'
+      +'<small>HMG Fitness</small><h1>L\'appli arrive sur iPhone</h1><p>HMG est en test privé. Tu as reçu un lien d\'invitation ? Ouvre-le, ou colle ton code ici.</p>'
+      +'<form onsubmit="return hmgEntrer(this)" autocomplete="off"><input name="code" placeholder="Ton code d\'invitation" aria-label="Code d\'invitation" autocapitalize="none" spellcheck="false"><button>Entrer</button></form><div id="priveMsg" aria-live="polite"></div></div>';
+    document.body.appendChild(d); });
+})();</script>
+<style>
+html.prive body>*:not(#prive){display:none!important}
+html.prive body{margin:0;min-height:100dvh;background:radial-gradient(circle at 50% 30%,rgba(200,255,30,.14),transparent 55%),#05070d;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#e9eefb}
+#prive{min-height:100dvh;display:grid;place-items:center;padding:24px 18px}
+#prive .pv-card{width:min(420px,100%);text-align:center;padding:30px 22px 24px;border-radius:28px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+#prive .pv-logo{width:64px;height:64px;margin:0 auto 14px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(135deg,#e6ff8a,#c8ff1e 55%,#9fe000);box-shadow:0 10px 34px rgba(200,255,30,.4)}
+#prive .pv-logo svg{width:34px;height:34px;fill:none;stroke:#0b1200;stroke-width:2.6;stroke-linecap:round}
+#prive small{display:block;font-weight:800;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#c8ff1e}
+#prive h1{margin:8px 0 10px;font-size:26px;line-height:1.15;color:#fff}
+#prive p{margin:0 0 18px;color:#9aa6bf;font-size:14.5px;line-height:1.5}
+#prive form{display:grid;gap:10px}
+#prive input{font:inherit;font-size:16px;padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.35);color:#fff;text-align:center;outline:none}
+#prive input:focus{border-color:#c8ff1e;box-shadow:0 0 0 3px rgba(200,255,30,.18)}
+#prive button{display:flex;justify-content:center;align-items:center;width:100%;font:inherit;font-weight:800;font-size:16px;padding:14px;border:0;border-radius:16px;color:#0b1200;background:linear-gradient(135deg,#e6ff8a,#c8ff1e 55%,#9fe000);box-shadow:0 10px 30px rgba(200,255,30,.35);cursor:pointer}
+#priveMsg{min-height:20px;margin-top:10px;font-size:13px;color:#ff8a8a}
+</style>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://hmgfitness.fr/">
 <meta property="og:locale" content="fr_FR">
@@ -1711,6 +1750,7 @@ button.cc-st:hover{border-color:rgba(var(--a-rgb),.4)}
 //# sourceMappingURL=leaflet.js.map</script>
 <script>
 "use strict";
+if(window.HMG_PRIVE) throw new Error("HMG : accès privé (test avant la sortie de l'appli)");
 /* ================= CONFIGURATION ================
    Base Supabase : colle ici la « Project URL » et la clé « anon public ».
    Laisse vide pour le mode démo (tout reste sur l'appareil). */
