@@ -3151,9 +3151,10 @@ async function acctFromHash(){
   if(p.v===voterId){ toast("Tu es déjà sur ton compte."); return; }
   const m=acctModalEl(); m.innerHTML=`<div class="card glass acct"><div class="acct-ico">${ic("loc")}</div><h2>Je retrouve ton compte…</h2></div>`;
   const s=await acctPeek(p.v); if(s&&!s.no&&!s.days){ m.innerHTML=`<div class="card glass acct"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button><div class="acct-ico">${ic("x")}</div><h2>Compte introuvable</h2><p>Ce lien ne correspond à aucun compte HMG.</p><button class="cy" data-acct-x>OK</button></div>`; return; }
-  const nm=s&&s.no?(PSEUDOS[s.no]||"Machine "+s.no):"ton compte", d=s?s.days||0:0, here=score.days||0;
+  const nm=s&&s.no?(PSEUDOS[s.no]||"Machine "+s.no):"", d=s?s.days||0:0, here=score.days||0;
+  const info=[s?d+" séance"+(d>1?"s":""):"", s&&s.points?s.points+" points":"", p.g&&p.g.hero?"ton héros t'attend":""].filter(Boolean).join(" · ");
   m.innerHTML=`<div class="card glass acct"><button class="x" data-acct-x aria-label="Fermer">${ic("x")}</button><div class="acct-ico ok">${ic("check")}</div>
-    <h2>Content de te revoir, <span class="gr">${esc(nm)}</span> !</h2><p>${d} séance${d>1?"s":""}${s&&s.points?" · "+s.points+" points":""}${p.g&&p.g.hero?" · ton héros t'attend":""}. Ce navigateur va utiliser ce compte.</p>
+    <h2>Content de te revoir${nm?`, <span class="gr">${esc(nm)}</span>`:""} !</h2><p>${info?info+". ":""}Ce navigateur va utiliser ce compte.</p>
     ${here?`<p class="acct-warn">Les ${here} séance${here>1?"s":""} faites ici sous ${esc(myName())} restent sur l'autre compte.</p>`:""}
     <div class="acct-row"><button data-acct-x>Annuler</button><button class="cy" id="acctGo">C'est moi</button></div></div>`;
   $("acctGo").addEventListener("click",()=>acctAdopt(p,s));
@@ -3594,11 +3595,13 @@ const gmSleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function gmSync(){ if(!GM.on) return; if(GM.sync){ GM.again=true; return; } GM.sync=true;
   try{ await gmSync0(); } finally{ GM.sync=false; } if(GM.again&&GM.on){ GM.again=false; setTimeout(gmSync,60); } }
 /* compte retrouvé depuis un autre navigateur : on rouvre en silence tous les coffres déjà gagnés (mêmes tirages, même ordre) */
-function gmRebuild(d){ const eq={...GM_EQ0,...gmS.eq}; Object.assign(gmS,{open:[],items:[],stars:0,leg:{}});
+function gmRebuild(d){ const eq={...GM_EQ0,...gmS.eq}, bare=!GM_CATS.some(([c])=>gmS.eq[c]); Object.assign(gmS,{open:[],items:[],stars:0,leg:{}});
   for(let n=0;n<=d;n++){ const k=gmKind(n); if(!k) continue; const leg=gmLegRoll(n), item=leg?null:gmRoll(n); gmS.open.push(n);
     if(leg) gmS.leg[leg.k]=n; else if(item) gmS.items.push(item.id); else gmS.stars=(gmS.stars||0)+1;
     const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id); }
-  GM_CATS.forEach(([c])=>{ if(eq[c]&&!gmOwn(eq[c])) eq[c]=null; }); if(GM_LG[eq.hero]&&gmS.leg[eq.hero]==null) eq.hero="homme";
+  GM_CATS.forEach(([c])=>{ if(eq[c]&&!gmOwn(eq[c])) eq[c]=null; });
+  /* compte retrouvé avec le seul code : on le rhabille avec le plus beau de sa collection */
+  if(bare){ const R={C:0,R:1,E:2,L:3}; GM_CATS.forEach(([c])=>{ const best=gmS.items.map(id=>GM_IT[id]).filter(i=>i&&i.cat===c).sort((x,y)=>R[y.r]-R[x.r])[0]; if(best) eq[c]=best.id; }); } if(GM_LG[eq.hero]&&gmS.leg[eq.hero]==null) eq.hero="homme";
   if(eq.hero&&!GM_LG[eq.hero]&&!GM_HEROES.some(h=>h.k===eq.hero)) eq.hero=null;
   gmS.eq=eq; gmS.seen=d; delete gmS.rebuild; gmSave(); }
 async function gmSync0(){
