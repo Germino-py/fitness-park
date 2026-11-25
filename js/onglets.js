@@ -133,7 +133,7 @@ const cqObj = () => { const st=window.HMGC&&HMGC.etat; return (st&&st.goal)||sto
 const CQ_OBJ={2:"Je reprends",3:"Le bon rythme",4:"Motivé",5:"À fond"};
 function cqMoi(){
   const body=cqPage("moi","Moi",{gear:true}); const st=window.HMGC&&HMGC.etat;
-  const lv=GM_MUS[gmHeroLv()]||GM_MUS[0], d=gDays(), avis=db.reviews.filter(r=>visitorOf(r)===myNo).length;
+  const lv=GM_MUS[typeof heroLvAff==="function"?heroLvAff():gmHeroLv()]||GM_MUS[0], d=gDays(), avis=db.reviews.filter(r=>visitorOf(r)===myNo).length;
   const sem=cqSemaine(), jours=new Set(cqJours()), auj=today();
   const ma=byId[store.get("hmg-ma-salle",null)], vis=Object.keys(myVisits||{}).filter(id=>byId[id]&&id!==(ma&&ma.id)).slice(0,4);
   const coeurs=window.HMGC&&HMGC.coeursHtml?HMGC.coeursHtml(24):"";
@@ -141,7 +141,7 @@ function cqMoi(){
       <div class="moi-id"><h2>${esc(myName())}</h2><div class="lv">💪 ${esc(lv.n)}</div>${coeurs?`<div class="hearts">${coeurs}${st&&st.streak?`<small>${st.streak} sem. d'affilée</small>`:""}</div>`:""}</div></div>
     <div class="moi-stats"><div><b>${d}</b><small>séance${d>1?"s":""}</small></div><div><b>${st?st.streak||0:score.streak||0}</b><small>${st?"semaines d'affilée":"jours d'affilée"}</small></div><div><b>${score.clubs||0}</b><small>salle${(score.clubs||0)>1?"s":""}</small></div><div><b>${avis}</b><small>avis</small></div></div>
     <div class="cq-sec">Mon héros</div>
-    <div class="moi-acts"><button data-cq="vestiaire">${cqI("sac")}Vestiaire</button><button data-cq="heros">${cqI("swap")}Changer de héros</button><button data-cq="partager">${cqI("share")}Partager</button></div>
+    <div class="moi-acts"><button data-cq="vestiaire">${cqI("sac")}Vestiaire${(()=>{ try{ const n=heroNouveaux().length; return n?`<span class="moi-new" aria-label="${n} nouveau${n>1?"x":""}">${n}</span>`:""; }catch(e){ return ""; } })()}</button><button data-cq="heros">${cqI("swap")}Changer de héros</button><button data-cq="partager">${cqI("share")}Partager</button></div>
     <div class="cq-sec">Ma semaine</div>
     <div class="cq-card"><button class="cq-row" data-cq="objectif" style="padding:0;min-height:44px"><span class="rt"><b>${cqObj()} séances par semaine</b><small>${esc(CQ_OBJ[cqObj()]||"")} · Modifier</small></span>${cqI("chev","chev")}</button>
       <div class="cal">${["L","M","M","J","V","S","D"].map(x=>`<span class="h">${x}</span>`).join("")}${sem.map(x=>`<span class="${jours.has(x)?"on":""}${x===auj?" today":""}">${+x.slice(8)}</span>`).join("")}</div></div>

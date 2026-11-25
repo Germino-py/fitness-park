@@ -4,7 +4,7 @@
    1 Bienvenue · 2 Héros · 3 Objectif · 4 Localisation · 5 Ta salle · 6 Notifications (appli seulement) · 7 Pseudo · 8 Coffre de bienvenue.
    Les écrans qui précèdent une autorisation n'ont qu'un bouton « Continuer » (règle d'Apple).
    Si la personne quitte en cours, elle reprend à l'écran où elle s'était arrêtée (hmg-onb). */
-const HMGA = { actif:false, etape:1, fin:null, _fin:null };
+const HMGA = { actif:false, etape:1, fin:null, _fin:null }; window.HMGA = HMGA;
 const ONB_ETAPES = APPLI ? [1,2,3,4,5,6,7,8] : [1,2,3,4,5,7,8];   // sur le site, pas de notifications
 const onbEtat = () => store.get("hmg-onb", {});
 const onbNoms = ["Titan","Colosse","Fusée","Panthère","Spartan","Tornade","Volcan","Comète","Faucon","Bison"];

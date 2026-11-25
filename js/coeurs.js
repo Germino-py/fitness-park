@@ -4,7 +4,7 @@
    Le serveur décide de tout (my_state) ; ce fichier ne fait qu'afficher, animer et proposer.
    Source de l'état : HMGS.etat() (js/serveur.js). Sans état, rien ne s'affiche et l'Aventure marche comme avant.
    HMGC.etat = dernier my_state reçu (voir le contrat §14.10) ; HMGC.coeursHtml(px) ; HMGC.rafraichir() ; HMGC.pause(). */
-const HMGC = { etat:null, vu:{}, file:[], occupe:false };
+const HMGC = { etat:null, vu:{}, file:[], occupe:false }; window.HMGC = HMGC;
 
 /* ---------- le dessin du cœur : plein, en danger (fissure), vide, gelé (pause) */
 (function cvDefs(){ const s=document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("width","0"); s.setAttribute("height","0"); s.setAttribute("aria-hidden","true"); s.style.position="absolute";
@@ -36,10 +36,10 @@ const CV_J=["L","M","M","J","V","S","D"];
 function cvSemaineJours(st){ const w=st.week||{}, s=w.start?new Date(w.start+"T12:00:00"):null; const days=new Map((w.days||[]).map(x=>typeof x==="string"?[x,"validee"]:[x.d,x.st||"validee"]));
   return CV_J.map((l,i)=>{ if(!s) return {l,k:"futur"}; const d=new Date(s); d.setDate(s.getDate()+i); const iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
     return {l,iso,k:days.has(iso)?(days.get(iso)==="courte"?"courte":"ok"):iso===today()?"auj":iso<today()?"repos":"futur"}; }); }
+const cvEtatHeros = st => { window.HMG_HEROS_ETAT = st&&!st.soft_mode?(st.pause?"pause":st.sick?((st.conva&&st.conva.n)?"convalescent":"malade"):null):null; };
 function cvHud(){
-  const st=HMGC.etat, g=$("game"); if(!g) return; const hud=g.querySelector(".gm-hud"); if(!hud) return;
+  const st=HMGC.etat; cvEtatHeros(st); const g=$("game"); if(!g) return; const hud=g.querySelector(".gm-hud"); if(!hud) return;
   hud.querySelectorAll(".cv-hearts,.cv-sem,.cv-dg").forEach(x=>x.remove()); g.querySelectorAll(".cv-band").forEach(x=>x.remove());
-  window.HMG_HEROS_ETAT = st&&!st.soft_mode?(st.pause?"pause":st.sick?((st.conva&&st.conva.n)?"convalescent":"malade"):null):null;
   if(!st) return;
   const btns=hud.querySelector(".btns");
   if(btns&&!st.soft_mode) btns.insertAdjacentHTML("afterbegin",`<button class="cv-hearts" data-cv="coeurs" aria-label="Tes cœurs : ${st.hearts||0} sur ${st.hearts_max||3}">${HMGC.coeursHtml(20)}</button>`);
@@ -63,7 +63,7 @@ HMGC.rafraichir = async function(){
   if(!(window.HMGS&&HMGS.etat)) return null;
   let st=null; try{ st=await HMGS.etat(); }catch(e){ st=null; }
   if(!st||typeof st!=="object") return HMGC.etat;
-  const avant=HMGC.etat||store.get("hmg-c-dernier",null); HMGC.etat=st; store.set("hmg-c-dernier",{sick:!!st.sick,hearts:st.hearts,pause:!!st.pause,day:today()});
+  const avant=HMGC.etat||store.get("hmg-c-dernier",null); HMGC.etat=st; cvEtatHeros(st); store.set("hmg-c-dernier",{sick:!!st.sick,hearts:st.hearts,pause:!!st.pause,day:today()});
   try{ if(GM.on) gmHud(); }catch(e){}
   if(CQ&&CQ.tab==="moi"&&!CQ.sub) try{ cqMoi(); }catch(e){}
   try{ if(window.HMGN&&HMGN.notifs&&HMGN.notifs.programmer) HMGN.notifs.programmer(st,cqNotif()); }catch(e){}
@@ -129,7 +129,7 @@ async function cvZero(){
   store.set("hmg-c-zero",today()); const st=HMGC.etat||{}, cv=st.conva&&st.conva.n;
   const p=cvPlein(`<button class="cv-x" data-z="x" aria-label="Fermer">${cqI("x")}</button>
     <div class="bl-hearts">${Array.from({length:st.hearts_max||3},()=>cvCoeur("vide",72)).join("")}</div>
-    <div class="z-hero">${(()=>{ try{ return gmBot(gmS.eq,{cls:"sleep"}); }catch(e){ return ""; } })()}<span class="zz">Zzz</span></div>
+    <div class="z-hero">${(()=>{ try{ return gmBot(gmS.eq,{cls:"sleep"}); }catch(e){ return ""; } })()}</div>
     <h2 class="bl-t">${cv?"Ça va déjà mieux !":"Ton héros a un coup de mou"}</h2>
     <p class="bl-p">${cv?"Une séance de plus, et il se relève avec un cœur.":"Zéro cœur, ça arrive aux meilleurs. Deux séances en 7 jours, et il se relève avec un cœur."}</p>
     <p class="bl-x" style="color:#9aa6bf">Ses objets et ses mondes, eux, restent à lui.</p>

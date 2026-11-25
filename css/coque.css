@@ -181,3 +181,5 @@ body.cq-full #cqTabs{transform:translateY(110%);transition:transform .3s}
 body.coque #toast{bottom:calc(var(--tabbar,60px) + var(--sab,0px) + 78px)}
 /* la séance se valide depuis l'Aventure (ou la fiche d'une salle) : pas de bouton flottant sur la carte */
 body.coque #bCheck{display:none!important}
+.moi-acts button{position:relative}
+.moi-new{position:absolute;top:8px;right:10px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:#ff4d64;color:#fff;font:800 11px/18px var(--f-b);text-align:center;box-shadow:0 0 0 2px #0b0f18}
