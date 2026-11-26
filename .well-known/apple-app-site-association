@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.fr.hmgfitness.app"],
+        "components": [
+          { "/": "/compte/*", "comment": "lien de compte (#c=…)" },
+          { "/": "/invite/*", "comment": "invitation (?c=CODE)" },
+          { "/": "/salle/*", "comment": "fiche d'une salle (?id=…)" }
+        ]
+      }
+    ]
+  }
+}

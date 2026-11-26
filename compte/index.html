@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ton compte · HMG Fitness</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/polices.css?v=9bb1d53c">
+<link rel="stylesheet" href="../css/pages.css?v=6b576842">
+<script>/* Lien universel « hmgfitness.fr/compte/#c=… » (2-appli-ios §1.6) : sur iPhone, l'appli l'ouvre elle-même ;
+   ici (navigateur), on passe au site avec « /#compte=… », que js/app.js sait lire (écran « Content de te revoir »).
+   Le code reste dans le fragment (#) : il n'est jamais envoyé à un serveur. */
+(function(){
+  var h=location.hash.replace(/^#/,""), q=new URLSearchParams(location.search);
+  var m=h.match(/(?:^|&)(?:c|compte)=([A-Za-z0-9_-]{8,4000})/), c=m?m[1]:(/^[A-Za-z0-9_-]{8,4000}$/.test(q.get("c")||"")?q.get("c"):"");
+  if(c){ location.replace("/#compte="+c); return; }
+  document.addEventListener("DOMContentLoaded",function(){ document.getElementById("rien").hidden=false; document.getElementById("attente").hidden=true; });
+})();</script>
+</head>
+<body>
+<div class="page">
+  <div class="attente" id="attente"><div class="rond" aria-hidden="true"></div><p>Ouverture de ton compte HMG…</p></div>
+  <div class="attente" id="rien" hidden>
+    <div class="carte" style="max-width:440px">
+      <h1>Lien incomplet</h1>
+      <p>Ce lien de compte HMG est coupé. Ouvre à nouveau le lien en entier, ou colle ton code secret dans l'appli : Moi › Réglages › Code de secours.</p>
+      <div class="boutons"><a class="btn" href="/">Ouvrir HMG</a><a class="btn verre" href="../aide/#compte">Aide</a></div>
+    </div>
+  </div>
+  <noscript><div class="carte"><p>Pour retrouver ton compte, active JavaScript ou ouvre l'appli HMG.</p></div></noscript>
+</div>
+</body>
+</html>

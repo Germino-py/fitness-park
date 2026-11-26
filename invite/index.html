@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Invitation · HMG Fitness</title>
+<meta name="description" content="Tu es invité sur HMG Fitness : la carte des salles, un héros qui grandit à chaque séance et une communauté qui s'encourage.">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/polices.css?v=9bb1d53c">
+<link rel="stylesheet" href="../css/pages.css?v=6b576842">
+</head>
+<body>
+<div class="page">
+<header class="haut">
+  <a class="marque" href="/"><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></span>HMG Fitness</a>
+  <nav class="liens" aria-label="Informations"><a href="../aide/">Aide</a><a href="../regles/">Règles</a><a href="../confidentialite/">Confidentialité</a></nav>
+</header>
+<main>
+  <p class="sur">Invitation</p>
+  <h1>On t'attend sur HMG</h1>
+  <p class="chapo">La carte des salles, un héros qui grandit à chaque séance validée, et une communauté qui s'encourage. Quelqu'un pense que tu vas adorer.</p>
+
+  <section class="carte volt" id="avecCode" hidden>
+    <h2>Ton code d'invitation</h2>
+    <div class="code" id="code" aria-live="polite"></div>
+    <div class="boutons"><button class="btn" type="button" id="copier">Copier le code</button><a class="btn verre" id="web" href="/">Ouvrir HMG sur le web</a></div>
+    <p class="petit" id="copie" aria-live="polite" style="margin-top:10px"></p>
+  </section>
+
+  <section class="carte">
+    <h2>Sur iPhone</h2>
+    <p>L'appli HMG arrive sur l'App Store. Pendant le test, installe-la avec le lien TestFlight qu'on t'a envoyé, puis entre ton code d'invitation quand l'appli te le demande.</p>
+    <p class="petit">Si l'appli est déjà installée, ce lien l'ouvre directement.</p>
+  </section>
+
+  <section class="carte">
+    <h2>Ce qui t'attend</h2>
+    <ul>
+      <li>Toutes les salles autour de toi, avec les notes et les avis des membres.</li>
+      <li>Un héros qui avance d'un pas à chaque séance validée à la salle, et qui s'habille au fil des coffres.</li>
+      <li>Des cœurs à garder chaque semaine, à ton rythme : de 2 à 5 séances, le repos compte aussi.</li>
+      <li>Sans e-mail, sans pub, sans pistage. <a href="../confidentialite/">Tes données, en clair</a>.</li>
+    </ul>
+  </section>
+</main>
+<footer class="pied">
+  <span>HMG Fitness</span><a href="mailto:contact@hmgfitness.fr">contact@hmgfitness.fr</a><a href="../regles/">Conditions et règles</a>
+</footer>
+</div>
+<script>/* Lien universel « hmgfitness.fr/invite/?c=CODE » (2-appli-ios §1.6) : l'appli le reçoit elle-même quand elle est
+   installée. Ici, on montre le code (iOS ne le transmet pas à travers l'installation depuis l'App Store) et on propose
+   le site avec « /?invite=CODE », que la porte d'invitation de index.html sait lire. */
+(function(){
+  var q=new URLSearchParams(location.search), c=(q.get("c")||location.pathname.split("/")[2]||"").trim();
+  if(!/^[A-Za-z0-9-]{4,40}$/.test(c)) return;
+  document.getElementById("avecCode").hidden=false;
+  document.getElementById("code").textContent=c;
+  document.getElementById("web").href="/?invite="+encodeURIComponent(c);
+  document.getElementById("copier").addEventListener("click",function(){
+    var m=document.getElementById("copie");
+    function ok(){ m.textContent="Code copié. Colle-le dans l'appli quand elle te le demande."; }
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(c).then(ok,function(){ m.textContent="Sélectionne le code et copie-le."; });
+    else m.textContent="Sélectionne le code et copie-le.";
+  });
+})();</script>
+</body>
+</html>

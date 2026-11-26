@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Une salle · HMG Fitness</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/polices.css?v=9bb1d53c">
+<link rel="stylesheet" href="../css/pages.css?v=6b576842">
+<script>/* Lien universel « hmgfitness.fr/salle/?id=lognes » : l'appli ouvre la fiche ; ici, le site l'ouvre avec « /#lognes ». */
+(function(){
+  var q=new URLSearchParams(location.search), id=(q.get("id")||location.hash.replace(/^#/,"")||"").toLowerCase();
+  location.replace(/^[a-z0-9-]{1,80}$/.test(id)?"/#"+id:"/");
+})();</script>
+</head>
+<body>
+<div class="page"><div class="attente"><div class="rond" aria-hidden="true"></div><p>Ouverture de la salle…</p><p><a href="/">Ouvrir HMG</a></p></div></div>
+</body>
+</html>
