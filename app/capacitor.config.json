@@ -3,7 +3,7 @@
   "appName": "HMG Fitness",
   "webDir": "www",
   "backgroundColor": "#05070d",
-  "loggingBehavior": "none",
+  "loggingBehavior": "debug",
   "ios": {
     "contentInset": "never",
     "backgroundColor": "#05070d",

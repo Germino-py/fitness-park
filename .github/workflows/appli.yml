@@ -72,7 +72,8 @@ jobs:
             -derivedDataPath simbuild CODE_SIGNING_ALLOWED=NO build | tail -20
           cd simbuild/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/HMG-Fitness-simulateur-iPhone.zip" App.app
       # Essai sur un vrai simulateur d'iPhone (le WebKit d'iOS) : captures d'écran et erreurs JavaScript de l'appli.
-      # 1. premier lancement (accueil des nouveaux) ; 2. héros déjà créé (Aventure) ; 3. lien hmgfitness://carte.
+      # 1. premier lancement (accueil des nouveaux), photographié à 4, 10, 20 et 40 s ; 2. héros déjà créé (Aventure).
+      # Le journal de la console JavaScript n'existe que dans la version Debug (loggingBehavior « debug »).
       - name: Essai dans le simulateur d'iPhone
         continue-on-error: true
         working-directory: app/ios/App
@@ -88,18 +89,21 @@ jobs:
           xcrun simctl spawn "$UDID" log stream --level debug --style compact --predicate 'process == "App"' > "$OUT/journal.txt" 2>&1 &
           LOG=$!
           xcrun simctl install "$UDID" "$APP"; xcrun simctl privacy "$UDID" grant location "$ID" || true
-          xcrun simctl launch "$UDID" "$ID"; sleep 20; xcrun simctl io "$UDID" screenshot "$OUT/1-premier-lancement.png"
+          xcrun simctl launch "$UDID" "$ID"; T=0
+          for t in 4 10 20 40; do sleep $((t-T)); T=$t; xcrun simctl io "$UDID" screenshot "$OUT/1-premier-lancement-${t}s.png"; done
           xcrun simctl terminate "$UDID" "$ID" || true; xcrun simctl uninstall "$UDID" "$ID"; xcrun simctl install "$UDID" "$APP"
           xcrun simctl privacy "$UDID" grant location "$ID" || true
-          P="$(xcrun simctl get_app_container "$UDID" "$ID" data)/Library/Preferences/$ID"; mkdir -p "$(dirname "$P")"
-          defaults write "$P" CapacitorStorage.hmg-onb -string '{"done":true}'
-          defaults write "$P" CapacitorStorage.hmg-game -string '{"seen":0,"open":[0],"items":["haltere"],"stars":0,"eq":{"hero":"homme","tone":"clair"},"leg":{}}'
-          defaults write "$P" CapacitorStorage.hmg-sound -string 'false'
-          xcrun simctl launch "$UDID" "$ID"; sleep 20; xcrun simctl io "$UDID" screenshot "$OUT/2-aventure.png"
-          xcrun simctl openurl "$UDID" "hmgfitness://carte"; sleep 8; xcrun simctl io "$UDID" screenshot "$OUT/3-carte.png"
+          # Preferences de Capacitor (UserDefaults de l'appli, lues par le simulateur hors du conteneur) : héros déjà créé
+          D() { xcrun simctl spawn "$UDID" defaults write "$ID" "CapacitorStorage.$1" -string "$2"; }
+          D hmg-onb '{"done":true}'; D hmg-sound 'false'
+          D hmg-game '{"seen":0,"open":[0],"items":["haltere"],"stars":0,"eq":{"hero":"homme","tone":"clair"},"leg":{}}'
+          xcrun simctl spawn "$UDID" defaults read "$ID" > "$OUT/preferences.txt" 2>&1 || true
+          xcrun simctl launch "$UDID" "$ID"; sleep 12; xcrun simctl io "$UDID" screenshot "$OUT/2-aventure.png"
+          sleep 15; xcrun simctl io "$UDID" screenshot "$OUT/3-aventure-27s.png"
           kill $LOG || true; sleep 1
-          grep -E "⚡️|\[(error|warn)\]|Error|Exception" "$OUT/journal.txt" | grep -vE "nw_|networkd|RunningBoard|com.apple" | head -200 > "$OUT/erreurs.txt" || true
-          echo "Lignes du journal : $(wc -l < "$OUT/journal.txt") · lignes d'erreur ou de console : $(wc -l < "$OUT/erreurs.txt")"
+          grep -F "⚡️" "$OUT/journal.txt" | grep -v "To Native" | head -400 > "$OUT/console.txt" || true
+          grep -E "\[(error|warn)\]|Error|Exception" "$OUT/console.txt" | head -200 > "$OUT/erreurs.txt" || true
+          echo "Lignes du journal : $(wc -l < "$OUT/journal.txt") · console JavaScript : $(wc -l < "$OUT/console.txt") · erreurs : $(wc -l < "$OUT/erreurs.txt")"
           grep -E "\[error\]|Error|Exception" "$OUT/erreurs.txt" | head -40 || true
           cd "$OUT" && zip -qry "$GITHUB_WORKSPACE/HMG-Fitness-essai-iPhone.zip" .
       - uses: actions/upload-artifact@v4
