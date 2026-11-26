@@ -328,3 +328,9 @@
   .hc,.hc *{transition:none!important}
   .hc-it::after,.hc-lg::after,.hc-it .new,.hc-hero.pop,.hc-burst i,.hc-shock,.hc .shake{animation:none!important}
 }
+/* [ensembles] pouvoir d'un ensemble */
+.hc-set .pw{margin:8px 0 2px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);color:#9aa6bf;font-size:12.5px;line-height:1.4}
+.hc-set .pw b{color:#cfd6e6;font-weight:700}
+.hc-set .pw.on{background:var(--scb);box-shadow:inset 0 0 0 1px var(--sca);color:#e8eefb}
+.hc-set .pw.on b{color:var(--sc)}
+.gm-chest .loot .pwr.set{border-color:rgba(200,255,30,.5);background:rgba(200,255,30,.08)}

@@ -1562,7 +1562,20 @@ const GM={on:false,busy:false,pos:0,lay:null,ghosts:null,tm:null};
 let gmUid=0;
 function gmHash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function gmRng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-const gmKind=n=>n===0?"w":n%GM_PER===0?"g":(n%GM_PER===3||n%GM_PER===6||(n%GM_PER===5&&gmLegOn("l_coach",n)))?"c":null;
+/* [ensembles] pouvoirs des ensembles complets (choix de Mino, 26/11/2026 : un vrai bonus de jeu).
+   Comme les légendes, un pouvoir compte à partir du coffre qui suit celui où l'ensemble a été complété (gmS.sets[k] = n) :
+   le tirage reste déterministe et « Mon compte » reconstruit exactement les mêmes coffres. */
+const GM_SET_PW={recrue:{pw:"Bonnes bases",pd:"Les coffres du 3e pas donnent au moins un objet rare."},
+  hiver:{pw:"Sang-froid",pd:"Les coffres du 6e pas donnent au moins un objet épique."},
+  volt:{pw:"Survolté",pd:"Un coffre bonus au 8e pas de chaque monde."},
+  cyber:{pw:"Surcharge",pd:"Un coffre bonus au 1er pas de chaque monde."},
+  ange:{pw:"Bonne étoile",pd:"Tes grands coffres donnent toujours un objet légendaire."},
+  or:{pw:"Midas",pd:"Chaque coffre te donne un objet de plus."}};
+const gmSetOn=(k,n)=>!!(gmS.sets&&gmS.sets[k]!=null&&(n==null||n>gmS.sets[k]));
+function gmSetsMaj(n){ if(typeof HV_SETS==="undefined") return []; gmS.sets=gmS.sets||{}; const neufs=[];
+  HV_SETS.forEach(S=>{ if(gmS.sets[S.k]==null&&GM_SET_PW[S.k]&&S.ids.every(gmOwn)){ gmS.sets[S.k]=n; neufs.push(S); } }); return neufs; }
+const gmKind=n=>n===0?"w":n%GM_PER===0?"g":(n%GM_PER===3||n%GM_PER===6||(n%GM_PER===5&&gmLegOn("l_coach",n))||(n%GM_PER===8&&gmSetOn("volt",n))||(n%GM_PER===1&&n>GM_PER&&gmSetOn("cyber",n)))?"c":null;
+if(!gmS.sets&&!gmS.rebuild){ gmSetsMaj(Math.max(0,...(gmS.open||[]))); } /* [/ensembles] */
 const gmNextChest=d=>{ let n=d+1; while(!gmKind(n)) n++; return n; };
 const gmWorld=w=>GM_W[((w%GM_W.length)+GM_W.length)%GM_W.length];
 const gmLap=w=>Math.floor(w/GM_W.length)+1;
@@ -1773,7 +1786,7 @@ function gmHud(){
   g.querySelector(".gm-hud").innerHTML=`<div><div class="w">Monde ${w+1}${gmLap(w)>1?" · Tour "+gmLap(w):""}<span class="ssn"> · ${GM_SSN[gmSeason()].e} ${GM_SSN[gmSeason()].n}</span></div><h3>${esc(W.n)}</h3></div>
     <div class="btns"><button data-gm="coll" aria-label="Ma collection" title="Ma collection"><svg class="i" viewBox="0 0 24 24"><path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="bdg">${gmS.items.length}</span></button>
     <button data-gm="share" aria-label="Partager mon héros" title="Partager mon héros"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button></div>
-    <div class="bar"><i style="width:${inW*10}%"></i><u style="left:30%"></u>${gmLegOn("l_coach")?`<u style="left:50%"></u>`:""}<u style="left:60%"></u></div>
+    <div class="bar"><i style="width:${inW*10}%"></i><u style="left:30%"></u>${gmLegOn("l_coach")?`<u style="left:50%"></u>`:""}${gmSetOn("cyber")?`<u style="left:10%"></u>`:""}${gmSetOn("volt")?`<u style="left:80%"></u>`:""}<u style="left:60%"></u></div>
     <div class="sub"><span><b>${d}</b> séance${d>1?"s":""} · 💪 <b>${GM_MUS[typeof heroLvAff==="function"?heroLvAff():gmHeroLv()].n}</b></span><span>${pend?`<b style="color:var(--a2)">Coffre à ouvrir !</b>`:`${left>1?"Coffre dans":"Coffre à la"} <b>${left>1?left+" séances":"prochaine séance"}</b>${eye?` · <b style="color:var(--gold)">${eye}</b>`:""}`}</span></div>`;
   const today=!!score.today, nm=esc(myName()), nu=!GM_LG[gmS.eq.hero]&&!gmS.eq.skin&&!gmS.eq.legs;
   g.querySelector(".gm-cta").innerHTML=`<p>${today?`Séance validée, <b>${nm}</b>. Ton héros a avancé : reviens demain pour le pas suivant.`:pend?`Un coffre t'attend, <b>${nm}</b>. Touche-le pour l'ouvrir.`:nu?`Ton héros est encore en caleçon, <b>${nm}</b>. Chaque séance le fait avancer, les coffres l'habillent.`:`Ton héros t'attend, <b>${nm}</b>. Chaque séance à la salle le fait avancer d'un pas.`}</p>
@@ -1801,10 +1814,11 @@ const gmSleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function gmSync(){ if(!GM.on) return; if(GM.sync){ GM.again=true; return; } GM.sync=true;
   try{ await gmSync0(); } finally{ GM.sync=false; } if(GM.again&&GM.on){ GM.again=false; setTimeout(gmSync,60); } }
 /* compte retrouvé depuis un autre navigateur : on rouvre en silence tous les coffres déjà gagnés (mêmes tirages, même ordre) */
-function gmRebuild(d){ const eq={...GM_EQ0,...gmS.eq}, bare=!GM_CATS.some(([c])=>gmS.eq[c]); Object.assign(gmS,{open:[],items:[],stars:0,leg:{}});
+function gmRebuild(d){ const eq={...GM_EQ0,...gmS.eq}, bare=!GM_CATS.some(([c])=>gmS.eq[c]); Object.assign(gmS,{open:[],items:[],stars:0,leg:{},sets:{}});
   for(let n=0;n<=d;n++){ const k=gmKind(n); if(!k) continue; const leg=gmLegRoll(n), item=leg?null:gmRoll(n); gmS.open.push(n);
     if(leg) gmS.leg[leg.k]=n; else if(item) gmS.items.push(item.id); else gmS.stars=(gmS.stars||0)+1;
-    const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id); }
+    const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id);
+    const item3=(!leg&&item&&gmSetOn("or",n))?gmRoll(n,"o"):null; if(item3) gmS.items.push(item3.id); gmSetsMaj(n); /* [ensembles] */ }
   GM_CATS.forEach(([c])=>{ if(eq[c]&&!gmOwn(eq[c])) eq[c]=null; });
   /* compte retrouvé avec le seul code : on le rhabille avec le plus beau de sa collection */
   if(bare){ const R={C:0,R:1,E:2,L:3}; GM_CATS.forEach(([c])=>{ const best=gmS.items.map(id=>GM_IT[id]).filter(i=>i&&i.cat===c).sort((x,y)=>R[y.r]-R[x.r])[0]; if(best) eq[c]=best.id; }); } if(GM_LG[eq.hero]&&gmS.leg[eq.hero]==null) eq.hero="homme";
@@ -1843,6 +1857,9 @@ function gmLegRoll(n){ if(!(n>0&&n%20===0)) return null; const ord=GM_LEG.slice(
 function gmRoll(n,salt){ const st=GM_START[n]; if(!salt&&st&&!gmOwn(st)) return GM_IT[st]; const k=gmKind(n), r=gmRng(gmHash(voterId+":"+n+(salt||"")))(), w=Math.floor(n/GM_PER);
   let rar=k==="w"?"C":k==="c"&&n%GM_PER===3?(r<.7?"C":"R"):k==="c"?(r<.6?"R":"E"):(w>=2||r<.35)?"L":"E";
   if(gmLegOn("l_masse",n)) rar={C:"R",R:"E",E:"L",L:"L"}[rar];
+  if(k==="c"&&n%GM_PER===3&&rar==="C"&&gmSetOn("recrue",n)) rar="R";   /* [ensembles] */
+  if(k==="c"&&n%GM_PER===6&&rar==="R"&&gmSetOn("hiver",n)) rar="E";
+  if(k==="g"&&gmSetOn("ange",n)) rar="L";
   const order={C:["C","R","E","L"],R:["R","C","E","L"],E:["E","R","L","C"],L:["L","E","R","C"]}[rar];
   for(const q of order){ const pool=GM_ITEMS.filter(i=>i.r===q&&!gmOwn(i.id)); if(pool.length){ const rr=gmRng(gmHash(voterId+"#"+n+q)); return pool[Math.floor(gmRng(gmHash(voterId+"#"+n+q+(salt||"")))()*pool.length)]; } }
   return null; }
@@ -1864,7 +1881,8 @@ function gmOpenChest(n){ return new Promise(res=>{
   const auto=setTimeout(()=>{ if(!taps){ const h=ov.querySelector(".hint"); if(h) h.innerHTML=`Touche le coffre !<small>3 petits coups et il s'ouvre</small><div class="dots"><i></i><i></i><i></i></div>`; } },4000);
   function reveal(){ clearTimeout(auto);
     gmS.open.push(n); if(leg) gmS.leg[leg.k]=n; else if(item) gmS.items.push(item.id); else gmS.stars=(gmS.stars||0)+1;
-    const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id); gmSave();
+    const item2=(!leg&&item&&k==="g"&&gmLegOn("l_classique",n))?gmRoll(n,"b"):null; if(item2) gmS.items.push(item2.id);
+    const item3=(!leg&&item&&gmSetOn("or",n))?gmRoll(n,"o"):null; if(item3) gmS.items.push(item3.id); const neufs=gmSetsMaj(n); /* [ensembles] */ gmSave();
     ov.style.setProperty("--rc",rc); ov.classList.add("open"); gmSnd("magic"); setTimeout(()=>gmSnd(leg||(item&&item.r==="L")?"crown":"fanfare"),650);
     const cols=[rc,"#ffffff",ACC,rc,ACC1]; for(let j=0;j<46;j++){ const a=Math.PI*2*j/46+Math.random()*.3, dd=160+Math.random()*260, c=document.createElement("i"); c.className="cf";
       c.style.cssText=`background:${cols[j%cols.length]};--x:${Math.round(Math.cos(a)*dd)}px;--y:${Math.round(Math.sin(a)*dd-60)}px;--r:${Math.round(Math.random()*900-450)}deg;animation-delay:${Math.round(Math.random()*150)}ms`; ov.appendChild(c); setTimeout(()=>c.remove(),2000); }
@@ -1875,6 +1893,8 @@ function gmOpenChest(n){ return new Promise(res=>{
       :item?`<span class="rar">${GM_RAR[item.r].t}</span>${drawHero(pv,{cls:"happy idle",pad:true}).replace('class="hh','class="pv hh') /* [heros] */}<h3>${esc(item.n)}</h3>
       <p>${item.say?esc(item.say):pickR(["Il te va à merveille.","Avec ça, la salle va trembler.","Style de champion, ","Les autres vont être jaloux."]).replace(/, $/,`, <b>${esc(myName())}</b>.`)}</p>
       ${item2?`<div class="pwr"><b>Pose classique · 2e objet</b>${esc(item2.n)} (${GM_RAR[item2.r].t.toLowerCase()}) rejoint ta collection.</div>`:""}
+      ${item3?`<div class="pwr"><b>Midas · objet en plus</b>${esc(item3.n)} (${GM_RAR[item3.r].t.toLowerCase()}) rejoint ta collection.</div>`:""}
+      ${neufs.map(S=>`<div class="pwr set"><b>Ensemble complet · ${esc(S.n)}</b>Pouvoir « ${esc(GM_SET_PW[S.k].pw)} » : ${esc(GM_SET_PW[S.k].pd)} Actif dès le prochain coffre.</div>`).join("")}
       <div class="row2"><button data-k="later">Plus tard</button><button class="cy" data-k="wear">${worn?"Super !":"Le porter"}</button></div>`
       :`<span class="rar">Étoile HMG</span><div style="font-size:84px;line-height:1.4">⭐</div><h3>Collection complète !</h3><p>Tu as déjà tous les objets : <b>+1 étoile</b>. Respect, ${esc(myName())}.</p><div class="row2"><button class="cy" data-k="later">Continuer</button></div>`;
     ov.querySelector(".loot").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(!b) return; e.stopPropagation();

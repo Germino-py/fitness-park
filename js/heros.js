@@ -632,7 +632,7 @@ const heroNouveaux = () => { const v = Array.isArray(gmS.vus) ? gmS.vus : gmS.it
    ===================================================================================== */
 const HV_RAR = { C: "#c3cddf", R: "#3fd8ff", E: "#c08cff", L: "#ffc93d" };
 const HC_CAT = { skin: "Hauts", legs: "Bas", feet: "Chaussures", hat: "Tête", neck: "Cou", face: "Lunettes", back: "Dos", hand: "Main", aura: "Auras" };
-/* ensembles : des objets qui vont bien ensemble, « Tout porter » les enfile d'un coup (aucun bonus de jeu : à valider avec Mino) */
+/* ensembles : des objets qui vont bien ensemble, « Tout porter » les enfile d'un coup ; complet = un pouvoir de jeu (GM_SET_PW dans app.js) */
 const HV_SETS = [
   { k: "recrue", n: "Recrue HMG", c: "#c3cddf", ids: ["blanc", "short_noir", "baskets", "haltere"] },
   { k: "volt", n: "Full Volt", c: "#c8ff1e", ids: ["volt", "short_volt", "baskets_volt", "bonnet_volt", "eclairs"] },
@@ -736,7 +736,8 @@ function hcLegCard(l) {
 }
 function hcSetCard(S) {
   const n = S.ids.filter(gmOwn).length, done = n === S.ids.length;
-  return `<div class="hc-set${HC.sel === "set:" + S.k ? " sel" : ""}" style="--sc:${S.c};--sca:${hvA(S.c, .4)};--scb:${hvA(S.c, .13)}"><div class="hd"><div><b>${hvE(S.n)}</b><small>${done ? "Ensemble complet, bravo !" : `Encore ${S.ids.length - n} pièce${S.ids.length - n > 1 ? "s" : ""} à trouver`}</small></div><span class="pr">${n}/${S.ids.length}</span></div>`
+  return `<div class="hc-set${HC.sel === "set:" + S.k ? " sel" : ""}" style="--sc:${S.c};--sca:${hvA(S.c, .4)};--scb:${hvA(S.c, .13)}"><div class="hd"><div><b>${hvE(S.n)}</b><small>${done ? "Ensemble complet, pouvoir actif !" : `Encore ${S.ids.length - n} pièce${S.ids.length - n > 1 ? "s" : ""} à trouver`}</small></div><span class="pr">${n}/${S.ids.length}</span></div>`
+    + (typeof GM_SET_PW !== "undefined" && GM_SET_PW[S.k] ? `<div class="pw${done ? " on" : ""}"><b>${done ? "⚡" : "🔒"} ${hvE(GM_SET_PW[S.k].pw)}</b> ${hvE(GM_SET_PW[S.k].pd)}</div>` : "")
     + `<div class="ics">${S.ids.map(id => `<span class="${gmOwn(id) ? "" : "lock"}" title="${gmOwn(id) ? hvE(GM_IT[id].n) : "???"}">${drawItem(id)}</span>`).join("")}</div><div class="bar"><i style="width:${Math.round(n / S.ids.length * 100)}%"></i></div>`
     + `<div class="bt"><button data-settry="${S.k}"${n ? "" : " disabled"}>Essayer</button><button class="v" data-setwear="${S.k}"${done ? "" : " disabled"}>${done ? "Tout porter" : `Encore ${S.ids.length - n}`}</button></div></div>`;
 }
