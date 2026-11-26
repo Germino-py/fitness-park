@@ -183,3 +183,28 @@ body.coque #toast{bottom:calc(var(--tabbar,60px) + var(--sab,0px) + 78px)}
 body.coque #bCheck{display:none!important}
 .moi-acts button{position:relative}
 .moi-new{position:absolute;top:8px;right:10px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:#ff4d64;color:#fff;font:800 11px/18px var(--f-b);text-align:center;box-shadow:0 0 0 2px #0b0f18}
+
+/* ---------- mon compte : code de transfert, invitation (js/compte.js) */
+.cp-code{display:grid;place-items:center;gap:6px;margin:4px 0 16px;padding:20px 14px;border-radius:20px;background:linear-gradient(160deg,rgba(200,255,30,.12),rgba(200,255,30,.03));border:1px solid rgba(200,255,30,.35);min-height:62px}
+.cp-code b{font:700 30px/1 ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.12em;color:#fff;user-select:all;-webkit-user-select:all}
+.cp-code small{color:var(--muted);font-size:12.5px}
+.cp-code.fini b{color:#6b7488;text-decoration:line-through}
+.cp-wait{width:26px;height:26px;border-radius:50%;border:3px solid rgba(200,255,30,.25);border-top-color:var(--volt);animation:cpTour 0.9s linear infinite}
+@keyframes cpTour{to{transform:rotate(360deg)}}
+.cp-champ{text-align:center;font:700 22px ui-monospace,"SF Mono",Menlo,monospace!important;letter-spacing:.1em;text-transform:uppercase}
+.cp-msg{min-height:20px;margin:10px 4px 4px;font-size:13.5px;color:#ff8a8a;text-align:center}
+.cp-msg.ok{color:var(--volt)}
+body.cp-bloque>*:not(#cpInvite):not(#toast){visibility:hidden}
+#cpInvite{position:fixed;inset:0;z-index:2600;display:grid;place-items:center;padding:calc(24px + var(--sat,0px)) 18px calc(24px + var(--sab,0px));background:radial-gradient(circle at 50% 30%,rgba(200,255,30,.14),transparent 55%),#05070d;color:#e9eefb;overflow:auto}
+#cpInvite .pv-card{width:min(420px,100%);text-align:center;padding:30px 22px 24px;border-radius:28px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+#cpInvite .pv-logo{width:64px;height:64px;margin:0 auto 14px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(135deg,#e6ff8a,#c8ff1e 55%,#9fe000);box-shadow:0 10px 34px rgba(200,255,30,.4)}
+#cpInvite .pv-logo svg{width:34px;height:34px;fill:none;stroke:#0b1200;stroke-width:2.6;stroke-linecap:round}
+#cpInvite small{display:block;font-weight:800;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--volt)}
+#cpInvite h1{margin:8px 0 10px;font:700 26px/1.15 var(--f-d);color:#fff}
+#cpInvite p{margin:0 0 18px;color:#9aa6bf;font-size:14.5px;line-height:1.5}
+#cpInvite form{display:grid;gap:10px}
+#cpInvite input{font:500 16px var(--f-b);padding:14px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.35);color:#fff;text-align:center;outline:none}
+#cpInvite input:focus{border-color:var(--volt);box-shadow:0 0 0 3px rgba(200,255,30,.18)}
+#cpInvite button{display:flex;justify-content:center;align-items:center;width:100%;font:800 16px var(--f-b);padding:14px;border:0;border-radius:16px;color:#0b1200;background:linear-gradient(135deg,#e6ff8a,#c8ff1e 55%,#9fe000);box-shadow:0 10px 30px rgba(200,255,30,.35);cursor:pointer;min-height:50px}
+#cpInvite button:disabled{opacity:.6}
+@media (prefers-reduced-motion:reduce){.cp-wait{animation:none}}

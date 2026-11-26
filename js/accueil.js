@@ -128,7 +128,7 @@ async function onbClic(e){
   const k=b.dataset.o;
   if(k==="retour"){ const i=ONB_ETAPES.indexOf(HMGA.etape); if(i>0) onbAller(ONB_ETAPES[i-1]); return; }
   if(k==="go"){ cqVib("choix"); return onbSuivant(); }
-  if(k==="compte"){ try{ acctModal("restore"); }catch(er){} return; }
+  if(k==="compte"){ try{ if(typeof cpSrv==="function"&&cpSrv()) cpEntrer({titre:"Retrouve ton héros",secours:true}); else acctModal("restore"); }catch(er){} return; }
   if(k==="heros"){ gmS.eq.hero=ONB_CHOIX.hero; gmS.eq.tone=ONB_CHOIX.tone; gmSave(); cqVib("succes"); try{ gmSnd("fanfare"); }catch(er){} return onbSuivant(); }
   if(k==="obj"){ const v=ONB_CHOIX.obj||store.get("hmg-objectif",3); store.set("hmg-objectif",v); try{ if(window.HMGS&&HMGS.objectif) await HMGS.objectif(v,{inscription:true}); }catch(er){} cqVib("succes"); return onbSuivant(); }
   if(k==="pos"){ b.disabled=true; b.textContent="Un instant…";

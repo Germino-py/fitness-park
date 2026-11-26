@@ -100,7 +100,7 @@ function cqClick(e){
   const A={
     retour:()=>cqSubClose(), reglages:()=>cqReglages(), vestiaire:()=>gmColl(), heros:()=>gmPickHero(false).then(()=>{ if(CQ.tab==="moi") cqMoi(); }), partager:()=>gmShare(),
     objectif:()=>cqObjectif(), pause:()=>(window.HMGC&&HMGC.pause)?HMGC.pause():toast("La pause arrive avec la prochaine mise à jour."), masalle:()=>cqMaSalle(),
-    pseudo:()=>pseudoModal(false), code:()=>acctModal("save"), donnees:()=>cqDonnees(), suppr:()=>cqSupprimer(),
+    pseudo:()=>pseudoModal(false), code:()=>acctModal("save"), telephone:()=>cpTelephone(), donnees:()=>cqDonnees(), suppr:()=>cqSupprimer(),
     politique:()=>cqOuvrir(cqSite("confidentialite/")), regles:()=>cqOuvrir(cqSite("regles/")), aide:()=>cqOuvrir(cqSite("aide/")), contact:()=>cqOuvrir(cqSite("aide/#contact")),
     signalersalle:()=>cqOuvrir(cqSite("aide/#salle")), coeurs:()=>cqCommentCoeurs(), presentation:()=>{ if(window.HMGA) HMGA.lancer(true); }, apropos:()=>cqAPropos(),
     position:()=>cqPosition(), admin:()=>{ cqTab("salles"); setTimeout(()=>{ try{ isAdmin()?toast("Tu es déjà connecté en admin."):loginModal(); }catch(er){} },300); },
@@ -112,18 +112,19 @@ function cqClick(e){
 }
 
 /* ================= CLASSEMENT ================= */
+const cqNom = r => (r&&r.pseudo&&psOn()?r.pseudo:null)||nameOf(r&&r.no);   // le classement du serveur du jeu donne le pseudo directement
 async function cqRang(load=true){
   const body=cqPage("classement","Classement"), mo=CQ.rgP==="month", rows=rankRows[CQ.rgP];
   const sean=r=>Math.round((r.points||0)/10), mine=rows&&rows.findIndex(r=>r.me);
-  const pod=rows&&rows.length?[1,0,2].map(i=>rows[i]?`<div class="pl p${i+1}"><div class="av" style="--c:${["linear-gradient(135deg,#fff1b0,#ffd166 60%,#d9a400)","linear-gradient(135deg,#ffffff,#cfd8ea 60%,#8f9bb3)","linear-gradient(135deg,#ffd2ae,#f0a067 60%,#b8642c)"][i]};--g:${["rgba(255,209,102,.45)","rgba(200,210,230,.3)","rgba(240,160,103,.35)"][i]}">${esc((nameOf(rows[i].no)||"?").slice(0,1).toUpperCase())}<i>${i+1}</i></div><b>${esc(nameOf(rows[i].no))}${rows[i].me?" (toi)":""}</b><small>${sean(rows[i])} séance${sean(rows[i])>1?"s":""}</small><div class="step" style="--h:${[64,44,30][i]}px"></div></div>`:`<div class="pl"></div>`).join(""):"";
+  const pod=rows&&rows.length?[1,0,2].map(i=>rows[i]?`<div class="pl p${i+1}"><div class="av" style="--c:${["linear-gradient(135deg,#fff1b0,#ffd166 60%,#d9a400)","linear-gradient(135deg,#ffffff,#cfd8ea 60%,#8f9bb3)","linear-gradient(135deg,#ffd2ae,#f0a067 60%,#b8642c)"][i]};--g:${["rgba(255,209,102,.45)","rgba(200,210,230,.3)","rgba(240,160,103,.35)"][i]}">${esc((cqNom(rows[i])||"?").slice(0,1).toUpperCase())}<i>${i+1}</i></div><b>${esc(cqNom(rows[i]))}${rows[i].me?" (toi)":""}</b><small>${sean(rows[i])} séance${sean(rows[i])>1?"s":""}</small><div class="step" style="--h:${[64,44,30][i]}px"></div></div>`:`<div class="pl"></div>`).join(""):"";
   const lundi=[1,2].includes(new Date().getDay());
   body.innerHTML=`<div class="rg-seg" role="tablist"><button role="tab" data-cq="rgP" data-p="month" aria-selected="${mo}">Ce mois-ci</button><button role="tab" data-cq="rgP" data-p="all" aria-selected="${!mo}">Depuis le début</button></div>
     ${mine>4?`<div class="rg-pin">Toi : <b>${mine+1}e</b> · ${sean(rows[mine])} séance${sean(rows[mine])>1?"s":""}</div>`:""}
     ${lundi&&typeof crowned==="function"&&crowned()?`<div class="rg-ange"><span>👼</span><div><b>Tu es l'ange de la semaine !</b><br>3 séances ou plus la semaine dernière. Respect.</div></div>`:""}
     ${rows===undefined?`<div class="cq-empty">Chargement…</div>`:rows===null?`<div class="cq-empty">Le classement est indisponible pour le moment. Réessaie dans un instant.</div>`:!rows.length?`<div class="cq-empty">Personne n'a encore validé de séance${mo?" ce mois-ci":""}.<br><b style="color:#fff">La première place t'attend.</b></div>`:
-      `<div class="rg-pod">${pod}</div><div class="cq-list">${rows.slice(3).map((r,i)=>`<div class="rg-row${r.me?" me":""}"><span class="n">${i+4}</span><div style="min-width:0"><b>${esc(nameOf(r.no))}${r.me?" (toi)":""}</b><small>${r.clubs} salle${r.clubs>1?"s":""}</small></div><em>${sean(r)}<small>séance${sean(r)>1?"s":""}</small></em></div>`).join("")||`<div class="cq-empty" style="padding:18px">Le podium est complet. Le reste du classement s'écrit avec toi.</div>`}</div>`}
+      `<div class="rg-pod">${pod}</div><div class="cq-list">${rows.slice(3).map((r,i)=>`<div class="rg-row${r.me?" me":""}"><span class="n">${i+4}</span><div style="min-width:0"><b>${esc(cqNom(r))}${r.me?" (toi)":""}</b><small>${r.clubs} salle${r.clubs>1?"s":""}</small></div><em>${sean(r)}<small>séance${sean(r)>1?"s":""}</small></em></div>`).join("")||`<div class="cq-empty" style="padding:18px">Le podium est complet. Le reste du classement s'écrit avec toi.</div>`}</div>`}
     <p class="cq-note" style="text-align:center;margin-top:18px">Une séance validée par jour, sur place. Ta position sert seulement à vérifier que tu es à la salle : elle n'est jamais montrée.</p>`;
-  if(load){ try{ rankRows[CQ.rgP]=LIVE?await rpc("leaderboard",{p_period:CQ.rgP,p_voter:voterId}):[]; }catch(e){ rankRows[CQ.rgP]=rankRows[CQ.rgP]||null; }
+  if(load){ try{ rankRows[CQ.rgP]=typeof cpSrv==="function"&&cpSrv()?await HMGS.classement(CQ.rgP):LIVE?await rpc("leaderboard",{p_period:CQ.rgP,p_voter:voterId}):[]; }catch(e){ rankRows[CQ.rgP]=rankRows[CQ.rgP]||null; }
     if(CQ.tab==="classement") cqRang(false); }
 }
 
@@ -179,7 +180,7 @@ function cqReglages(){
     <div class="cq-sec">Sons et vibrations</div><div class="cq-list">
       ${sw("son","sound","Sons du jeu",(()=>{ try{ return SND.on(); }catch(e){ return true; } })())}${sw("vib","vib","Vibrations",store.get("hmg-vib",true)!==false)}</div>
     <div class="cq-sec">Compte</div><div class="cq-list">
-      ${row("pseudo","user","Pseudo",esc(myName()))}${row("code","key","Code de secours",null,"Pour retrouver ton héros sur un autre téléphone")}</div>
+      ${row("pseudo","user","Pseudo",esc(myName()))}${typeof cpSrv==="function"&&cpSrv()?row("telephone","swap","Changer de téléphone",null,"Ton héros et sa collection te suivent"):row("code","key","Code de secours",null,"Pour retrouver ton héros sur un autre téléphone")}</div>
     <div class="cq-sec">Confidentialité</div><div class="cq-list">
       ${row("position","loc","Localisation",null,"Seulement quand l'appli est ouverte")}${row("donnees","data","Mes données","Télécharger")}
       ${row("politique","shield","Politique de confidentialité")}${row("regles","doc","Règles de la communauté")}</div>

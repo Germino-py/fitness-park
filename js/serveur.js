@@ -482,7 +482,27 @@
         case "set_pseudo_v2": d.pseudo = String(a.p_pseudo || "").trim().slice(0, 20) || null; r = { ok: true }; break;
         case "account_status": r = { access: true, player: true, no: d.no, anonymous: true, admin: false, mode: "demo" }; break;
         case "my_export": r = { exported_at: new Date(t).toISOString(), demo: true, dossier: d }; break;
-        case "delete_account": D.dossier = null; r = { ok: true }; break;
+        case "delete_account": D.dossier = null; D.jeu = null; r = { ok: true }; break;
+        case "leaderboard_v2": {                              // démo : on est seul au classement
+          const st = V.etat(d, t), pts = a.p_period === "all" ? (d.checkins || []).reduce((s, c) => s + (+c.points || 10), 0) : st.points_month;
+          r = pts > 0 ? [{ no: d.no, pseudo: d.pseudo, points: pts, clubs: new Set((d.checkins || []).map(c => c.club_id)).size || 1, steps: st.steps, me: true }] : [];
+          break;
+        }
+        case "load_game": r = { player: true, seed: d.seed || d.voter, steps: (d.checkins || []).length, game: D.jeu || null, prefs: null, chests: [] }; break;
+        case "save_game": {
+          const cur = D.jeu;
+          if (cur && a.p_version !== cur.version) { r = { ok: false, why: "conflit", version: cur.version, data: cur.data }; break; }
+          D.jeu = { data: a.p_data, version: cur ? cur.version + 1 : 1, updated_at: new Date(t).toISOString() };
+          r = { ok: true, version: D.jeu.version };
+          break;
+        }
+        case "create_transfer_code": D.code = "DEMO" + Math.floor(100000 + Math.random() * 899999); r = { ok: true, code: D.code.slice(0, 5) + "-" + D.code.slice(5), expires_at: new Date(t + 15 * 60e3).toISOString() }; break;
+        case "redeem_transfer_code": {
+          const n = s => String(s || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
+          r = D.code && n(a.p_code) === n(D.code) ? (D.code = null, { ok: true, why: "deja", no: d.no, state: V.etat(d, t) }) : { ok: false, why: "code" };
+          break;
+        }
+        case "redeem_invite": r = String(a.p_code || "").trim().length >= 4 ? { ok: true, why: "deja" } : { ok: false, why: "code" }; break;
         case "gyms_near": {
           const o = V.outils, n = Math.max(1, Math.min(100, a.p_limit || 20));
           r = sallesDemo.map(s => Object.assign({}, s, { dist: Math.round(o.distM(pos.lat, pos.lon, s.lat, s.lon)) })).sort((x, y) => x.dist - y.dist).slice(0, n);
