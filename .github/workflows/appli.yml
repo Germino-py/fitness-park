@@ -89,18 +89,19 @@ jobs:
           xcrun simctl spawn "$UDID" log stream --level debug --style compact --predicate 'process == "App"' > "$OUT/journal.txt" 2>&1 &
           LOG=$!
           xcrun simctl install "$UDID" "$APP"; xcrun simctl privacy "$UDID" grant location "$ID" || true
-          xcrun simctl launch --stdout="$OUT/sortie-1.txt" --stderr="$OUT/sortie-1.txt" "$UDID" "$ID"; T=0
+          # --console-pty : la sortie de l'appli ligne par ligne (avec --stdout, la console JavaScript restait dans le tampon)
+          xcrun simctl launch --console-pty "$UDID" "$ID" > "$OUT/sortie-1.txt" 2>&1 & C1=$!; T=0
           for t in 4 10 20 40; do sleep $((t-T)); T=$t; xcrun simctl io "$UDID" screenshot "$OUT/1-premier-lancement-${t}s.png"; done
-          xcrun simctl terminate "$UDID" "$ID" || true; xcrun simctl uninstall "$UDID" "$ID"; xcrun simctl install "$UDID" "$APP"
+          xcrun simctl terminate "$UDID" "$ID" || true; kill $C1 2>/dev/null || true; xcrun simctl uninstall "$UDID" "$ID"; xcrun simctl install "$UDID" "$APP"
           xcrun simctl privacy "$UDID" grant location "$ID" || true
           # Preferences de Capacitor (UserDefaults de l'appli, lues par le simulateur hors du conteneur) : héros déjà créé
           D() { xcrun simctl spawn "$UDID" defaults write "$ID" "CapacitorStorage.$1" -string "$2"; }
           D hmg-onb '{"done":true}'; D hmg-sound 'false'; D hmg-pseudo-later 'true'
           D hmg-game '{"seen":0,"open":[0],"items":["haltere"],"stars":0,"eq":{"hero":"homme","tone":"clair"},"leg":{}}'
           xcrun simctl spawn "$UDID" defaults read "$ID" > "$OUT/preferences.txt" 2>&1 || true
-          xcrun simctl launch --stdout="$OUT/sortie-2.txt" --stderr="$OUT/sortie-2.txt" "$UDID" "$ID"; sleep 12; xcrun simctl io "$UDID" screenshot "$OUT/2-aventure.png"
+          xcrun simctl launch --console-pty "$UDID" "$ID" > "$OUT/sortie-2.txt" 2>&1 & C2=$!; sleep 12; xcrun simctl io "$UDID" screenshot "$OUT/2-aventure.png"
           sleep 15; xcrun simctl io "$UDID" screenshot "$OUT/3-aventure-27s.png"
-          kill $LOG || true; sleep 1
+          xcrun simctl terminate "$UDID" "$ID" || true; kill $LOG $C2 2>/dev/null || true; sleep 1
           cat "$OUT"/sortie-*.txt 2>/dev/null | grep -v "To Native" | head -600 > "$OUT/console.txt" || true   # console JavaScript (Capacitor, version Debug)
           grep -E "\[(error|warn)\]|Error|Exception" "$OUT/console.txt" | head -200 > "$OUT/erreurs.txt" || true
           echo "Lignes du journal : $(wc -l < "$OUT/journal.txt") · console JavaScript : $(wc -l < "$OUT/console.txt") · erreurs : $(wc -l < "$OUT/erreurs.txt")"

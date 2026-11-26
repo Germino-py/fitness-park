@@ -843,7 +843,7 @@ function pseudoModal(first){
       updateHeader(); applyFeatures(); if(sheetMode==="club") renderClub(); else if(sheetMode==="rank") renderRank(false); else if(sheetMode==="mod") renderMod();
     }catch(err){ $("psMsg").textContent=/ouverte/.test(err.message)?"Les pseudos arrivent très bientôt.":err.message; $("psMsg").className="ps-msg ko"; go.disabled=false; go.textContent=myPseudo?"Valider mon nouveau pseudo":"C'est mon pseudo"; }
   });
-  check(); setTimeout(()=>{ try{ inp.focus({preventScroll:true}); }catch(e){} }, TOUCH_DEV?350:50);
+  check(); if(!(first&&TOUCH_DEV)) setTimeout(()=>{ try{ inp.focus({preventScroll:true}); }catch(e){} }, TOUCH_DEV?350:50);   // ouvert tout seul sur un téléphone : pas de clavier qui surgit
 }
 function psWelcome(wasNew){
   const cols=[ACC,ACC1,ACC3,"#ffffff",ACC,"#ffffff"];
