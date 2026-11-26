@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # =====================================================================================================
 # Tests du serveur HMG sur un Postgres 16 LOCAL et JETABLE (jamais sur Supabase).
-#   bash supabase/tests/lancer.sh            → tout : base neuve, migrations jouées 2 fois, tests SQL, scénarios croisés
+#   bash supabase/tests/lancer.sh            → tout : base neuve, migrations jouées 2 fois, tests SQL, scénarios croisés,
+#                                              client js/serveur.js contre le serveur, fichiers de données (05…)
 #   GARDER=1 bash supabase/tests/lancer.sh   → garde la base à la fin (pour fouiller), affiche comment s'y connecter
 # Il faut : Postgres 16 (initdb, pg_ctl, psql) et Node 18+. Aucun réseau. La base vit dans un dossier temporaire,
 # n'écoute que sur un fichier socket (pas de port réseau), puis est arrêtée et supprimée.
@@ -54,6 +55,10 @@ echo "== Scénarios croisés serveur ↔ miroir JavaScript"
 set +e
 node "$ICI/scenarios-sql.js"
 CROISE=$?
+# Le vrai client js/serveur.js (HMGS) contre ce serveur, à travers un petit Supabase de test (Auth + PostgREST)
+echo "== Client js/serveur.js ↔ serveur"
+node "$ICI/client-sql.js"
+CLIENT=$?
 set -e
 
 # Les fichiers de données (05-salles-fitness-park.sql, puis 06-salles-osm.sql s'il existe) : 2 fois, sans erreur
@@ -66,6 +71,6 @@ for f in "$RACINE"/supabase/0[5-9]-*.sql; do
 done
 
 echo
-echo "== Bilan SQL : $((TOT - ECH)) / $TOT vérifications réussies$([ $ARRET = 0 ] || echo ' (un fichier s est arrêté)') ; scénarios croisés : $([ $CROISE = 0 ] && echo 'ok' || echo 'ÉCHEC')"
+echo "== Bilan SQL : $((TOT - ECH)) / $TOT vérifications réussies$([ $ARRET = 0 ] || echo ' (un fichier s est arrêté)') ; scénarios croisés : $([ $CROISE = 0 ] && echo 'ok' || echo 'ÉCHEC') ; client : $([ $CLIENT = 0 ] && echo 'ok' || echo 'ÉCHEC')"
 if [ "${GARDER:-0}" = "1" ]; then echo "   Base gardée : PGHOST=$TMP PGPORT=$PORT psql -U postgres"; trap - EXIT; fi
-[ "$ECH" = "0" ] && [ "$CROISE" = "0" ] && [ "$ARRET" = "0" ] && [ "$DONNEES" = "0" ]
+[ "$ECH" = "0" ] && [ "$CROISE" = "0" ] && [ "$CLIENT" = "0" ] && [ "$ARRET" = "0" ] && [ "$DONNEES" = "0" ]
