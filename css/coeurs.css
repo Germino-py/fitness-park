@@ -65,3 +65,12 @@ body.coque .gm-cta p{display:none}
 .cv-raisons button[aria-pressed="true"]{border-color:var(--volt,#c8ff1e);color:var(--volt,#c8ff1e);background:rgba(200,255,30,.1)}
 .cq-sheet h2 .cv-c{margin-right:4px}
 @media (prefers-reduced-motion:reduce){ .cv-c.danger,.cv-c.perd,.cv-c.gagne,.cv-c.respire,.z-hero .zz{animation:none} .cv-c.perd{opacity:0;transition:opacity .2s} }
+
+/* la séance en 2 temps (js/seance.js) : bouton « séance en cours » puis « J'ai fini » */
+.gm-go.encours{color:var(--volt,#c8ff1e);background:rgba(14,20,34,.8);border:1.5px solid rgba(200,255,30,.45);box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+.gm-go.encours::before{display:none}
+.gm-go.encours em{background:rgba(200,255,30,.14);color:var(--volt,#c8ff1e)}
+.gm-go.encours svg{animation:seTic 2.4s ease-in-out infinite}
+@keyframes seTic{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+.gm-go.pret{animation:onbTip 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){ .gm-go.encours svg,.gm-go.pret{animation:none} }

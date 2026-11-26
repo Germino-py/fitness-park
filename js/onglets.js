@@ -194,14 +194,14 @@ function cqReglages(){
 
 /* ---------- objectif par semaine */
 function cqObjectif(){
-  let v=cqObj();
-  const f=cqFeuille(`<h2>Combien de séances par semaine ?</h2><p>Ton héros a 3 cœurs. Tiens au moins la moitié de ton objectif chaque semaine pour les garder. Le changement compte à partir de lundi prochain.</p>
+  let v=cqObj(); const premier=!!(window.HMGC&&HMGC.etat&&HMGC.etat.onboarded===false);   // premier objectif avec le serveur du jeu : il compte tout de suite
+  const f=cqFeuille(`<h2>Combien de séances par semaine ?</h2><p>Ton héros a 3 cœurs. Tiens au moins la moitié de ton objectif chaque semaine pour les garder. ${premier?"Il compte dès cette semaine.":"Le changement compte à partir de lundi prochain."}</p>
     <div class="cq-choice" role="radiogroup">${[2,3,4,5].map(n=>`<button role="radio" data-n="${n}" aria-checked="${n===v}"><b>${n}</b> séances <small>· ${CQ_OBJ[n]}</small>${n===3?`<span class="tag">Conseillé</span>`:""}</button>`).join("")}</div>
     <button class="cq-btn" data-ok>Valider mon objectif</button><p class="cq-note" style="text-align:center">Le repos fait partie de l'entraînement : pas besoin d'y aller tous les jours.</p>`);
   f.el.addEventListener("click",async e=>{ const c=e.target.closest("[data-n]"); if(c){ v=+c.dataset.n; f.el.querySelectorAll("[data-n]").forEach(x=>x.setAttribute("aria-checked",String(+x.dataset.n===v))); cqVib("choix"); return; }
     if(!e.target.closest("[data-ok]")) return; store.set("hmg-objectif",v);
-    try{ if(window.HMGS&&HMGS.objectif){ const r=await HMGS.objectif(v); if(r&&r.ok===false&&r.why==="trop_tot"){ toast(`Tu pourras le changer à partir du ${frDate(r.next_date)}.`); f.fermer(); return; } } }catch(er){}
-    f.fermer(); cqVib("succes"); toast(`Objectif : ${v} séances par semaine, à partir de lundi.`); if(window.HMGC&&HMGC.rafraichir) HMGC.rafraichir(); if(CQ.sub) cqReglages(); else if(CQ.tab==="moi") cqMoi(); });
+    try{ if(window.HMGS&&HMGS.objectif){ const r=await HMGS.objectif(v,premier?{inscription:true}:undefined); if(r&&r.ok===false&&r.why==="trop_tot"){ toast(`Tu pourras le changer à partir du ${frDate(r.next_date)}.`); f.fermer(); return; } } }catch(er){}
+    f.fermer(); cqVib("succes"); toast(`Objectif : ${v} séances par semaine${premier?"":", à partir de lundi"}.`); if(window.HMGC&&HMGC.rafraichir) HMGC.rafraichir(); if(CQ.sub) cqReglages(); else if(CQ.tab==="moi") cqMoi(); });
 }
 
 /* ---------- ma salle : les plus proches, ou une recherche */
@@ -258,7 +258,7 @@ function cqAPropos(){
 
 /* ---------- supprimer mon compte (obligatoire pour Apple, règle 5.1.1 v) */
 function cqSupprimer(){
-  const f=cqFeuille(`<h2>Supprimer ton compte ?</h2><p>Ton héros, ta collection, tes séances, ton classement, ton pseudo, tes avis et tes photos seront effacés pour toujours. Impossible de revenir en arrière.</p>
+  const f=cqFeuille(`<h2>Supprimer ton compte ?</h2><p>Ton héros, ta collection, tes séances, ton classement, ton pseudo et tes avis seront effacés pour toujours. Impossible de revenir en arrière.</p>
     <button class="cq-btn red" data-ok>Supprimer définitivement</button><button class="cq-link" data-sh-x>Annuler</button>`);
   f.el.querySelector("[data-ok]").addEventListener("click",async e=>{ const b=e.currentTarget; b.disabled=true; b.textContent="Suppression…";
     try{

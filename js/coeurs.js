@@ -48,7 +48,8 @@ function cvHud(){
   hud.insertAdjacentHTML("beforeend",`<div class="cv-sem${ok?" ok":""}" data-cv="semaine" role="button" tabindex="0" aria-label="Cette semaine : ${S} séance${S>1?"s":""} sur ${G}">
     ${cvSemaineJours(st).map(d=>`<span class="d ${d.k}"><small>${d.l}</small><i></i></span>`).join("")}<b>${ok?`${S} / ${G} ✓`:`${S} / ${G}`}</b></div>`);
   const dg=cvDanger(st);
-  if(dg) hud.insertAdjacentHTML("beforeend",`<div class="cv-dg">Encore ${dg} séance${dg>1?"s":""} d'ici dimanche pour garder ton cœur.</div>`);
+  if(!st.pause&&st.pause_next&&st.pause_next.start_week) hud.insertAdjacentHTML("beforeend",`<div class="cv-dg doux">❄️ Pause prévue à partir du lundi ${frDate(st.pause_next.start_week)}.</div>`);
+  else if(dg) hud.insertAdjacentHTML("beforeend",`<div class="cv-dg">Encore ${dg} séance${dg>1?"s":""} d'ici dimanche pour garder ton cœur.</div>`);
   else if(w.kind==="reprise") hud.insertAdjacentHTML("beforeend",`<div class="cv-dg doux">Semaine de reprise : objectif ${G}, aucun cœur en jeu. On reprend en douceur.</div>`);
   else if(w.kind==="essai") hud.insertAdjacentHTML("beforeend",`<div class="cv-dg doux">Semaine d'essai : objectif ${G}, aucun cœur en jeu.</div>`);
   /* bandeaux doux : pause, coup de mou */
@@ -155,6 +156,10 @@ async function cvRetour(){
 const cvLundi = (n=0) => { const d=new Date(), j=(d.getDay()+6)%7, l=new Date(d.getFullYear(),d.getMonth(),d.getDate()-j+7*n); return l; };
 HMGC.pause = function(){
   const st=HMGC.etat;
+  if(st&&!st.pause&&st.pause_next){ const f=cqFeuille(`<h2>Pause prévue</h2><p>Ton héros se met en pause à partir du lundi ${frDate(st.pause_next.start_week)}${st.pause_next.until?`, jusqu'au ${frDate(st.pause_next.until)}`:""}. Tes cœurs seront gelés.</p>
+      <button class="cq-btn ghost" data-fin>Annuler cette pause</button><button class="cq-link" data-sh-x>Garder la pause</button>`);
+    f.el.querySelector("[data-fin]").onclick=async()=>{ try{ await HMGS.finPause(); toast("Pause annulée."); }catch(e){ toast("Impossible pour le moment. Réessaie dans un instant.",1); } f.fermer(); HMGC.rafraichir(); };
+    return; }
   if(st&&st.pause){ const f=cqFeuille(`<h2>Ton héros est en pause</h2><p>${st.pause.until?`Jusqu'au ${frDate(st.pause.until)}. `:""}Tes cœurs sont gelés, rien ne se perd. Une séance pendant la pause compte quand même.</p>
       <button class="cq-btn" data-fin>Reprendre lundi prochain</button><button class="cq-link" data-sh-x>Rester en pause</button>`);
     f.el.querySelector("[data-fin]").onclick=async()=>{ try{ await HMGS.finPause(); toast("C'est noté : ton héros reprend lundi."); }catch(e){ toast("Impossible pour le moment. Réessaie dans un instant.",1); } f.fermer(); HMGC.rafraichir(); };
