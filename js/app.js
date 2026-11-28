@@ -79,10 +79,36 @@ const fmt1 = x => x.toLocaleString("fr-FR",{minimumFractionDigits:1,maximumFract
 function toast(t,err){ const el=document.createElement("div"); el.id="toast"; el.className="glass"; el.style.color=err?"var(--danger)":""; el.textContent=t; document.querySelectorAll("#toast").forEach(x=>x.remove()); document.body.appendChild(el); setTimeout(()=>el.remove(),3200); }
 
 const byId = Object.fromEntries(CLUBS.map(c=>[c.id,c]));
-const isDom = c => c.d.startsWith("97");
-const fullAddr = c => [c.a, (c.cp+" "+c.c).trim()].filter(Boolean).join(", ");
+const GYM_BRANDS = [
+  ["fitness-park","Fitness Park"],
+  ["basic-fit","Basic-Fit"],
+  ["orange-bleue","L'Orange Bleue"],
+  ["keepcool","Keepcool"],
+  ["on-air","On Air"],
+  ["crossfit","CrossFit"],
+  ["autres","Autres salles"],
+  ["all","Toutes"]
+];
+const cpToDep = cp => { const s=String(cp||"").trim(); return s.startsWith("97")?s.slice(0,3):s.slice(0,2); };
+function gymBrand(c){
+  if(!c) return "autres";
+  if(c.b) return c.b;
+  if(!c.osm) return "fitness-park";
+  const t=((c.brand||"")+" "+(c.n||"")).toLowerCase();
+  if(/fitness\s*park/.test(t)) return "fitness-park";
+  if(/basic[\s-]*fit/.test(t)) return "basic-fit";
+  if(/orange\s*bleue/.test(t)) return "orange-bleue";
+  if(/keep\s*cool|keepcool/.test(t)) return "keepcool";
+  if(/\bon\s*air\b/.test(t)) return "on-air";
+  if(/crossfit/.test(t)) return "crossfit";
+  return "autres";
+}
+let activeBrand = (k => GYM_BRANDS.some(x=>x[0]===k)?k:"fitness-park")(store.get("hmg-brand","fitness-park"));
+const clubShown = c => activeBrand==="all" || gymBrand(c)===activeBrand || selected===c.id || mine(c.id) || visited(c.id);
+const isDom = c => (c.d||"").startsWith("97");
+const fullAddr = c => [c.a, ((c.cp||"")+" "+(c.c||"")).trim()].filter(Boolean).join(", ");
 const DEPNAME = Object.fromEntries(DEPS.map(d=>[d.c,d.n]));
-const depName = c => DEPNAME[c.d] || ({"971":"Guadeloupe","972":"Martinique","973":"Guyane","974":"La Réunion","976":"Mayotte"})[c.d] || c.d;
+const depName = c => DEPNAME[c.d] || ({"971":"Guadeloupe","972":"Martinique","973":"Guyane","974":"La Réunion","976":"Mayotte"})[c.d] || c.d || "";
 
 /* ================= DONNÉES (Supabase ou démo locale) ================ */
 let session = store.get("hmg-session", null);
@@ -151,6 +177,36 @@ async function loadAll(){
   PSEUDOS = (ps && typeof ps==="object") ? ps : {};
   if(PSEUDOS[myNo] && PSEUDOS[myNo]!==myPseudo){ myPseudo=PSEUDOS[myNo]; store.set("hmg-pseudo",myPseudo); }
 }
+let gymsLoaded = false;
+async function loadGyms(){
+  if(!LIVE || gymsLoaded) return;
+  const rows = [];
+  for(let off=0; off<10000; off+=1000){
+    const h = { apikey: CONFIG.key, Range: `${off}-${off+999}` };
+    if(session && session.access_token) h.Authorization = "Bearer " + session.access_token;
+    else if(CONFIG.key.startsWith("eyJ")) h.Authorization = "Bearer " + CONFIG.key;
+    const r = await fetch(CONFIG.url + "/rest/v1/gyms?select=id,name,brand,address,postcode,city,lat,lon,source,precise,active&active=eq.true&order=id", { headers: h });
+    if(!r.ok) return;
+    const page = await r.json();
+    if(!Array.isArray(page) || !page.length) break;
+    rows.push(...page);
+    if(page.length < 1000) break;
+  }
+  gymsLoaded = true;
+  for(const g of rows){
+    const cur = byId[g.id];
+    if(cur){
+      if(g.lat!=null && g.lon!=null && !db.geo[g.id] && g.precise) db.geo[g.id] = { lat: g.lat, lon: g.lon };
+      cur.b = gymBrand({ brand: g.brand, n: g.name, osm: g.source !== "fitnesspark" });
+      continue;
+    }
+    const cp = g.postcode || "";
+    const c = { id: g.id, n: g.name, brand: g.brand || "", b: gymBrand({ brand: g.brand, n: g.name, osm: true }), a: g.address || "", cp, c: g.city || "", d: cpToDep(cp), u: "", osm: true };
+    CLUBS.push(c); byId[c.id] = c;
+    if(g.lat!=null && g.lon!=null) db.geo[c.id] = { lat: g.lat, lon: g.lon };
+  }
+  renderBrandBar(); refreshMarkers(); updateHeader();
+}
 function migrateOldVisits(){ const old=store.get("fp-visited-v1",{}); const o={}; for(const k in old) if(byId[k]) o[k]={d:(old[k]&&old[k].d)||today(),n:(old[k]&&old[k].n)||""}; return o; }
 const photoUrl = p => p.dataUrl || (CONFIG.url + "/storage/v1/object/public/photos/" + p.path);
 const showProgress = () => isAdmin() || db.settings.show_progress===true;
@@ -197,7 +253,7 @@ let geoCache = store.get("fp-geo-v2", {});
 function pos(c){ const g=db.geo[c.id]||(geoCache[c.id]&&geoCache[c.id].lat&&geoCache[c.id]); if(g) return {lat:g.lat,lon:g.lon}; const p=PRE[c.id]; return p?{lat:p[0],lon:p[1],approx:1}:null; }
 async function ban(q,params){ const r=await fetch("https://api-adresse.data.gouv.fr/search/?q="+encodeURIComponent(q)+"&limit=1"+(params||"")); if(!r.ok) throw new Error(r.status); const j=await r.json(); return j.features&&j.features[0]; }
 async function geocodeMissing(){
-  const todo=CLUBS.filter(c=>c.a&&!isDom(c)&&!db.geo[c.id]&&!geoCache[c.id]);
+  const todo=CLUBS.filter(c=>!c.osm&&c.a&&!isDom(c)&&!db.geo[c.id]&&!geoCache[c.id]);
   let i=0, fails=0, done=0;
   async function w(){ while(i<todo.length&&fails<6){ const c=todo[i++]; try{
       let f=await ban(c.a+" "+c.cp+" "+c.c,"&postcode="+c.cp); if(!f) f=await ban(c.a+" "+c.c);
@@ -324,7 +380,33 @@ function drawMarker(c){
   m.on("click",()=>{ if(crowdZoom(m)) return; openClub(c.id); });
   clubLayer.addLayer(m); markers[c.id]=m;
 }
-function refreshMarkers(){ CLUBS.forEach(c=>drawMarker(c)); }
+function refreshMarkers(){
+  for(const c of CLUBS){
+    if(clubShown(c)) drawMarker(c);
+    else if(markers[c.id]){ clubLayer.removeLayer(markers[c.id]); delete markers[c.id]; }
+  }
+  pinRenderer._redrawBounds=null; pinRenderer._redraw();
+}
+function renderBrandBar(){
+  const bar=$("brandBar"); if(!bar) return;
+  const counts={};
+  for(const c of CLUBS){ const b=gymBrand(c); counts[b]=(counts[b]||0)+1; }
+  const visible=GYM_BRANDS.filter(([k])=>k==="all"||k==="fitness-park"||(counts[k]||0)>0);
+  bar.hidden=visible.length<=2;
+  bar.innerHTML=visible.map(([k,label])=>{
+    const n=k==="all"?CLUBS.length:(counts[k]||0);
+    return `<button type="button" data-brand="${k}" aria-pressed="${k===activeBrand}">${esc(label)}${n?` <em>${n}</em>`:""}</button>`;
+  }).join("");
+}
+function setBrand(k,silent){
+  if(!GYM_BRANDS.some(x=>x[0]===k)) k="fitness-park";
+  if(activeBrand===k){ renderBrandBar(); return; }
+  activeBrand=k; store.set("hmg-brand",k);
+  renderBrandBar(); refreshMarkers();
+  if(sheetMode==="list") renderList();
+  if(!silent && window.cqVib) try{ cqVib("choix"); }catch(e){}
+}
+$("brandBar").addEventListener("click",e=>{ const b=e.target.closest("[data-brand]"); if(b) setBrand(b.dataset.brand); });
 map.on("zoomend",()=>{ const f=map.getZoom()<7.5, t=map.getZoom()>=9; if(f!==FARZ||t!==TAGZ){ FARZ=f; TAGZ=t; for(const id in markers) markers[id].redraw(); } });
 function drawStart(){
   if(startMarker){ map.removeLayer(startMarker); startMarker=null; }
@@ -363,7 +445,9 @@ function gmKeep(){ $("sheet").classList.toggle("gm-keep",sheetMode==="rank"||she
 function closeSheet(){ $("sheet").hidden=true; sheetMode=null; const prev=selected; selected=null; if(prev&&byId[prev]) drawMarker(byId[prev]); }
 function openClub(id,fly){
   const prev=selected; selected=id; if(prev&&byId[prev]) drawMarker(byId[prev]);
-  const c=byId[id]; drawMarker(c);
+  const c=byId[id];
+  if(c&&activeBrand!=="all"&&gymBrand(c)!==activeBrand) setBrand(gymBrand(c),true);
+  else if(c) drawMarker(c);
   if(fly){ const p=pos(c); if(p&&!isDom(c)) map.flyTo(isMobile()?[p.lat-0.012*Math.pow(2,13-Math.max(map.getZoom(),12)),p.lon]:[p.lat,p.lon],Math.max(map.getZoom(),12.5),{duration:1.2}); }
   sheetMode="club",gmKeep(); draftRating=0; renderClub();
 }
@@ -374,12 +458,12 @@ function renderClub(){
   const st=stats(c.id), p=pos(c), v=db.visits[c.id], adm=isAdmin();
   const photos=db.photos.filter(x=>x.club_id===c.id&&(x.approved||adm));
   const maxd=Math.max(1,...st.dist);
-  const gmaps="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent("Fitness Park "+fullAddr(c));
+  const gmaps="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent([c.n,fullAddr(c)].filter(Boolean).join(" "));
   const sh=$("sheet"); sh.hidden=false; sh.classList.remove("big");
   sh.innerHTML=`
   <div class="sh-head"><h2>${esc(c.n)}</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
   <div class="sh-body">
-    <p class="addr">${esc(fullAddr(c))||"Adresse pas encore publiée"} · ${esc(depName(c))}</p>
+    <p class="addr">${esc(fullAddr(c))||"Adresse pas encore publiée"}${depName(c)?" · "+esc(depName(c)):""}</p>
     <div class="chips">
       ${c.s?`<span class="chip soon">${esc(c.note||"Ouverture prochaine")}</span>`:`<span class="chip">Ouverte</span>`}
       ${visited(c.id)?`<span class="chip done">Visitée par ${esc(CONFIG.owner)} · ${frDate(v.d)}</span>`:""}
@@ -398,7 +482,7 @@ function renderClub(){
       ${score.today?"":`<span class="pb-go">J'y suis</span>`}</button>`:""}
     <div class="acts">
       <a class="btn pri" href="${gmaps}" target="_blank" rel="noopener">${ic("nav")} Itinéraire</a>
-      <a class="btn" href="${esc(c.u)}" target="_blank" rel="noopener">${ic("ext")} Site officiel</a>
+      ${c.u?`<a class="btn" href="${esc(c.u)}" target="_blank" rel="noopener">${ic("ext")} Site officiel</a>`:""}
     </div>
     ${mineOn()?mineHtml(c):""}
     <div class="tabs" role="tablist">
@@ -533,21 +617,24 @@ function openList(){ sheetMode="list",gmKeep(); renderList(); }
 function renderList(){
   const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const q=fold(listQ.trim());
-  let rows=CLUBS.filter(c=>!q||fold(c.n+" "+c.a+" "+c.cp+" "+c.c+" "+c.d+" "+depName(c)).includes(q));
+  let rows=CLUBS.filter(c=>q?fold((c.n||"")+" "+(c.brand||"")+" "+(c.a||"")+" "+(c.cp||"")+" "+(c.c||"")+" "+(c.d||"")+" "+depName(c)).includes(q):clubShown(c));
   const groups=[];
   if(listSort==="note"){ rows.sort((a,b)=>(avgOf(b.id)??-1)-(avgOf(a.id)??-1)||(STATS[b.id]?.n||0)-(STATS[a.id]?.n||0)||a.n.localeCompare(b.n,"fr")); groups.push(["Les mieux notées",rows]); }
-  else if(listSort==="dep"){ const m={}; rows.forEach(c=>(m[c.d]=m[c.d]||[]).push(c)); Object.keys(m).sort().forEach(k=>groups.push([k+" · "+depName(m[k][0]),m[k].sort((a,b)=>a.n.localeCompare(b.n,"fr"))])); }
+  else if(listSort==="dep"){ const m={}; rows.forEach(c=>(m[c.d||"00"]=m[c.d||"00"]||[]).push(c)); Object.keys(m).sort().forEach(k=>groups.push([k+" · "+depName(m[k][0]),m[k].sort((a,b)=>a.n.localeCompare(b.n,"fr"))])); }
   else if(listSort==="mine"&&mineOn()){ const l=rows.filter(c=>myVisits[c.id]).sort((a,b)=>myVisits[b.id].localeCompare(myVisits[a.id])||a.n.localeCompare(b.n,"fr")); if(l.length) groups.push(["Visitées par moi · "+l.length+" / "+CLUBS.length,l]); }
   else if(listSort==="near"&&me){ rows.sort((a,b)=>dkm(a)-dkm(b)); groups.push(["Autour de toi",rows]); }
   else groups.push(["De A à Z",rows.sort((a,b)=>a.n.localeCompare(b.n,"fr"))]);
-  const html=groups.map(([t,l])=>l.length?`<div class="grp">${esc(t)}</div>`+l.map(c=>{ const a=avgOf(c.id), v=visited(c.id), m=mine(c.id);
+  let shown=0, total=rows.length;
+  const html=groups.map(([t,l])=>{ if(!l.length||shown>=120) return ""; const cut=l.slice(0,120-shown); shown+=cut.length;
+    return `<div class="grp">${esc(t)}</div>`+cut.map(c=>{ const a=avgOf(c.id), v=visited(c.id), m=mine(c.id);
     return `<div class="item${selected===c.id?" sel":""}" data-open="${c.id}"><span class="dot ${m?"mine":v?"done":c.s?"soon":"todo"}"></span><b>${esc(c.n)}</b>
       <span>${esc(c.c||"")} ${esc(c.cp||"")}${listSort==="near"&&me?" · "+Math.round(dkm(c))+" km":""}${listSort==="mine"&&m?" · "+frDate(myVisits[c.id]):""}</span>
-      <em>${a!=null?fmt1(a):"–"}<small>${STATS[c.id]?STATS[c.id].n+" avis":"/ 10"}</small></em></div>`}).join(""):"").join("");
-  sh.innerHTML=`<div class="sh-head"><h2>Toutes les salles</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
+      <em>${a!=null?fmt1(a):"–"}<small>${STATS[c.id]?STATS[c.id].n+" avis":"/ 10"}</small></em></div>`}).join(""); }).join("");
+  const brandTitle = !q && activeBrand!=="all" ? (GYM_BRANDS.find(x=>x[0]===activeBrand)||[,"Salles"])[1] : "Toutes les salles";
+  sh.innerHTML=`<div class="sh-head"><h2>${esc(brandTitle)} (${total.toLocaleString("fr-FR")})</h2><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
    <div class="sh-body"><div class="lst-tools"><input id="lq" type="search" placeholder="Filtrer…" value="${esc(listQ)}" aria-label="Filtrer la liste">
      <select id="ls" aria-label="Trier">${[["note","Mieux notées"],["az","A → Z"],["dep","Département"],...(me?[["near","Autour de moi"]]:[]),...(mineOn()?[["mine","Visitées par moi"]]:[])].map(([k,t])=>`<option value="${k}"${k===listSort?" selected":""}>${t}</option>`).join("")}</select></div>
-     <div id="lrows">${html||(listSort==="mine"&&mineOn()&&!q?'<div class="empty">Tu n\'as encore ajouté aucune salle. Ouvre une salle et clique sur « J\'y suis déjà allé ».</div>':'<div class="empty">Aucune salle ne correspond.</div>')}</div></div>`;
+     <div id="lrows">${html||(listSort==="mine"&&mineOn()&&!q?'<div class="empty">Tu n\'as encore ajouté aucune salle. Ouvre une salle et clique sur « J\'y suis déjà allé ».</div>':'<div class="empty">Aucune salle ne correspond.</div>')}${total>shown?`<p class="empty">Affichage limité aux ${shown} premières sur ${total.toLocaleString("fr-FR")} — affine avec la recherche.</p>`:""}</div></div>`;
   const lq=$("lq"); lq.addEventListener("input",()=>{ listQ=lq.value; const p=lq.selectionStart; renderList(); const n=$("lq"); n.focus(); n.setSelectionRange(p,p); });
   $("ls").addEventListener("change",e=>{ listSort=e.target.value; renderList(); });
 }
@@ -557,7 +644,7 @@ let suggIdx=-1, suggRows=[];
 function updateSugg(){
   const q=fold($("search").value.trim()); const box=$("sugg");
   if(q.length<2){ box.hidden=true; return; }
-  suggRows=CLUBS.map(c=>{ const h=fold(c.n+" "+c.c+" "+c.cp+" "+c.d+" "+depName(c)); const i=h.indexOf(q); return i<0?null:[i===0?0:fold(c.n).includes(q)?1:2,c]; }).filter(Boolean).sort((a,b)=>a[0]-b[0]||a[1].n.localeCompare(b[1].n,"fr")).slice(0,8).map(x=>x[1]);
+  suggRows=CLUBS.map(c=>{ const h=fold((c.n||"")+" "+(c.brand||"")+" "+(c.c||"")+" "+(c.cp||"")+" "+(c.d||"")+" "+depName(c)); const i=h.indexOf(q); return i<0?null:[i===0?0:fold(c.n||"").includes(q)?1:2,c]; }).filter(Boolean).sort((a,b)=>a[0]-b[0]||a[1].n.localeCompare(b[1].n,"fr")).slice(0,8).map(x=>x[1]);
   suggIdx=-1;
   box.innerHTML=suggRows.length?suggRows.map((c,i)=>{ const a=avgOf(c.id); return `<div class="sg" role="option" data-open="${c.id}"><b>${esc(c.n)}</b><span>${esc(fullAddr(c))}</span><em>${a!=null?fmt1(a)+"/10":""}</em></div>`; }).join(""):`<div class="empty">Aucune salle trouvée</div>`;
   box.hidden=false;
@@ -1992,9 +2079,11 @@ $("modeSw").addEventListener("click",e=>{ const b=e.target.closest("[data-mode]"
   if(session&&LIVE){ if(!(await refresh())) session=null; }
   try{ await loadAll(); }catch(e){ toast("Avis indisponibles pour le moment.",1); }
   computeStats(); applyAdminUi();
-  const order=CLUBS.filter(c=>!isDom(c)).map(c=>({c,p:pos(c)})).filter(x=>x.p).sort((a,b)=>b.p.lat-a.p.lat);
+  const order=CLUBS.filter(c=>clubShown(c)&&!isDom(c)).map(c=>({c,p:pos(c)})).filter(x=>x.p).sort((a,b)=>b.p.lat-a.p.lat);
   order.forEach(x=>drawMarker(x.c)); pinWave();
+  renderBrandBar();
   updateHeader();
+  loadGyms().catch(()=>{});
   if(/^#compte=/.test(location.hash)) acctFromHash();
   if(store.get("hmg-acct-welcome",false)){ store.set("hmg-acct-welcome",false); setTimeout(()=>toast("Compte retrouvé : bon retour parmi nous !"),1200); }
   clearTimeout(introSafety); welcome(); refreshScore();

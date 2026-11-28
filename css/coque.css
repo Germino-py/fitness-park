@@ -13,8 +13,8 @@
 /* ---------- ce que la coque retire du site */
 body.coque #top .brand, body.coque #modeSw, body.coque #stats, body.coque #meChip, body.coque #meDrop,
 body.coque #legend, body.coque #bRank, body.coque #legal, body.coque #appInv{display:none!important}
-body.coque #top{top:calc(10px + var(--sat))}
-body.coque #searchBox{max-width:none}
+body.coque #top{top:calc(10px + var(--sat));flex-wrap:wrap;gap:8px}
+body.coque #searchBox{max-width:none;flex-basis:100%}
 body.coque.t-aventure #top, body.coque.t-classement #top, body.coque.t-moi #top{display:none}
 body.coque.t-classement #fab, body.coque.t-moi #fab, body.coque.t-aventure #fab{display:none}
 
