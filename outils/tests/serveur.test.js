@@ -320,12 +320,29 @@ test("exporter : my_export plus ce que l'appareil garde, sans la clé hmg-voter"
 });
 
 test("admin : seulement avec la session admin de js/app.js", async () => {
-  const sb = fauxSupabase({ routes: { admin_reports: () => sb.rep(200, []) } });
+  const sb = fauxSupabase({ routes: {
+    admin_reports: () => sb.rep(200, []),
+    admin_report_decide: () => sb.rep(200, { ok: true }),
+    admin_ban: () => sb.rep(200, { ok: true, banned: true }),
+    admin_suspects: () => sb.rep(200, []),
+    admin_reject_session: () => sb.rep(200, { ok: true }),
+  } });
   const o = onglet({ sb });
   await assert.rejects(o.H.admin("admin_reports", { p_status: "ouvert" }), e => e.hint === "admin");
+  await assert.rejects(o.H.adminRapports("ouvert"), e => e.hint === "admin");
   const o2 = onglet({ sb, global: { session: { access_token: "jeton-admin", refresh_token: "r", admin: true } } });
   egal(await o2.H.admin("admin_reports", { p_status: "ouvert" }), []);
   assert.equal(sb.appels.at(-1).jeton, "jeton-admin");
+  egal(await o2.H.adminRapports("traite"), []);
+  egal(sb.appels.at(-1).corps, { p_status: "traite" });
+  egal(await o2.H.adminDecider(12, "retirer"), { ok: true });
+  egal(sb.appels.at(-1).corps, { p_id: 12, p_decision: "retirer" });
+  egal(await o2.H.adminBannir(48213, { ban: true, raison: "spam", jours: 7 }), { ok: true, banned: true });
+  egal(sb.appels.at(-1).corps, { p_no: 48213, p_ban: true, p_reason: "spam", p_days: 7 });
+  egal(await o2.H.adminSuspects(14), []);
+  egal(sb.appels.at(-1).corps, { p_days: 14 });
+  egal(await o2.H.adminRejeterSeance(99), { ok: true });
+  egal(sb.appels.at(-1).corps, { p_id: 99 });
 });
 
 test("mode démo : le jeu simulé par HMGV, sans aucun appel réseau", async () => {

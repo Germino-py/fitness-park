@@ -555,6 +555,19 @@
     pret, statut, etat, etatCache,
     rpc: (nom, args) => appel(nom, args),
     admin: (nom, args) => appel(nom, args, { admin: true }),
+    adminRapports: statut => appel("admin_reports", { p_status: statut || "ouvert" }, { admin: true }),
+    adminDecider: (id, decision) => appel("admin_report_decide", { p_id: +id, p_decision: String(decision || "") }, { admin: true }),
+    adminBannir: (no, o) => {
+      o = o || {};
+      return appel("admin_ban", {
+        p_no: +no,
+        p_ban: o.ban !== false,
+        p_reason: o.raison == null ? null : String(o.raison),
+        p_days: o.jours == null ? null : +o.jours,
+      }, { admin: true });
+    },
+    adminSuspects: jours => appel("admin_suspects", { p_days: jours == null ? 30 : +jours }, { admin: true }),
+    adminRejeterSeance: id => appel("admin_reject_session", { p_id: +id }, { admin: true }),
     // jeu
     objectif: async (v, o) => { if (o && o.inscription) await avantEcriture(); return action("set_goal", { p_goal: v }); },
     pause: n => action("pause_start", { p_kind: "pause", p_weeks: n }),

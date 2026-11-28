@@ -435,7 +435,7 @@ function updateHeader(){
   $("lgMine").hidden=!mo; $("mineBox").hidden=!mo;
   if(mo){ $("mineTxt").textContent=`Moi : ${nMine} / ${CLUBS.length} salles visitées`; requestAnimationFrame(()=>$("mineBar").style.width=(100*nMine/CLUBS.length)+"%"); }
   $("demo").hidden=LIVE;
-  const pend=db.photos.filter(p=>!p.approved).length+db.reviews.filter(r=>r.hidden).length; $("aPend").hidden=!pend; $("aPend").textContent=pend;
+  const pend=modPendCount(); $("aPend").hidden=!pend; $("aPend").textContent=pend;
 }
 
 /* ================= FICHE D'UNE SALLE ================ */
@@ -694,10 +694,10 @@ function loginModal(){
   });
 }
 function applyAdminUi(){ $("adminBar").hidden=!isAdmin(); $("aShowProg").checked=db.settings.show_progress===true; drawStart(); $("bAdmin").textContent=isAdmin()?"Admin connecté":"Admin"; applyFeatures(); }
-async function reloadEverything(){ try{ await loadAll(); }catch(e){ toast("Impossible de charger les avis : "+e.message,1); } computeStats(); refreshMarkers(); updateHeader(); applyAdminUi(); if(sheetMode==="club") renderClub(); else if(sheetMode==="list") renderList(); else if(sheetMode==="mod") renderMod(); else if(sheetMode==="visits") renderVisits(); else if(sheetMode==="rank") renderRank(); else if(sheetMode==="feat") renderFeat(); refreshScore(); }
+async function reloadEverything(){ try{ await loadAll(); }catch(e){ toast("Impossible de charger les avis : "+e.message,1); } computeStats(); refreshMarkers(); updateHeader(); applyAdminUi(); if(isAdmin()&&LIVE) modLoad(true); if(sheetMode==="club") renderClub(); else if(sheetMode==="list") renderList(); else if(sheetMode==="mod") renderMod(); else if(sheetMode==="visits") renderVisits(); else if(sheetMode==="rank") renderRank(); else if(sheetMode==="feat") renderFeat(); refreshScore(); }
 $("bAdmin").addEventListener("click",()=>isAdmin()?null:loginModal());
 if(EMBARQUE) $("bAdmin").hidden=true; /* [natif] */
-$("aOut").addEventListener("click",async()=>{ session=null; store.set("hmg-session",null); if(routeLine){map.removeLayer(routeLine);routeLine=null;} await reloadEverything(); toast("Déconnecté."); });
+$("aOut").addEventListener("click",async()=>{ session=null; store.set("hmg-session",null); modState={tab:"reports",status:"ouvert",open:null,list:null,suspects:null,err:null,loading:false}; if(routeLine){map.removeLayer(routeLine);routeLine=null;} await reloadEverything(); toast("Déconnecté."); });
 $("aShowProg").addEventListener("change",async e=>{
   const on=e.target.checked; try{ if(LIVE) await api("/rest/v1/settings?key=eq.show_progress",{method:"PATCH",body:{value:on},prefer:"return=minimal"}); db.settings.show_progress=on; if(!LIVE) demo.set("settings",db.settings); updateHeader(); toast(on?"Ta progression est maintenant visible par tous.":"Ta progression est masquée au public."); }
   catch(err){ e.target.checked=!on; toast(err.message,1); } });
@@ -733,7 +733,7 @@ function renderFeat(){
   if(!isAdmin()) return;
   const sh=$("sheet"), was=sheetMode==="feat"&&!sh.hidden, body0=sh.querySelector(".sh-body"), sc=was&&body0?body0.scrollTop:0;
   sheetMode="feat",gmKeep(); sh.hidden=false; sh.classList.add("big"); const sy=$("meSay"); if(sy) sy.remove();
-  const pend=db.photos.filter(p=>!p.approved).length+db.reviews.filter(r=>r.hidden).length, revs=db.reviews.filter(r=>!r.hidden).length;
+  const pend=modPendCount(), revs=db.reviews.filter(r=>!r.hidden).length;
   const list=FEATURES.filter(f=>CC_F[f.k]), onN=list.filter(f=>featOn(f.k)).length, ang=ANGEL_STYLES.find(a=>a.k===angelStyle())||ANGEL_STYLES[0];
   const st=(v,l,cls,act)=>`<${act?`button type="button" data-cc="${act}"`:"div"} class="cc-st${cls?" "+cls:""}"><b>${v==null?"–":v}</b><span>${l}</span></${act?"button":"div"}>`;
   sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("sliders")}</div><div class="cc-t"><small>HMG · Espace admin</small><h2>Centre de contrôle</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
@@ -1391,18 +1391,133 @@ document.addEventListener("change",async e=>{
     updateHeader(); applyFeatures(); refreshMarkers(); if(sheetMode==="feat") renderFeat(); }
   catch(err){ e.target.checked=!on; toast(err.message,1); }
 });
-function renderMod(){
+const MOD_REASONS = { spam:"Spam", insulte:"Insulte", harcelement:"Harcèlement", haine:"Haine", sexuel:"Sexuel", violence:"Violence", danger:"Danger", faux:"Faux", perso:"Données perso", autre:"Autre" };
+const MOD_KINDS = { review:"Avis", photo:"Photo", member:"Membre" };
+let modState = { tab:"reports", status:"ouvert", open:null, list:null, suspects:null, err:null, loading:false };
+function modPendCount(){
+  const open=modState.open||[], ids=new Set(open.map(x=>x.target));
+  return db.photos.filter(p=>!p.approved&&!ids.has(p.id)).length+db.reviews.filter(r=>r.hidden&&!ids.has(r.id)).length+open.length;
+}
+function modAge(iso){
+  if(!iso) return ""; const h=Math.max(0,Math.floor((Date.now()-new Date(iso).getTime())/36e5));
+  return h<1?"moins d'1 h":h<24?h+" h":Math.floor(h/24)+" j";
+}
+async function modLoad(force){
+  if(!LIVE||!isAdmin()||!window.HMGS) return;
+  if(modState.loading&&!force) return;
+  modState.loading=true; modState.err=null;
+  try{
+    if(modState.tab==="suspects"){
+      modState.suspects=await HMGS.adminSuspects(30);
+    }else{
+      const rows=await HMGS.adminRapports(modState.status);
+      modState.list=rows||[];
+      if(modState.status==="ouvert") modState.open=modState.list;
+      else if(modState.open===null) modState.open=(await HMGS.adminRapports("ouvert"))||[];
+    }
+  }catch(e){ modState.err=e.message||"Chargement impossible."; }
+  modState.loading=false;
+  const pend=modPendCount(); $("aPend").hidden=!pend; $("aPend").textContent=pend;
+  if(sheetMode==="feat") renderFeat(); else if(sheetMode==="mod") renderMod(false);
+}
+function modSnapHtml(r){
+  const sn=r.snapshot||{};
+  if(r.kind==="review"){
+    const cn=byId[sn.club]?.n||sn.club||"Salle inconnue";
+    return `<div class="mod-snap"><b data-open="${esc(sn.club||"")}" style="cursor:pointer">${esc(cn)}</b> · <b>${esc(String(sn.rating??"–"))}/10</b><br>${sn.comment?esc(sn.comment):"<i>sans commentaire</i>"}</div>`;
+  }
+  if(r.kind==="photo"){
+    const cn=byId[sn.club]?.n||sn.club||"Salle inconnue";
+    const ok=/^(pending|admin)\/[a-z0-9-]{1,80}\/[0-9a-f-]{36}\.jpg$/.test(sn.path||"");
+    return `<div class="mod-snap"><b data-open="${esc(sn.club||"")}" style="cursor:pointer">${esc(cn)}</b>${ok?`<img src="${esc(CONFIG.url+"/storage/v1/object/public/photos/"+sn.path)}" alt="Photo signalée" data-mod-zoom>`:""}</div>`;
+  }
+  return `<div class="mod-snap">Membre <b>#${esc(String(sn.no||r.target))}</b>${sn.pseudo?` · <b>${esc(sn.pseudo)}</b>`:""}</div>`;
+}
+function modReportsHtml(){
+  const list=modState.list, openN=(modState.open||[]).length, old=modState.status==="ouvert"&&list&&list.length?modAge(list[0].first_at):"";
+  const stBtn=(k,l)=>`<button type="button" class="${modState.status===k?"on":""}" data-mod-status="${k}">${l}</button>`;
+  const body = modState.err ? `<div class="msg err">${esc(modState.err)}</div>`
+    : modState.loading && !list ? `<div class="empty">Chargement des signalements…</div>`
+    : !list || !list.length ? `<div class="empty">${modState.status==="ouvert"?"Aucun signalement ouvert 🎉":"Aucun signalement dans cette vue."}</div>`
+    : list.map(r=>{
+        const rs=(r.reasons||[]).map(k=>MOD_REASONS[k]||k).join(", ");
+        const notes=(r.list||[]).filter(x=>x.note).map(x=>`<div><b>${esc(MOD_REASONS[x.reason]||x.reason)} :</b> ${esc(x.note)}</div>`).join("");
+        const canBan=!!(r.author_no||r.kind==="member"||r.kind==="review");
+        return `<article class="mod-card" data-rep-id="${r.id}">
+          <div class="mod-head">
+            <span class="mod-tag">${esc(MOD_KINDS[r.kind]||r.kind)} · ×${r.n}</span>
+            ${rs?`<span class="mod-tag">${esc(rs)}</span>`:""}
+            ${r.hidden?`<span class="mod-tag warn">Masqué auto</span>`:""}
+            ${r.author_banned?`<span class="mod-tag bad">Auteur banni</span>`:""}
+            ${r.author_no?`<span>#${esc(String(r.author_no))}</span>`:""}
+            <span>${esc(frDateTime(r.first_at))}</span>
+          </div>
+          ${modSnapHtml(r)}
+          ${notes?`<div class="mod-notes">${notes}</div>`:""}
+          ${modState.status==="ouvert"?`<div class="mod-acts">
+            <button type="button" class="mini cy" data-rep-dec="garder" data-id="${r.id}">Garder</button>
+            <button type="button" class="mini danger" data-rep-dec="retirer" data-id="${r.id}">Retirer</button>
+            ${canBan?`<button type="button" class="mini danger" data-rep-dec="bannir" data-id="${r.id}">Retirer + Bannir</button>`:""}
+          </div>`:""}
+        </article>`;
+      }).join("");
+  return `<div class="mod-bar">
+    <div class="mod-pills">${stBtn("ouvert",`Ouverts (${openN})`)}${stBtn("traite","Traités")}${stBtn("rejete","Rejetés")}</div>
+    <div style="display:flex;align-items:center;gap:8px">${old?`<span class="mod-sla">Plus ancien : ${esc(old)}</span>`:""}<button type="button" class="mini" data-mod-reload>Actualiser</button></div>
+  </div>
+  ${body}
+  <div class="mod-ban">
+    <h3>Bannir ou gracier un membre</h3>
+    <div class="mod-ban-row">
+      <input type="number" id="modBanNo" min="10000" max="999999" placeholder="N° (ex. 48213)" aria-label="Numéro du membre">
+      <select id="modBanDays" aria-label="Durée"><option value="">Définitif</option><option value="7">7 jours</option><option value="30">30 jours</option></select>
+    </div>
+    <input type="text" id="modBanReason" maxlength="200" placeholder="Motif (facultatif)" aria-label="Motif du bannissement">
+    <div class="mod-acts"><button type="button" class="mini danger" id="modBanGo">Bannir ce membre</button><button type="button" class="mini" id="modUnbanGo">Gracier</button></div>
+  </div>`;
+}
+function modSuspectsHtml(){
+  const list=modState.suspects;
+  const body = modState.err ? `<div class="msg err">${esc(modState.err)}</div>`
+    : modState.loading && !list ? `<div class="empty">Analyse des séances suspectes…</div>`
+    : !list || !list.length ? `<div class="empty">Aucune séance suspecte sur les 30 derniers jours.</div>`
+    : list.map(u=>`<article class="mod-card">
+        <div class="mod-head">
+          <span class="mod-tag warn">Score ${esc(String(u.score||0))}</span>
+          <b>${u.pseudo?esc(u.pseudo)+" · ":""}#${esc(String(u.no))}</b>
+          <span>${u.sessions} séance(s)</span>
+          ${(u.kinds||[]).map(k=>`<span class="mod-tag">${esc(k)}</span>`).join("")}
+        </div>
+        <div>${(u.list||[]).slice(0,10).map(s=>`<div class="mod-srow">
+          <div><b>${esc(byId[s.club]?.n||s.club)}</b><br><small style="color:var(--dim)">${esc(frDate(s.day))} · ${esc((s.flags||[]).join(", "))} · ${esc(s.status)}</small></div>
+          ${s.status==="rejetee"?`<span class="mod-tag">Rejetée</span>`:`<button type="button" class="mini danger" data-mod-reject="${s.id}">Rejeter</button>`}
+        </div>`).join("")}</div>
+        <div class="mod-acts"><button type="button" class="mini danger" data-mod-ban-no="${u.no}">Bannir #${esc(String(u.no))}</button></div>
+      </article>`).join("");
+  return `<div class="mod-bar"><span style="font-size:12px;color:var(--muted)">Derniers 30 jours (drapeaux GPS / vitesse)</span><button type="button" class="mini" data-mod-reload>Actualiser</button></div>${body}`;
+}
+function renderMod(fetchIfNeeded=true){
   sheetMode="mod",gmKeep(); const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
   const pend=db.photos.filter(p=>!p.approved), pendR=db.reviews.filter(r=>r.hidden), last=db.reviews.filter(r=>!r.hidden).slice(0,150);
+  const openN=(modState.open||[]).length, valN=pend.length+pendR.length;
   const revRow=r=>`<div class="rev${r.hidden?" hid":""}" style="opacity:1"><div class="n">${r.rating}</div><div class="t"><b data-open="${r.club_id}" style="cursor:pointer">${esc(byId[r.club_id]?.n||r.club_id)}</b> · ${r.comment?esc(r.comment):"<i>sans commentaire</i>"}</div><div class="d">${whoHtml(r)} · ${frDateTime(r.created_at)}${VOTES&&r.comment&&!r.hidden?` · <span style="color:var(--done)">${r.up||0} d'accord</span> · <span style="color:var(--danger)">${r.down||0} pas d'accord</span>`:""}</div><div class="adm"><button class="mini${r.hidden?" cy":""}" data-hide="${r.id}">${r.hidden?"Publier":"Masquer"}</button><button class="mini danger" data-delrev="${r.id}">Suppr.</button></div></div>`;
-  sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("shield")}</div><div class="cc-t"><small>HMG · Espace admin</small><h2>Modération</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div><div class="sh-body">
-   <div class="grp">Photos à valider (${pend.length})</div>
-   ${pend.length?`<div class="gal">${pend.map(p=>`<figure data-img="${p.id}"><img src="${esc(photoUrl(p))}" alt="" loading="lazy"><span class="tag p">${esc(byId[p.club_id]?.n||p.club_id)}</span><div class="adm"><button class="mini" data-approve="${p.id}">Valider</button><button class="mini danger" data-delph="${p.id}">Suppr.</button></div></figure>`).join("")}</div>`:`<div class="empty">Rien à valider.</div>`}
-   <div class="grp">Commentaires à valider (${pendR.length})</div>
-   ${pendR.map(revRow).join("")||'<div class="empty">Rien à valider.</div>'}
-   <div class="grp">Avis publiés (${db.reviews.length-pendR.length})</div>
-   ${last.map(revRow).join("")||'<div class="empty">Aucun avis.</div>'}
+  const valBody=`<div class="grp">Photos à valider (${pend.length})</div>
+    ${pend.length?`<div class="gal">${pend.map(p=>`<figure data-img="${p.id}"><img src="${esc(photoUrl(p))}" alt="" loading="lazy"><span class="tag p">${esc(byId[p.club_id]?.n||p.club_id)}</span><div class="adm"><button class="mini" data-approve="${p.id}">Valider</button><button class="mini danger" data-delph="${p.id}">Suppr.</button></div></figure>`).join("")}</div>`:`<div class="empty">Rien à valider.</div>`}
+    <div class="grp">Commentaires à valider (${pendR.length})</div>
+    ${pendR.map(revRow).join("")||'<div class="empty">Rien à valider.</div>'}
+    <div class="grp">Avis publiés (${db.reviews.length-pendR.length})</div>
+    ${last.map(revRow).join("")||'<div class="empty">Aucun avis.</div>'}`;
+  const tabBody = modState.tab==="reports" ? modReportsHtml() : modState.tab==="suspects" ? modSuspectsHtml() : valBody;
+  sh.innerHTML=`<div class="sh-head cc-head"><div class="cc-logo" aria-hidden="true">${ic("shield")}</div><div class="cc-t"><small>HMG · Espace admin</small><h2>Modération</h2></div><button class="x" data-close aria-label="Fermer">${ic("x")}</button></div>
+  <div class="sh-body">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-mod-tab="reports" aria-selected="${modState.tab==="reports"}">Signalements${openN?` (${openN})`:""}</button>
+      <button type="button" role="tab" data-mod-tab="queue" aria-selected="${modState.tab==="queue"}">À valider${valN?` (${valN})`:""}</button>
+      <button type="button" role="tab" data-mod-tab="suspects" aria-selected="${modState.tab==="suspects"}">Suspects</button>
+    </div>
+    ${tabBody}
   </div>`;
+  if(fetchIfNeeded&&LIVE&&isAdmin()&&((modState.tab==="reports"&&modState.list===null)||(modState.tab==="suspects"&&modState.suspects===null))) modLoad();
 }
 function renderVisits(){
   sheetMode="visits",gmKeep(); const sh=$("sheet"); sh.hidden=false; sh.classList.add("big");
@@ -1458,6 +1573,62 @@ document.addEventListener("click",async e=>{
   const dr=t.closest("[data-delrev]"); if(dr){ if(dr.dataset.sure!=="1"){ dr.dataset.sure="1"; dr.textContent="Sûr ?"; return; } const r=db.reviews.find(x=>x.id===dr.dataset.delrev); try{ if(LIVE) await api("/rest/v1/reviews?id=eq."+r.id,{method:"DELETE"}); db.reviews=db.reviews.filter(x=>x!==r); if(!LIVE) demo.set("reviews",db.reviews); afterMod(r.club_id);}catch(err){toast(err.message,1)} return; }
   const ap=t.closest("[data-approve]"); if(ap){ const p=db.photos.find(x=>x.id===ap.dataset.approve); try{ if(LIVE) await api("/rest/v1/photos?id=eq."+p.id,{method:"PATCH",body:{approved:true},prefer:"return=minimal"}); p.approved=true; afterMod(p.club_id);}catch(err){toast(err.message,1)} return; }
   const dp=t.closest("[data-delph]"); if(dp){ if(dp.dataset.sure!=="1"){ dp.dataset.sure="1"; dp.textContent="Sûr ?"; return; } const p=db.photos.find(x=>x.id===dp.dataset.delph); try{ if(LIVE){ await api("/rest/v1/photos?id=eq."+p.id,{method:"DELETE"}); await api("/storage/v1/object/photos/"+p.path,{method:"DELETE"}).catch(()=>{}); } db.photos=db.photos.filter(x=>x!==p); if(!LIVE) demo.set("photos",db.photos); afterMod(p.club_id);}catch(err){toast(err.message,1)} return; }
+  const mt=t.closest("[data-mod-tab]"); if(mt){ modState.tab=mt.dataset.modTab; modState.err=null; renderMod(); return; }
+  const ms=t.closest("[data-mod-status]"); if(ms){ modState.status=ms.dataset.modStatus; modState.list=null; modState.err=null; renderMod(false); modLoad(true); return; }
+  if(t.closest("[data-mod-reload]")){ modLoad(true); return; }
+  if(t.closest("[data-mod-zoom]")){ const m=document.createElement("div"); m.className="modal"; m.innerHTML=`<img src="${esc(t.closest("[data-mod-zoom]").src)}" alt="">`; m.addEventListener("click",()=>m.remove()); document.body.appendChild(m); return; }
+  const rdec=t.closest("[data-rep-dec]"); if(rdec){
+    const dec=rdec.dataset.repDec, id=+rdec.dataset.id;
+    if(dec!=="garder"&&rdec.dataset.sure!=="1"){ rdec.dataset.sure="1"; rdec.textContent=dec==="bannir"?"Bannir ?":"Sûr ?"; return; }
+    const rep=(modState.list||[]).find(x=>x.id===id); rdec.disabled=true;
+    try{
+      const res=await HMGS.adminDecider(id,dec);
+      if(res&&res.ok===false) throw new Error("Signalement introuvable.");
+      if(rep){
+        if(dec!=="garder"&&rep.kind==="photo"&&rep.snapshot&&rep.snapshot.path) await api("/storage/v1/object/photos/"+rep.snapshot.path,{method:"DELETE"}).catch(()=>{});
+        if(rep.kind==="review"){
+          if(dec==="garder"){ const rv=db.reviews.find(x=>x.id===rep.target); if(rv) rv.hidden=false; }
+          else db.reviews=db.reviews.filter(x=>x.id!==rep.target);
+        }else if(rep.kind==="photo"){
+          if(dec==="garder"){ const ph=db.photos.find(x=>x.id===rep.target); if(ph) ph.approved=true; }
+          else db.photos=db.photos.filter(x=>x.id!==rep.target);
+        }
+        modState.open=(modState.open||[]).filter(x=>x.id!==id);
+        modState.list=(modState.list||[]).filter(x=>x.id!==id);
+      }
+      computeStats(); refreshMarkers(); updateHeader(); renderMod(false); modLoad(true);
+      toast(dec==="garder"?"Contenu conservé.":dec==="bannir"?"Contenu retiré et auteur banni.":"Contenu retiré.");
+    }catch(err){ rdec.disabled=false; toast(err.message,1); }
+    return;
+  }
+  if(t.closest("#modBanGo")||t.closest("#modUnbanGo")){
+    const ban=!!t.closest("#modBanGo"), b=t.closest("button"), no=+($("modBanNo")&&$("modBanNo").value||0);
+    if(!(no>=10000)){ toast("Entre un numéro de membre valide.",1); return; }
+    if(ban&&b.dataset.sure!=="1"){ b.dataset.sure="1"; b.textContent="Confirmer ?"; return; }
+    const d=$("modBanDays")?.value, rs=($("modBanReason")?.value||"").trim()||null; b.disabled=true;
+    try{
+      const r=await HMGS.adminBannir(no,{ban,raison:ban?rs:null,jours:ban&&d?+d:null});
+      if(r&&r.why==="introuvable") throw new Error("Membre #"+no+" introuvable.");
+      toast(ban?"Membre #"+no+" banni.":"Membre #"+no+" gracié.");
+      modLoad(true);
+    }catch(err){ toast(err.message,1); }
+    b.disabled=false; b.dataset.sure=""; b.textContent=ban?"Bannir ce membre":"Gracier";
+    return;
+  }
+  const mrej=t.closest("[data-mod-reject]"); if(mrej){
+    if(mrej.dataset.sure!=="1"){ mrej.dataset.sure="1"; mrej.textContent="Sûr ?"; return; }
+    const id=+mrej.dataset.modReject; mrej.disabled=true;
+    try{ await HMGS.adminRejeterSeance(id); modLoad(true); toast("Séance rejetée."); }
+    catch(err){ mrej.disabled=false; toast(err.message,1); }
+    return;
+  }
+  const mban=t.closest("[data-mod-ban-no]"); if(mban){
+    if(mban.dataset.sure!=="1"){ mban.dataset.sure="1"; mban.textContent="Bannir ?"; return; }
+    const no=+mban.dataset.modBanNo; mban.disabled=true;
+    try{ await HMGS.adminBannir(no,{ban:true,raison:"Séances suspectes"}); toast("Membre #"+no+" banni."); modLoad(true); }
+    catch(err){ mban.disabled=false; toast(err.message,1); }
+    return;
+  }
   const im=t.closest("[data-img]"); if(im&&!t.closest("button")){ const p=db.photos.find(x=>x.id===im.dataset.img); if(!p) return; const m=document.createElement("div"); m.className="modal"; m.innerHTML=`<img src="${esc(photoUrl(p))}" alt="">`; m.addEventListener("click",()=>m.remove()); document.body.appendChild(m); return; }
   if(t.closest("#vAdd")){ saveVisit(selected,{d:today(),n:""}); return; }
   if(t.closest("#vSave")){ saveVisit(selected,{d:$("vDate").value||today(),n:$("vNote").value.trim()}); toast("Visite enregistrée."); return; }
@@ -2079,6 +2250,7 @@ $("modeSw").addEventListener("click",e=>{ const b=e.target.closest("[data-mode]"
   if(session&&LIVE){ if(!(await refresh())) session=null; }
   try{ await loadAll(); }catch(e){ toast("Avis indisponibles pour le moment.",1); }
   computeStats(); applyAdminUi();
+  if(isAdmin()&&LIVE) setTimeout(()=>modLoad(true),0);
   const order=CLUBS.filter(c=>clubShown(c)&&!isDom(c)).map(c=>({c,p:pos(c)})).filter(x=>x.p).sort((a,b)=>b.p.lat-a.p.lat);
   order.forEach(x=>drawMarker(x.c)); pinWave();
   renderBrandBar();

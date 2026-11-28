@@ -844,6 +844,27 @@ button.cc-st:hover{border-color:rgba(var(--a-rgb),.4)}
 .ps-acct{margin-top:2px}
 .acct-code span{display:inline-block;margin:0 5px;white-space:nowrap}
 
+/* modération admin (signalements, suspects, bannissement) */
+.mod-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.mod-pills{display:flex;gap:5px;flex-wrap:wrap}
+.mod-pills button{padding:5px 10px;font-size:11.5px;border-radius:999px;color:var(--muted)}
+.mod-pills button.on{color:var(--a-ink);background:linear-gradient(135deg,var(--a1),var(--a2));border-color:transparent;font-weight:700}
+.mod-sla{font-size:11.5px;color:var(--gold)}
+.mod-card{padding:12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--stroke);margin-bottom:10px;display:grid;gap:8px}
+.mod-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.mod-tag{font:700 10.5px/1 var(--f-b);padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--stroke);color:var(--ink)}
+.mod-tag.warn{color:var(--gold);border-color:rgba(255,209,102,.35)}
+.mod-tag.bad{color:var(--danger);border-color:rgba(255,93,115,.35)}
+.mod-snap{font-size:13px;line-height:1.45;word-break:break-word}
+.mod-snap img{display:block;width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-top:6px;cursor:zoom-in;border:1px solid var(--stroke)}
+.mod-notes{display:grid;gap:4px;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.22);font-size:12px;color:var(--muted)}
+.mod-acts{display:flex;gap:6px;flex-wrap:wrap}
+.mod-ban{display:grid;gap:8px;margin-top:14px;padding:12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--stroke)}
+.mod-ban h3{margin:0;font:700 12px var(--f-d);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mod-ban-row{display:flex;gap:6px;flex-wrap:wrap}
+.mod-ban-row input,.mod-ban-row select{flex:1;min-width:95px}
+.mod-srow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid var(--stroke);font-size:12px}
+
 /* les messages éphémères ne bloquent jamais un bouton en dessous */
 #toast{pointer-events:none}
 
