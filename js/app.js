@@ -82,11 +82,11 @@ const byId = Object.fromEntries(CLUBS.map(c=>[c.id,c]));
 const GYM_BRANDS = [
   ["fitness-park","Fitness Park"],
   ["basic-fit","Basic-Fit"],
+  ["on-air","On Air"],
   ["orange-bleue","L'Orange Bleue"],
   ["keepcool","Keepcool"],
-  ["on-air","On Air"],
   ["crossfit","CrossFit"],
-  ["autres","Autres salles"],
+  ["autres","Autres"],
   ["all","Toutes"]
 ];
 const cpToDep = cp => { const s=String(cp||"").trim(); return s.startsWith("97")?s.slice(0,3):s.slice(0,2); };

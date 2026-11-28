@@ -48,9 +48,9 @@ svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .brand h1 b{background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
 .brand small{display:block;font:500 11.5px var(--f-b);color:var(--muted);letter-spacing:.02em;margin-top:2px}
 #searchBox{position:relative;z-index:2;flex:1;max-width:420px}
-#brandBar{flex-basis:100%;display:flex;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:2px 0;-webkit-overflow-scrolling:touch}
+#brandBar{flex-basis:100%;display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:2px 24px 2px 0;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
 #brandBar::-webkit-scrollbar{display:none}
-#brandBar button{flex:none;padding:7px 12px;border-radius:999px;font:600 12.5px/1 var(--f-b);color:var(--muted);background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--stroke);gap:6px}
+#brandBar button{flex:none;padding:6px 10px;border-radius:999px;font:600 12px/1 var(--f-b);color:var(--muted);background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid var(--stroke);gap:5px}
 #brandBar button em{font-style:normal;font-size:11px;opacity:.75}
 #brandBar button[aria-pressed="true"]{background:linear-gradient(135deg,var(--a1),var(--a2));border-color:transparent;color:var(--a-ink);font-weight:700;box-shadow:0 4px 16px rgba(var(--a-rgb),.3)}
 #brandBar button[aria-pressed="true"] em{opacity:.8}
