@@ -2,7 +2,7 @@
   "id": "/",
   "name": "HMG Fitness",
   "short_name": "HMG",
-  "description": "La carte des Fitness Park : notes, avis, photos, séances et l'Aventure HMG.",
+  "description": "La carte des salles de sport de France : notes, avis, photos, séances et l'Aventure HMG.",
   "lang": "fr",
   "start_url": "/?source=appli",
   "scope": "/",
