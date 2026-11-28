@@ -352,3 +352,12 @@ test("mode démo : le jeu simulé par HMGV, sans aucun appel réseau", async () 
   await o.H.demo.couper();
   assert.equal(o.H.statut().mode, "serveur");
 });
+
+test("sauver : p_version null même quand version est undefined (pas de 404 PostgREST)", async () => {
+  const sb = fauxSupabase({ routes: { save_game: a => sb.rep(200, { ok: true, version: a.corps.p_version == null ? 1 : a.corps.p_version + 1 }) } });
+  const o = onglet({ sb });
+  await o.H.pret();
+  egal(await o.H.sauver("game", { eq: { hero: "homme" } }, undefined), { ok: true, version: 1 });
+  assert.equal("p_version" in sb.appels.at(-1).corps, true);
+  assert.equal(sb.appels.at(-1).corps.p_version, null);
+});

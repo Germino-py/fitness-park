@@ -1175,7 +1175,7 @@ begin
                  from chest_grants where voter = v));
 end $$;
 
-create or replace function public.save_game(p_slot text, p_data jsonb, p_version integer) returns json
+create or replace function public.save_game(p_slot text, p_data jsonb, p_version integer default null) returns json
   language plpgsql security definer set search_path = public as $$
 declare v text; cur public.game_saves; nb int; nv int;
 begin

@@ -573,7 +573,7 @@
     sallesProches: (lat, lon, n) => appel("gyms_near", { p_lat: num(lat), p_lon: num(lon), p_limit: n || 20 }),
     chercherSalles: (q, n) => appel("gyms_search", { p_q: String(q || ""), p_limit: n || 20 }),
     charger: () => appel("load_game"),
-    sauver: (emplacement, data, version) => appel("save_game", { p_slot: emplacement, p_data: data, p_version: version }),
+    sauver: (emplacement, data, version) => appel("save_game", { p_slot: emplacement, p_data: data, p_version: version == null ? null : version }),
     // compte
     compte: () => appel("account_status"),
     pseudo: p => sansRejet(avantEcriture().then(() => appel("set_pseudo_v2", { p_pseudo: p }))),
