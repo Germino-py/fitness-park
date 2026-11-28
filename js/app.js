@@ -350,11 +350,13 @@ function sprite(kind,colKey,sel,far){
 /* apparition au lancement : une onde part de Lognes (le départ de HMG) et allume les salles une à une */
 let PIN_T0=0, pinAnimRaf=0; const PIN_DUR=520, PIN_SPREAD=1300;
 const easeBack=t=>{ const c=1.9; t-=1; return 1+(c+1)*t*t*t+c*t*t; };
-function pinWave(){ PIN_T0=performance.now()+120; let maxD=0; const o=CONFIG.start;
+function pinWave(){
+  if(!pinRenderer._ctx || !Object.keys(markers).length){ PIN_T0=0; return; }
+  PIN_T0=performance.now()+120; let maxD=0; const o=CONFIG.start;
   for(const id in markers){ const m=markers[id], ll=m.getLatLng(); m._d=Math.hypot(ll.lat-o.lat,(ll.lng-o.lon)*.68); if(m._d>maxD) maxD=m._d; }
   for(const id in markers){ const m=markers[id]; m._delay=Math.pow(m._d/(maxD||1),.75)*PIN_SPREAD; }
   cancelAnimationFrame(pinAnimRaf); const end=PIN_T0+PIN_SPREAD+PIN_DUR+60;
-  (function f(){ pinRenderer._redrawBounds=null; pinRenderer._redraw(); if(performance.now()<end) pinAnimRaf=requestAnimationFrame(f); else PIN_T0=0; })(); }
+  (function f(){ if(!pinRenderer._ctx){ PIN_T0=0; return; } pinRenderer._redrawBounds=null; pinRenderer._redraw(); if(performance.now()<end) pinAnimRaf=requestAnimationFrame(f); else PIN_T0=0; })(); }
 let FARZ=map.getZoom()<7.5, TAGZ=map.getZoom()>=9; const TAGFONT="700 9.5px "+(CSSV("--f-d")||"sans-serif");
 const Pin=L.CircleMarker.extend({
   _updateBounds(){ const p=[30,34]; this._pxBounds=new L.Bounds(this._point.subtract(p),this._point.add(p)); },
@@ -385,7 +387,7 @@ function refreshMarkers(){
     if(clubShown(c)) drawMarker(c);
     else if(markers[c.id]){ clubLayer.removeLayer(markers[c.id]); delete markers[c.id]; }
   }
-  pinRenderer._redrawBounds=null; pinRenderer._redraw();
+  if(pinRenderer._ctx){ pinRenderer._redrawBounds=null; pinRenderer._redraw(); }
 }
 function renderBrandBar(){
   const bar=$("brandBar"); if(!bar) return;
